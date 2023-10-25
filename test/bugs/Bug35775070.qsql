@@ -1,0 +1,11 @@
+speakers
+  title                          vc(200) 
+speaker_role
+  name                           vc(255) 
+sessions
+  name
+session_speakers
+  session_id                     num  /fk sessions /nn
+  speaker_id                     num  /fk speakers /nn /lower
+  speaker_role_id                num  /fk speaker_role /nn
+  sort_sequence                  num 

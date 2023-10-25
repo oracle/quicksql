@@ -1,0 +1,7 @@
+dept  /unique name, email /insert 0
+    name
+    city 
+    state
+    emp /unique name, email
+        name
+        email 

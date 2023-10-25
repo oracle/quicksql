@@ -1,0 +1,41 @@
+providers
+    name vc60
+    rating number
+
+patients
+    first_name vc50
+    last_name vc50
+    email vc50
+    username vc20
+    date_of_birth date
+    phone vc30
+    address vc250
+    city vc50
+    state vc2
+    zip vc9
+    address_latitude num
+    address_longitude num
+    insurance_provider /fk providers
+    insurance_policy_number vc30
+    insurance_proof_scan blob
+    insurance_proof_latitude num
+    insurance_proof_longitude num
+    status vc30
+    insurance_score num
+    initial_procedure vc30
+    registration_date date
+
+patient_procedures
+  patient_id num  /fk patients
+  doctor vc30
+  medical_procedure vc30
+  procedure_date date 
+  status vc30
+  amount_due num 
+
+doctor_procedures
+    doctor vc30
+    medical_procedure vc30
+  
+# settings = { "prefix": "FRC", "ondelete": "RESTRICT", "semantics": "CHAR", 
+  "auditcols": true, "language": "EN", "APEX": true }

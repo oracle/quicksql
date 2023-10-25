@@ -1,0 +1,9 @@
+sales    /insert 2
+    quantity
+    > product   /insert 1
+         name
+    > customers  /insert 1
+         first name 
+
+       
+

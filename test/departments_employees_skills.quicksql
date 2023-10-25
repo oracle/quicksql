@@ -1,0 +1,16 @@
+departments /insert 2
+   name
+   location vc255
+   country vc255
+   employees /insert 4
+      name
+      email
+      job vc255
+      hiredate
+      skills /insert 6
+          skill vc255 /values C++, Java, APEX, JSON, Javascript, Python, CSS
+          proficiency num /check 1, 2, 3, 4, 5 [with 1 being a novice and 5 being a guru]
+          
+# "schema": null
+# "semantics": "char"     
+--# DV : no     

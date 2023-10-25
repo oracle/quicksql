@@ -1,0 +1,4 @@
+#semantics: byte
+foo /insert 10
+    name
+    status vc1 /check A,B,C /values A,B,C

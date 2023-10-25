@@ -1,0 +1,5 @@
+departments
+    dname
+    emp  /cascade
+        department_id /fk departments 
+        ename

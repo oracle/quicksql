@@ -1,0 +1,11 @@
+departments
+   name
+   location vc255
+   country vc255
+   employees
+      name
+      email
+      job vc255
+      hiredate
+
+# settings = { semantics: "CHAR", auditCols: true, language: "EN", APEX: true, DB:"12c" }

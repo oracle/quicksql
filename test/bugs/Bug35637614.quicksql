@@ -1,0 +1,5 @@
+customers /colprefix cust
+  name
+  email
+  phone1
+  phone2

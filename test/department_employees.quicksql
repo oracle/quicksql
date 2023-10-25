@@ -1,0 +1,14 @@
+departments /insert 2
+   name /nn
+   location
+   country
+   employees /insert 4
+      name /nn vc50
+      email /lower
+      cost center num
+      date hired
+      job vc255
+
+view emp_v departments employees
+
+# settings = { "prefix": null, "semantics": "CHAR", "DV": false }

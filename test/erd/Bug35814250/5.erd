@@ -1,0 +1,23 @@
+{
+    "items": [
+        {
+            "name": "foo",
+            "schema": null,
+            "columns": [
+                {
+                    "name": "id",
+                    "datatype": "number"
+                },
+                {
+                    "name": "name",
+                    "datatype": "varchar2(255 byte)"
+                },
+                {
+                    "name": "status",
+                    "datatype": "varchar2(1 byte)"
+                }
+            ]
+        }
+    ],
+    "links": []
+}

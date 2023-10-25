@@ -1,0 +1,22 @@
+employees /insert 50 /api
+    name /nn /unique
+    email /nn /lower /unique
+    country vc100 /nn /values US, Canada, Mexico
+    employee type vc30 /n /check full time, part time 
+    approver vc255 /nn /index /values tbd
+    timecards /api /auditcols /insert 200
+        status /check SUBMITTED, APPROVED, DECLINED /default SUBMITTED
+        week of date /nn
+        sunday int /default 0 /between 0 and 24
+        monday int /default 0 /between 0 and 24
+        tuesday int /default 0 /between 0 and 24
+        wednesday int /default 0 /between 0 and 24
+        thursday int /default 0 /between 0 and 24
+        friday int /default 0 /between 0 and 24
+        saturday int /default 0 /between 0 and 24
+        comments
+        confirmation code v50 /values null
+
+view employee_timecards employees timecards
+
+# settings = { semantics: "CHAR", API: true, rowVersion: true, drop: true, language: "EN", APEX: true, dv: false }

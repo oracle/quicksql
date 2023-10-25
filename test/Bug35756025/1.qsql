@@ -1,0 +1,6 @@
+-- TEST 1 (genpk off)
+bug35756025
+    deptno num
+    dname vc14
+    loc   vc13
+#genpk: N

@@ -1,0 +1,9 @@
+departments /rest
+   name
+   location vc255
+   country vc255
+   employees /rest
+      name
+      email
+      job vc255
+      hiredate

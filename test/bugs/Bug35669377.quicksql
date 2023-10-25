@@ -1,0 +1,13 @@
+products
+   name
+customers
+   first name
+channels
+   name
+promotions
+   name
+sales
+   product_id
+   customer_id
+   promotion id
+   channel id

@@ -1,0 +1,10 @@
+#apex: true, auditcols: true 
+assignees /insert 10
+  full_name /nn
+  email
+  phone_number
+  todos /insert 50 
+    name vc255 /nn 
+    due_date date
+    priority vc50 /check P1, P2, P3
+    status vc50 /check OPEN, COMPLETE, ON HOLD, CANCELLED

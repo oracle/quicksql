@@ -1,0 +1,11 @@
+-- tests generateSelectJsonTopDown()
+
+regions
+    region_name
+    countries
+        country_name
+        
+
+view country_dv regions countries
+
+# settings = { "prefixpkwithtname" : true, "DV": true }

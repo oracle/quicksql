@@ -1,0 +1,5 @@
+person
+    name vc40
+    date_of_birth date
+    mother /fk person
+    father /fk person

@@ -1,0 +1,12 @@
+departments /insert 2
+   name /nn
+   location
+   country
+   employees /insert 4
+      name /nn vc50
+      email /lower
+      cost center num
+      date hired
+      job vc255
+
+# settings = { semantics: "CHAR", language: "EN", prefixPKwithTname: true } 

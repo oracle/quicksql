@@ -1,0 +1,21 @@
+customers
+    name
+
+products
+    name
+    price num
+
+warehouses
+    name
+
+orders
+    order_date
+    customer_id /fk /cascade customers
+
+order_lines
+    quantity num
+    product_id /fk products /cascade
+
+line_fulfillments
+    warehouse_id /fk warehouses
+    line_id /cascade /fk order_lines

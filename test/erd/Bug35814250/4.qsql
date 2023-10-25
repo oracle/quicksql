@@ -1,0 +1,16 @@
+customers
+    name
+
+products
+    name
+
+orders
+    customer_id /fk customers
+    order_date date
+    order_notes
+    order_total num
+
+order_lines
+    order_id /fk orders /cascade
+    product_id /fk products
+    quantity num(8,2)

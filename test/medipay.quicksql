@@ -1,0 +1,77 @@
+coverage_plan
+  name                           vc30
+
+coverage_plan_option
+  name                           vc40
+  coverage_plan_id               number /fk coverage_plan
+  reimburse_percentage           number
+
+countries
+  iso_a2                         vc3 /pk
+  country_name                   vc255
+
+users
+  username                       vc320
+  home_latitude                  number
+  home_longitude                 number
+  country                        vc80 /fk countries
+  address                        vc80
+  city                           vc80
+  state                          vc80
+  postal_code                    vc80
+  payment_method                 vc6 /check BANK,DEBIT,PAYPAL
+  paypal_name                    vc200
+  debit_card_number              vc16
+  bank_account_number            vc40
+  bank_routing_number            vc40
+  photo                          blob
+  coverage_plan_id               number /fk coverage_plan
+  coverage_plan_option_id        number /fk coverage_plan  
+  push_subscription              vc4000
+
+user_sources
+  user_id                        number /nn /fk users
+  source_name                    vc100
+  latitude                       number
+  longitude                      number
+  country                        vc80 /fk countries
+  address                        vc80
+  city                           vc80
+  state                          vc80
+  postal_code                    vc80
+
+user_claims
+  receipt_from_id                number /nn /fk user_sources
+  receipt_date                   date  /nn
+  receipt_amount                 number  /nn
+  claimant                       number  /fk users
+  status                         vc80
+  payment_txn_id                 number
+  reimburse_percentage           number
+
+user_claim_docs
+  image                          blob
+  status                         vc80
+  claim                          number  /fk user_claims
+  latitude                       number
+  longitude                      number
+
+user_claim_notes
+  message                        vc4000
+  claim                          number  /fk user_claims
+
+user_notifications
+  username                       vc80
+  title                          vc80
+  body                           vc2000
+  delivered                      vc1
+
+lead_meetings
+  staff_contact                  vc80
+  lead_email                     vc80
+  proposed_meeting_start         date
+  proposed_meeting_end           date
+  notes                          vc4000
+  confirmed                      vc1 /default N
+
+# settings = { prefix: "MED", semantics: "CHAR", auditCols: true, rowVersion: true,  language: "EN", APEX: true }

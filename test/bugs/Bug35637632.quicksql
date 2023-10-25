@@ -1,0 +1,9 @@
+departments /audit
+   name
+   location vc255
+   country vc255
+   employees /audit
+      name
+      email
+      job vc255
+      hiredate

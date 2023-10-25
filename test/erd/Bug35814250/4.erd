@@ -1,0 +1,100 @@
+{
+    "items": [
+        {
+            "name": "customers",
+            "schema": null,
+            "columns": [
+                {
+                    "name": "id",
+                    "datatype": "number"
+                },
+                {
+                    "name": "name",
+                    "datatype": "varchar2(255 char)"
+                }
+            ]
+        },
+        {
+            "name": "products",
+            "schema": null,
+            "columns": [
+                {
+                    "name": "id",
+                    "datatype": "number"
+                },
+                {
+                    "name": "name",
+                    "datatype": "varchar2(255 char)"
+                }
+            ]
+        },
+        {
+            "name": "orders",
+            "schema": null,
+            "columns": [
+                {
+                    "name": "id",
+                    "datatype": "number"
+                },
+                {
+                    "name": "customer_id",
+                    "datatype": "number"
+                },
+                {
+                    "name": "order_date",
+                    "datatype": "date"
+                },
+                {
+                    "name": "order_notes",
+                    "datatype": "varchar2(4000 char)"
+                },
+                {
+                    "name": "order_total",
+                    "datatype": "number"
+                }
+            ]
+        },
+        {
+            "name": "order_lines",
+            "schema": null,
+            "columns": [
+                {
+                    "name": "id",
+                    "datatype": "number"
+                },
+                {
+                    "name": "order_id",
+                    "datatype": "number"
+                },
+                {
+                    "name": "product_id",
+                    "datatype": "number"
+                },
+                {
+                    "name": "quantity",
+                    "datatype": "number(8,2)"
+                }
+            ]
+        }
+    ],
+    "links": [
+        {
+            "source": "customers",
+            "source_id": "id",
+            "target": "orders",
+            "target_id": "customer_id"
+        },
+        {
+            "source": "orders",
+            "source_id": "id",
+            "target": "order_lines",
+            "target_id": "order_id"
+        },
+        {
+            "source": "products",
+            "source_id": "id",
+            "target": "order_lines",
+            "target_id": "product_id"
+        }
+    ]
+}

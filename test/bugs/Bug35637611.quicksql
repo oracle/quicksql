@@ -1,0 +1,8 @@
+departments /api
+   name /nn
+   location
+   country
+   employees /api
+      name /nn vc50
+      email /lower
+      cost center num

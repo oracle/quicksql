@@ -1,0 +1,44 @@
+{
+    "items": [
+        {
+            "name": "person",
+            "schema": null,
+            "columns": [
+                {
+                    "name": "id",
+                    "datatype": "number"
+                },
+                {
+                    "name": "name",
+                    "datatype": "varchar2(40 char)"
+                },
+                {
+                    "name": "date_of_birth",
+                    "datatype": "date"
+                },
+                {
+                    "name": "mother",
+                    "datatype": "number"
+                },
+                {
+                    "name": "father",
+                    "datatype": "number"
+                }
+            ]
+        }
+    ],
+    "links": [
+        {
+            "source": "person",
+            "source_id": "id",
+            "target": "person",
+            "target_id": "mother"
+        },
+        {
+            "source": "person",
+            "source_id": "id",
+            "target": "person",
+            "target_id": "father"
+        }
+    ]
+}
