@@ -1,0 +1,37 @@
+/* Diagram generator */
+
+.joint-paper.joint-theme-default, .joint-paper-background {
+    background-color: transparent;
+}
+
+/* .joint-link.joint-theme-default .connection-wrap {
+   display: none !important;
+} */
+
+.joint-link.joint-theme-default .connection-wrap {
+    stroke: #075af5;
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.selection-wrapper { display: none !important; }
+
+.link-tools .tool-remove { display: none !important; }
+.link-tools .tool-options { display: none !important; }
+.link .marker-arrowheads { display: none !important; }
+
+.marker-vertex-group, .marker-arrowheads {
+    display: none !important;
+}
+
+.marker-arrowheads { display: none !important; }
+
+.joint-halo .handle.clone { display: none; }
+.joint-halo .handle.resize { display: none; }
+.joint-halo .handle.rotate { display: none; }
+.joint-halo .handle.fork { display: none; }
+.joint-halo .handle.unlink { display: none; }
+.joint-halo .handle.remove { display: none; }

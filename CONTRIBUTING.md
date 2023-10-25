@@ -1,57 +1,43 @@
-*Detailed instructions on how to contribute to the project, if applicable. Must include section about Oracle Contributor Agreement with link and instructions*
+# Contributing <!-- omit in toc -->
 
-# Contributing to this repository
+## Table of Contents <!-- omit in toc -->
 
-We welcome your contributions! There are multiple ways to contribute.
+- [Project Setup](#project-setup)
+- [Building Locally](#building-locally)
+- [Running Tests](#running-tests)
+- [Running the Example CLI](#running-the-example-cli)
 
-## Opening issues
+## Project Setup
 
-For bugs or enhancement requests, please file a GitHub issue unless it's
-security related. When filing a bug remember that the better written the bug is,
-the more likely it is to be fixed. If you think you've found a security
-vulnerability, do not raise a GitHub issue and follow the instructions in our
-[security policy](./SECURITY.md).
+1. Open a terminal window
+2. Clone the repository
+3. Change into the cloned repository directory
+4. Install dependencies by running
 
-## Contributing code
+    ```bash
+    npm install
+    ```
 
-We welcome your code contributions. Before submitting code via a pull request,
-you will need to have signed the [Oracle Contributor Agreement][OCA] (OCA) and
-your commits need to include the following line using the name and e-mail
-address you used to sign the OCA:
+## Building Locally
 
-```text
-Signed-off-by: Your Name <you@example.org>
+Once you have set up the project, you can build the library by executing:
+
+```bash
+npm run build
 ```
 
-This can be automatically added to pull requests by committing with `--sign-off`
-or `-s`, e.g.
+## Running Tests
 
-```text
-git commit --signoff
+Once you have set up the project, you can run the test suite by executing:
+
+```bash
+npm run test
 ```
 
-Only pull requests from committers that can be verified as having signed the OCA
-can be accepted.
+## Running the Example CLI
 
-## Pull request process
+Once you have built the library, you can run the example CLI by executing:
 
-1. Ensure there is an issue created to track and discuss the fix or enhancement
-   you intend to submit.
-1. Fork this repository.
-1. Create a branch in your fork to implement the changes. We recommend using
-   the issue number as part of your branch name, e.g. `1234-fixes`.
-1. Ensure that any documentation is updated with the changes that are required
-   by your change.
-1. Ensure that any samples are updated if the base image has been changed.
-1. Submit the pull request. *Do not leave the pull request blank*. Explain exactly
-   what your changes are meant to do and provide simple steps on how to validate.
-   your changes. Ensure that you reference the issue you created as well.
-1. We will assign the pull request to 2-3 people for review before it is merged.
-
-## Code of conduct
-
-Follow the [Golden Rule](https://en.wikipedia.org/wiki/Golden_Rule). If you'd
-like more specific guidelines, see the [Contributor Covenant Code of Conduct][COC].
-
-[OCA]: https://oca.opensource.oracle.com
-[COC]: https://www.contributor-covenant.org/version/1/4/code-of-conduct/
+```bash
+npm run example-cli -- ./test/department_employees.quicksql
+```
