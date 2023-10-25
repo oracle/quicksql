@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickERD</title>
+
+    <link rel="stylesheet" type="text/css" href="libs/rappid.css">
+
+    <link rel="stylesheet" href="../../dist/quick-erd.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js" integrity="sha256-qXBd/EfAdjOA2FGrGAG+b3YBn2tn5A6bhz+LSgYD96k=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/backbone@1.5.0/backbone-min.min.js"></script>
+    
+    <script src="libs/rappid.min.js"></script>
+    <script src="libs/rappid.min.js"></script>
+
+    <!-- <script src="../../dist/quick-erd.umd.cjs"></script>
+    <script src="../../dist/quick-sql.umd.cjs"></script> -->
+
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        :root {
+            --qs-diagram-table-background-color: #FFF;
+            --qs-diagram-font-family: var(--a-base-font-family, sans-serif);
+            --qs-diagram-table-border-color: #f1efed;
+            --qs-diagram-table-name-text-color: rgb(22 21 19);
+            --qs-diagram-table-column-text-color: rgba(22, 21, 19, .9);
+            --qs-diagram-table-data-type-text-color: rgba(22, 21, 19, .5);
+            --qs-diagram-table-separator-color: #e7e3e1;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            html, body {
+                background: #312D2A;
+                color: white;
+            }
+
+            :root {
+                --qs-diagram-table-background-color: #4a4541;
+                --qs-diagram-font-family: var(--a-base-font-family, sans-serif);
+                --qs-diagram-table-border-color: #55504c;
+                --qs-diagram-table-text-color: #fcfbfa;
+                --qs-diagram-table-name-text-color: white;
+                --qs-diagram-table-column-text-color: rgb(255 255 255 / 90%);
+                --qs-diagram-table-data-type-text-color: rgb(255 255 255 / 60%);
+                --qs-diagram-table-separator-color: #55504c;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="sql">
+            <pre></pre>
+        </div>
+        <div id="quickERD" style="width: 100%; height: 100%;"></div>
+    </div>
+    
+    <script type="module">
+        import { toERD } from '../../dist/quick-sql.js';
+        import { Diagram  } from '../../dist/quick-erd.js';
+
+        const input = 
+`departments /insert 2
+   name /nn
+   location
+   country
+   employees /insert 4
+      name /nn vc50
+      email /lower
+      cost center num
+      date hired
+      job vc255
+
+view emp_v departments employees
+
+# settings = { "prefix": null, "semantics": "CHAR", "DV": false }
+`
+        // new quickERD.Diagram( quickSQL.toERD( input ), document.getElementById( 'quickERD' ) );
+        new Diagram( toERD( input, document.getElementById( 'quickERD' ) ) );
+
+        document.querySelector( '#sql > pre' ).innerText = input;
+    </script>
+</body>
+</html>

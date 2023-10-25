@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickSQL Standalone</title>
+
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <script type="module">
+        import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.39.0/+esm';
+        import quicksql from '../dist/quick-sql.js';
+      
+        var initialExample=`departments /insert 2
+  name /nn
+  location
+  country
+  employees /insert 4
+     name /nn vc50
+     email /lower
+     cost center num
+     date hired
+     job vc255
+     
+view emp_v departments employees
+     
+# settings = { "prefix": null, "semantics": "CHAR", "DV": false }
+
+        `;
+
+        window.editor = monaco.editor.create(
+                                                document.querySelector('.monacoQuickSQL')
+                                                ,{value :initialExample});
+
+  var examples = [{"name":"Bug35063257","value":"customers\n    name\n\nproducts\n    name\n    price num\n\nwarehouses\n    name\n\norders\n    order_date\n    customer_id /fk /cascade customers\n\norder_lines\n    quantity num\n    product_id /fk products /cascade\n\nline_fulfillments\n    warehouse_id /fk warehouses\n    line_id /cascade /fk order_lines"},{"name":"Bug35637603","value":"dept  /unique name, email /insert 0\n    name\n    city \n    state\n    emp /unique name, email\n        name\n        email "},{"name":"Bug35637611","value":"departments /api\n   name /nn\n   location\n   country\n   employees /api\n      name /nn vc50\n      email /lower\n      cost center num"},{"name":"Bug35637614","value":"customers /colprefix cust\n  name\n  email\n  phone1\n  phone2"},{"name":"Bug35637619","value":"# settings = { rowkey: true }\ndepartments /insert 2\n   name /nn\n   location\n   country\n   employees /insert 4\n      name /nn vc50\n      email /lower\n      cost center num\n      date hired\n      job vc255\n"},{"name":"Bug35637622","value":"departments /rest\n   name\n   location vc255\n   country vc255\n   employees /rest\n      name\n      email\n      job vc255\n      hiredate"},{"name":"Bug35637632","value":"departments /audit\n   name\n   location vc255\n   country vc255\n   employees /audit\n      name\n      email\n      job vc255\n      hiredate"},{"name":"Bug35649666","value":"departments /insert 2\n   name /nn\n   location\n   country\n   employees /insert 4\n      name /nn vc50\n      email /lower\n      cost center num\n      date hired\n      job vc255\n\n# settings = { semantics: \"CHAR\", language: \"EN\", prefixPKwithTname: true } "},{"name":"Bug35650535","value":"departments /insert 2\n   name /nn\n   location\n   country\n   employees /insert 4\n      name /nn vc50\n      email /lower\n      cost center num\n      date hired\n      job vc255\nview emp_v departments employees\n\n# settings = { semantics: \"CHAR\", DB: \"23c\", editionable: true, language: \"EN\", APEX: true }\n"},{"name":"Bug35659128","value":"departments\n   name\n   location vc255\n   country vc255\n   employees\n      name\n      email\n      job vc255\n      hiredate\n\n# settings = { semantics: \"CHAR\", auditCols: true, language: \"EN\", APEX: true, DB:\"12c\" }"},{"name":"Bug35665146","value":"dept\n    name\n    created_on"},{"name":"Bug35667673","value":"departments\n\n# settings = { pk: \"SEQ\" }"},{"name":"Bug35669377","value":"products\n   name\ncustomers\n   first name\nchannels\n   name\npromotions\n   name\nsales\n   product_id\n   customer_id\n   promotion id\n   channel id"},{"name":"Bug35714343","value":"departments\n    dname\n    emp  /cascade\n        department_id /fk departments \n        ename"},{"name":"department_employees","value":"departments /insert 2\n   name /nn\n   location\n   country\n   employees /insert 4\n      name /nn vc50\n      email /lower\n      cost center num\n      date hired\n      job vc255\n\nview emp_v departments employees\n\n# settings = { \"prefix\": null, \"semantics\": \"CHAR\", \"DV\": false }\n"},{"name":"departments_employees_skills","value":"departments /insert 2\n   name\n   location vc255\n   country vc255\n   employees /insert 4\n      name\n      email\n      job vc255\n      hiredate\n      skills /insert 6\n          skill vc255 /values C++, Java, APEX, JSON, Javascript, Python, CSS\n          proficiency num /check 1, 2, 3, 4, 5 [with 1 being a novice and 5 being a guru]\n          \n# \"schema\": null\n# \"semantics\": \"char\"     \n--# DV : no     \n"},{"name":"empty_emp","value":"dept \n   name \n\nemp   "},{"name":"forrestclinic","value":"providers\n    name vc60\n    rating number\n\npatients\n    first_name vc50\n    last_name vc50\n    email vc50\n    username vc20\n    date_of_birth date\n    phone vc30\n    address vc250\n    city vc50\n    state vc2\n    zip vc9\n    address_latitude num\n    address_longitude num\n    insurance_provider /fk providers\n    insurance_policy_number vc30\n    insurance_proof_scan blob\n    insurance_proof_latitude num\n    insurance_proof_longitude num\n    status vc30\n    insurance_score num\n    initial_procedure vc30\n    registration_date date\n\npatient_procedures\n  patient_id num  /fk patients\n  doctor vc30\n  medical_procedure vc30\n  procedure_date date \n  status vc30\n  amount_due num \n\ndoctor_procedures\n    doctor vc30\n    medical_procedure vc30\n  \n# settings = { \"prefix\": \"FRC\", \"ondelete\": \"RESTRICT\", \"semantics\": \"CHAR\", \n  \"auditcols\": true, \"language\": \"EN\", \"APEX\": true }"},{"name":"medipay","value":"coverage_plan\n  name                           vc30\n\ncoverage_plan_option\n  name                           vc40\n  coverage_plan_id               number /fk coverage_plan\n  reimburse_percentage           number\n\ncountries\n  iso_a2                         vc3 /pk\n  country_name                   vc255\n\nusers\n  username                       vc320\n  home_latitude                  number\n  home_longitude                 number\n  country                        vc80 /fk countries\n  address                        vc80\n  city                           vc80\n  state                          vc80\n  postal_code                    vc80\n  payment_method                 vc6 /check BANK,DEBIT,PAYPAL\n  paypal_name                    vc200\n  debit_card_number              vc16\n  bank_account_number            vc40\n  bank_routing_number            vc40\n  photo                          blob\n  coverage_plan_id               number /fk coverage_plan\n  coverage_plan_option_id        number /fk coverage_plan  \n  push_subscription              vc4000\n\nuser_sources\n  user_id                        number /nn /fk users\n  source_name                    vc100\n  latitude                       number\n  longitude                      number\n  country                        vc80 /fk countries\n  address                        vc80\n  city                           vc80\n  state                          vc80\n  postal_code                    vc80\n\nuser_claims\n  receipt_from_id                number /nn /fk user_sources\n  receipt_date                   date  /nn\n  receipt_amount                 number  /nn\n  claimant                       number  /fk users\n  status                         vc80\n  payment_txn_id                 number\n  reimburse_percentage           number\n\nuser_claim_docs\n  image                          blob\n  status                         vc80\n  claim                          number  /fk user_claims\n  latitude                       number\n  longitude                      number\n\nuser_claim_notes\n  message                        vc4000\n  claim                          number  /fk user_claims\n\nuser_notifications\n  username                       vc80\n  title                          vc80\n  body                           vc2000\n  delivered                      vc1\n\nlead_meetings\n  staff_contact                  vc80\n  lead_email                     vc80\n  proposed_meeting_start         date\n  proposed_meeting_end           date\n  notes                          vc4000\n  confirmed                      vc1 /default N\n\n# settings = { prefix: \"MED\", semantics: \"CHAR\", auditCols: true, rowVersion: true,  language: \"EN\", APEX: true }"},{"name":"product_sales","value":"sales /insert 40\n   product id\n   customer id\n   promotion id\n   channel id\n   date of sale\n   quantity num\n   unit price num\n   products /insert 10\n      name vc50\n      description\n      sku vc30\n      unit num\n      unit price num\n   customers /insert 20\n      first name\n      last name\n      email\n      city\n      country vc50\n      gender  vc30 /check Male, Female\n      date of birth\n      phone vc30\n      postal code vc30\n   channels /insert 3\n      name /check direct, online, phone\n   promotions /insert 4\n      name\n      code vc10\n      date begin\n      date end\n      discount percentage  num\n\n\nview sales_v products customers channels promotions sales\n\n# settings = { \"datalimit\": 3, \"prefix\": null, \"semantics\": \"CHAR\", \"DV\": false }"},{"name":"project_management","value":"#apex: true, auditcols: true \nprojects /insert 5 \n    name /nn \n    owner \n    milestones /insert 10 \n       name /nn\n       status /check open completed closed /values open, open, open, open, closed, completed \n       owner \n       started date \n       closed date \n    links /insert 5 \n       name  /nn\n       url \n    attachments \n       contributed by \n       attachment file \n    action items /insert 12 \n       action \n       desc clob \n       owner \n       status /check open completed closed \n \nview project_ms projects milestones \nview project_ai projects action_items"},{"name":"star_schema_as_tree","value":"sales\n    quantity\n    > product\n         name\n    > customers \n         first name \n\n       \n\n"},{"name":"timecard","value":"employees /insert 50 /api\n    name /nn /unique\n    email /nn /lower /unique\n    country vc100 /nn /values US, Canada, Mexico\n    employee type vc30 /n /check full time, part time \n    approver vc255 /nn /index /values tbd\n    timecards /api /auditcols /insert 200\n        status /check SUBMITTED, APPROVED, DECLINED /default SUBMITTED\n        week of date /nn\n        sunday int /default 0 /between 0 and 24\n        monday int /default 0 /between 0 and 24\n        tuesday int /default 0 /between 0 and 24\n        wednesday int /default 0 /between 0 and 24\n        thursday int /default 0 /between 0 and 24\n        friday int /default 0 /between 0 and 24\n        saturday int /default 0 /between 0 and 24\n        comments\n        confirmation code v50 /values null\n\nview employee_timecards employees timecards\n\n# settings = { semantics: \"CHAR\", API: true, rowVersion: true, drop: true, language: \"EN\", APEX: true, dv: false }"},{"name":"to_dos","value":"#apex: true, auditcols: true \nassignees /insert 10\n  full_name /nn\n  email\n  phone_number\n  todos /insert 50 \n    name vc255 /nn \n    due_date date\n    priority vc50 /check P1, P2, P3\n    status vc50 /check OPEN, COMPLETE, ON HOLD, CANCELLED"}]
+  examples.forEach(example=>{
+            window.editor.addAction(
+                 {
+                    id : example.name,
+                    label :  "_qs/"+example.name,
+                    value: example.value,
+                    run: function (ed) {
+                        var path = this.id;
+                        window.editor.getModel().setValue(this.value);     
+                    }
+                }
+                )
+         });
+            
+
+
+        var sql = quicksql.toDDL(initialExample);
+
+        window.editorSQL = monaco.editor.create(
+                                                document.querySelector('.monocoSQL')
+                                                ,{value :sql,
+                                                readOnly: true});
+
+        //window.editorSQL.updateOptions({readOnly: false})
+
+        window.editor.onDidChangeModelContent(e => {
+                var sql = quicksql.toDDL(window.editor.getModel().getValue());
+                window.editorSQL.getModel().setValue(sql);        
+        });
+      </script>
+     <div style="width: 100%;height: 100%">
+        <div class="monacoQuickSQL" style="width: 50%; height:100%; float: left;"> </div>
+        <div class="monocoSQL" style="margin-left: 50%; height: 100%; "> </div>
+    </div>
+</body>
+
+
+</html>

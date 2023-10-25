@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickSQL</title>
+</head>
+<body>
+    <script type="module">
+        import quicksql from '../dist/quick-sql.js';
+        document.body.innerText = quicksql.toDDL(
+`departments /insert 2
+   name /nn
+   location
+   country
+   employees /insert 4
+      name /nn vc50
+      email /lower
+      cost center num
+      date hired
+      job vc255
+
+view emp_v departments employees
+
+# settings = { "prefix": null, "semantics": "CHAR", "DV": false }
+
+`
+        );
+    </script>
+</body>
+</html>
