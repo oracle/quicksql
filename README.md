@@ -31,6 +31,41 @@ module that can be used as seen in the example below:
 
 ![Quick ERD](./assets/quick-erd-dark.png)
 
+## Installation
+
+1. Open a terminal window
+2. Clone the repository
+3. Change into the cloned repository directory
+4. Install dependencies by running
+
+    ```bash
+    npm install
+    ```
+
+## Building Locally
+
+Once you have set up the project, you can build the library by executing:
+
+```bash
+npm run build
+```
+
+## Running Tests
+
+Once you have set up the project, you can run the test suite by executing:
+
+```bash
+npm run test
+```
+
+## Running the Example CLI
+
+Once you have built the library, you can run the example CLI by executing:
+
+```bash
+npm run example-cli -- ./test/department_employees.quicksql
+```
+
 ## Translating QSQL into Oracle SQL Data Definition Language (DDL)
 
 The QSQL to DDL translator is the product's core component, It allows users
@@ -305,3 +340,19 @@ Which would produce the following:
 - Dark Color Scheme
 
     ![Dark Quick ERD Example](./assets/quick-erd-dark-example.png)
+
+
+## Contributing
+
+
+This project welcomes contributions from the community. Before submitting a pull request, please [review our contribution guide](./CONTRIBUTING.md)
+
+## Security
+
+Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
+
+## License
+
+[UPL, Version 1.0](./LICENSE.txt) 
+
+
