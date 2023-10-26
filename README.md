@@ -2,18 +2,6 @@
 
 ## Table of Contents <!-- omit in toc -->
 
-- [Overview](#overview)
-- [Translating Quick SQL into Oracle SQL Data Definition Language (DDL)](#translating-quick-sql-into-oracle-sql-data-definition-language-ddl)
-    - [DDL NodeJS ECMA Script Module (ESM) Example](#ddl-nodejs-ecma-script-module-esm-example)
-    - [DDL NodeJS Common JS (CJS) Example](#ddl-nodejs-common-js-cjs-example)
-    - [DDL Browser ECMA Script Module (ESM) Example](#ddl-browser-ecma-script-module-esm-example)
-    - [DDL Browser Universal Module Definition (UMD) Example](#ddl-browser-universal-module-definition-umd-example)
-- [Transforming Quick SQL into an Entity-Relationship Diagram (ERD)](#transforming-quick-sql-into-an-entity-relationship-diagram-erd)
-    - [Prerequisites](#prerequisites)
-    - [ERD Browser ESM Example](#erd-browser-esm-example)
-    - [ERD Browser UMD Example](#erd-browser-umd-example)
-    - [ERD Theming](#erd-theming)
-
 ## Overview
 
 Quick SQL (QSQL) is a markdown-like shorthand syntax that expands to standards-based
