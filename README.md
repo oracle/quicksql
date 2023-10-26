@@ -1,6 +1,26 @@
-# Quick SQL <!-- omit in toc -->
+<!-- TOC -->
 
-## Table of Contents <!-- omit in toc -->
+- [Overview](#overview)
+- [Installation](#installation)
+- [Building Locally](#building-locally)
+- [Running Tests](#running-tests)
+- [Running the Example CLI](#running-the-example-cli)
+- [Translating QSQL into Oracle SQL Data Definition Language (DDL)](#translating-qsql-into-oracle-sql-data-definition-language-ddl)
+  - [DDL NodeJS ECMA Script Module (ESM) Example](#ddl-nodejs-ecma-script-module-esm-example)
+  - [DDL NodeJS Common JS (CJS) Example](#ddl-nodejs-common-js-cjs-example)
+  - [DDL Browser ECMA Script Module (ESM) Example](#ddl-browser-ecma-script-module-esm-example)
+  - [DDL Browser Universal Module Definition (UMD) Example](#ddl-browser-universal-module-definition-umd-example)
+- [Transforming Quick SQL into an Entity-Relationship Diagram (ERD)](#transforming-quick-sql-into-an-entity-relationship-diagram-erd)
+  - [Prerequisites](#prerequisites)
+  - [ERD Browser ESM Example](#erd-browser-esm-example)
+  - [ERD Browser UMD Example](#erd-browser-umd-example)
+  - [ERD Theming](#erd-theming)
+- [Contributing](#contributing)
+- [Security](#security)
+- [License](#license)
+
+<!-- /TOC -->
+
 
 ## Overview
 
