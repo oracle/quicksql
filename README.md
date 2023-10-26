@@ -1,3 +1,5 @@
+# QuickSQL
+
 <!-- TOC -->
 
 - [Overview](#overview)
