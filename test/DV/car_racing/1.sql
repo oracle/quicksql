@@ -71,24 +71,24 @@ insert into team (
 commit;
 
 insert into driver (
-    team_id,
     driverid,
+    team_id,
     name,
     points
 ) values (
-    302,
     103,
+    302,
     'Charles Leclerc',
     192
 );
 insert into driver (
-    team_id,
     driverid,
+    team_id,
     name,
     points
 ) values (
-    302,
     104,
+    302,
     'Carlos Sainz Jr',
     118
 );
