@@ -40,4 +40,4 @@ if ( !fs.existsSync( file_path ) ) {
 }
 let file_content = fs.readFileSync( file_path ).toString();
 
-console.log( quicksql.translate( file_content ) );
+console.log( quicksql.toDDL( file_content ) );
