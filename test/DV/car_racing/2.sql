@@ -86,13 +86,13 @@ select JSON {
 -- load data
 
 insert into driver (
-    teamInfo_id,
     driverId,
+    teamInfo_id,
     name,
     points
 ) values (
-    301,
     101,
+    301,
     'Max Verstappen',
     258
 );
@@ -110,25 +110,25 @@ insert into teamInfo (
 commit;
 
 insert into race (
+    driverRaceMapId,
     raceInfo_id,
     driver_id,
-    driverRaceMapId,
     finalPosition
 ) values (
+    3,
     201,
     101,
-    3,
     19
 );
 insert into race (
+    driverRaceMapId,
     raceInfo_id,
     driver_id,
-    driverRaceMapId,
     finalPosition
 ) values (
+    11,
     202,
     101,
-    11,
     1
 );
 
