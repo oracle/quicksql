@@ -3,6 +3,8 @@
 
 var utils = {};
 
+const FONT_NAME = getComputedStyle(document.querySelector(':root')).getPropertyValue('--qs-diagram-font-family') || 'Arial';
+
 utils.newGuid = function () {
     function _s8(s) {
         var p = (Math.random().toString(16) + '000000000').substr(2, 8);
@@ -16,17 +18,15 @@ utils.calcWidth = function (schema, name, columns) {
     if (schema) {
         objName = schema.concat('.').concat(name);
     }
-    var nameWidth = utils.getTextWidth(objName, '12pt Arial');
-    var colWidth = 60;
+    var nameWidth = utils.getTextWidth(objName, `12pt ${FONT_NAME}`);
+    var colWidth = 0;
     var dtWidth = 0;
-    var indexWidth = 0;
     for (var i = 0; i < columns.length; i++) {
-        colWidth = Math.max(colWidth, utils.getTextWidth(columns[i].name, '10pt Arial'));
-        dtWidth = Math.max(dtWidth, utils.getTextWidth(columns[i].datatype, '10pt Arial'));
+        colWidth = Math.max(colWidth, utils.getTextWidth(columns[i].name, `10pt ${FONT_NAME}`));
+        dtWidth = Math.max(dtWidth, utils.getTextWidth(columns[i].datatype, `10pt ${FONT_NAME}`));
     }
 
-    const bonus = 40; // colWidth > 100 ? 15 : 40;
-    const cdtWidth = colWidth + bonus + dtWidth;
+    const cdtWidth = (dtWidth > colWidth) ? (dtWidth * 2) : colWidth + dtWidth + 20;
     let width = Math.max(nameWidth, cdtWidth);
     return width;
 };

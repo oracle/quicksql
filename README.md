@@ -191,8 +191,8 @@ You need to add the following dependencies to your HTML:
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Quick ERD</title>
 
-        <!-- Assuming you put the rappid.css file in this path -->
-        <link rel="stylesheet" type="text/css" href="./examples/diagram-generator/libs/rappid.css">
+        <!-- Assuming you put the rappid.min.css file in this path -->
+        <link rel="stylesheet" type="text/css" href="./examples/diagram-generator/libs/rappid.min.css">
         <link rel="stylesheet" href="./dist/quick-erd.css">
 
         <style>
@@ -221,23 +221,25 @@ You need to add the following dependencies to your HTML:
             import { Diagram  } from './dist/quick-erd.js';
 
             new Diagram( toERD(
-`departments /insert 2
+`
+departments
     name /nn
     location
     country
-    employees /insert 4
-        name /nn vc50
-        email /lower
-        cost center num
-        date hired
-        job vc255
+employees
+    departments_id /fk departments
+    name /nn vc50
+    email /lower
+    cost center num
+    date hired
+    job vc255
 
 view emp_v departments employees
 
 # settings = { "prefix": null, "semantics": "CHAR", "DV": false }
 
 `
-            ), document.getElementById( 'quickERD' ) );
+            ), '#quickERD' );
         </script>
     </body>
 </html>
@@ -255,8 +257,8 @@ view emp_v departments employees
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Quick ERD</title>
 
-        <!-- Assuming you put the rappid.css file in this path -->
-        <link rel="stylesheet" type="text/css" href="./examples/diagram-generator/libs/rappid.css">
+        <!-- Assuming you put the rappid.min.css file in this path -->
+        <link rel="stylesheet" type="text/css" href="./examples/diagram-generator/libs/rappid.min.css">
         <link rel="stylesheet" href="./dist/quick-erd.css">
 
         <style>
@@ -285,23 +287,25 @@ view emp_v departments employees
 
         <script>
             new quickERD.Diagram( quickSQL.toERD(
-`departments /insert 2
+`
+departments
     name /nn
     location
     country
-    employees /insert 4
-        name /nn vc50
-        email /lower
-        cost center num
-        date hired
-        job vc255
+employees
+    departments_id /fk departments
+    name /nn vc50
+    email /lower
+    cost center num
+    date hired
+    job vc255
 
 view emp_v departments employees
 
 # settings = { "prefix": null, "semantics": "CHAR", "DV": false }
 
 `
-            ), document.getElementById( 'quickERD' ) );
+            ), '#quickERD' );
         </script>
     </body>
 </html>
