@@ -7,7 +7,7 @@ Error diagnostics procedure is called like this
 
     let output = ddl.errorMsgs(`dept
        col1
-    "is this table or misaligned column?"`);
+     "is this table or misaligned column?"`);
 
 
 It returns an array of the Error objects
