@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuickERD</title>
 
-    <link rel="stylesheet" type="text/css" href="libs/rappid.css">
+    <!-- Assuming you put the rappid.min.css file in this path -->
+    <link rel="stylesheet" type="text/css" href="libs/rappid.min.css">
 
     <link rel="stylesheet" href="../../dist/quick-erd.css">
 
@@ -13,11 +14,8 @@
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js" integrity="sha256-qXBd/EfAdjOA2FGrGAG+b3YBn2tn5A6bhz+LSgYD96k=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/backbone@1.5.0/backbone-min.min.js"></script>
     
+    <!-- Assuming you put the rappid.min.js file in this path -->
     <script src="libs/rappid.min.js"></script>
-    <script src="libs/rappid.min.js"></script>
-
-    <!-- <script src="../../dist/quick-erd.umd.cjs"></script>
-    <script src="../../dist/quick-sql.umd.cjs"></script> -->
 
     <style>
         html, body {
@@ -61,7 +59,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="padding: 20px;">
         <div id="sql">
             <pre></pre>
         </div>
@@ -73,23 +71,24 @@
         import { Diagram  } from '../../dist/quick-erd.js';
 
         const input = 
-`departments /insert 2
-   name /nn
-   location
-   country
-   employees /insert 4
-      name /nn vc50
-      email /lower
-      cost center num
-      date hired
-      job vc255
+`
+departments
+    name /nn
+    location
+    country
+employees
+    departments_id /fk departments
+    name /nn vc50
+    email /lower
+    cost center num
+    date hired
+    job vc255
 
 view emp_v departments employees
 
 # settings = { "prefix": null, "semantics": "CHAR", "DV": false }
 `
-        // new quickERD.Diagram( quickSQL.toERD( input ), document.getElementById( 'quickERD' ) );
-        new Diagram( toERD( input, document.getElementById( 'quickERD' ) ) );
+        new Diagram( toERD(input), '#quickERD' );
 
         document.querySelector( '#sql > pre' ).innerText = input;
     </script>
