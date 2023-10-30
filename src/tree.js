@@ -1201,23 +1201,60 @@ let tree = (function(){
                         ret += 'insert into '+objName+' (\n';
                         let idColName = this.getGenIdColName();
                         if( idColName != null ) {
-                            ret += tab + idColName +',\n';  
+                            ret += tab + idColName +',\n';
+                        } else {
+                            let pkNode = this.getExplicitPkNode();
+                            if( pkNode != null ) {
+                                ret += tab + pkNode.parseName() +',\n';
+                            }
                         }
                         for( let fk in this.fks ) {
-                            let parent = this.fks[fk];
-                            ret += tab+singular(parent)+'_id,\n';
+                            let parent = this.fks[fk];				
+                            let refNode = ddl.find(parent);
+                            let _id = '';    
+                            if( refNode == null ) {
+                                refNode = ddl.find(fk);
+                                if( refNode.isMany2One() & !fk.endsWith('_id') ) {
+                                    parent = fk;
+                                    fk = singular(fk);
+                                    _id = '_id';  
+                                }
+                            }
+                            ret += tab+fk+_id+',\n';
                         }
                         for( let j = 0; j < this.children.length; j++ ) {
-                            let child = this.children[j]; 
-                            if( 0 == child.children.length ) 
-                                ret += tab+child.parseName()+',\n';
+                            let child = this.children[j];
+                            if( idColName != null && child.parseName() == 'id' )
+                                continue;
+                            if (child.refId() == null  ) {
+                                if( child == this.getExplicitPkNode() )
+                                    continue; //ret += '--';
+                                if( 0 == child.children.length ) 
+                                    ret += tab+child.parseName()+',\n';
+                            }
                         }
                         if( ret.lastIndexOf(',\n') == ret.length-2 )
                             ret = ret.substr(0,ret.length-2)+'\n';
+
                         ret += ') values (\n';
-                        if( ddl.optionEQvalue('Auto Primary Key','yes') ) {
-                            ret += tab + (i+1)+ ',\n';  
+
+                        if( idColName != null ) {
+                            ret += tab + (i+1)+ ',\n'; 
+                        } else {
+                            let pkNode = this.getExplicitPkNode();
+                            if( pkNode != null ) {
+                                const field = pkNode.parseName();
+                                let tmp = getValue(ddl.data, null /*no name at level 0*/, field, this.parseName());
+                                let v = -1;
+                                if( elem != null )
+                                    v = elem[field];
+                                if( tmp != null && tmp[i] != null ) {
+                                     v = tmp[i];
+                                }
+                                ret += tab + (v != null ? v : i+1)+ ',\n';  
+                            }
                         }
+                       
                         for( let fk in this.fks ) {
                             let ref = this.fks[fk];
                             let refNode = ddl.find(ref);
@@ -1246,23 +1283,29 @@ let tree = (function(){
                         }
                         for( let j = 0; j < this.children.length; j++ ) {
                             let child = this.children[j]; 
-                            if( 0 == child.children.length ) {
-                                let values = child.parseValues();
-                                let cname = child.parseName();
-                                if( elem != null ) {
-                                    let v = elem[cname];
-                                    if( v != null ) {
+                            if( idColName != null && child.parseName() == 'id' )
+                                continue;
+                            if (child.refId() == null  ) {
+                                if( child == this.getExplicitPkNode() )
+                                    continue; //ret += '--';
+                                if( 0 == child.children.length )  {
+                                    let values = child.parseValues();
+                                    let cname = child.parseName();
+                                    if( elem != null ) {
+                                        let v = elem[cname];
+                                        if( v != null ) {
+                                            values = [];
+                                            values[0] = v;
+                                        }                                   
+                                    }
+                                    let tmp = getValue(ddl.data, null /*no name at level 0*/, cname, this.parseName());
+                                    if( tmp != null && tmp[i] != null ) {
                                         values = [];
-                                        values[0] = v;
-                                    }                                   
+                                        values[0] = tmp[i];
+                                    }
+                                    let datum = sample(objName, cname, child.parseType(), values);
+                                    ret += tab + translate(ddl.getOptionValue('Data Language'), datum)+',\n';
                                 }
-                                let tmp = getValue(ddl.data, null /*no name at level 0*/, cname, this.parseName());
-                                if( tmp != null && tmp[i] != null ) {
-                                    values = [];
-                                    values[0] = tmp[i];
-                                }
-                                let datum = sample(objName, cname, child.parseType(), values);
-                                ret += tab + translate(ddl.getOptionValue('Data Language'), datum)+',\n';
                             }
                         }
                         if( ret.lastIndexOf(',\n') == ret.length-2 )

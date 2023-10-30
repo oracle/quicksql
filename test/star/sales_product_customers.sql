@@ -38,7 +38,7 @@ create table customers (
 insert into sales (
     id,
     product_id,
-    customer_id,
+    customers_id,
     quantity
 ) values (
     1,
@@ -49,7 +49,7 @@ insert into sales (
 insert into sales (
     id,
     product_id,
-    customer_id,
+    customers_id,
     quantity
 ) values (
     2,

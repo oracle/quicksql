@@ -2,24 +2,25 @@
 
 <!-- TOC -->
 
-- [Overview](#overview)
-- [Installation](#installation)
-- [Building Locally](#building-locally)
-- [Running Tests](#running-tests)
-- [Running the Example CLI](#running-the-example-cli)
-- [Translating QSQL into Oracle SQL Data Definition Language (DDL)](#translating-qsql-into-oracle-sql-data-definition-language-ddl)
-  - [DDL NodeJS ECMA Script Module (ESM) Example](#ddl-nodejs-ecma-script-module-esm-example)
-  - [DDL NodeJS Common JS (CJS) Example](#ddl-nodejs-common-js-cjs-example)
-  - [DDL Browser ECMA Script Module (ESM) Example](#ddl-browser-ecma-script-module-esm-example)
-  - [DDL Browser Universal Module Definition (UMD) Example](#ddl-browser-universal-module-definition-umd-example)
-- [Transforming Quick SQL into an Entity-Relationship Diagram (ERD)](#transforming-quick-sql-into-an-entity-relationship-diagram-erd)
-  - [Prerequisites](#prerequisites)
-  - [ERD Browser ESM Example](#erd-browser-esm-example)
-  - [ERD Browser UMD Example](#erd-browser-umd-example)
-  - [ERD Theming](#erd-theming)
-- [Contributing](#contributing)
-- [Security](#security)
-- [License](#license)
+- [QuickSQL](#quicksql)
+  - [Overview](#overview)
+  - [Installation](#installation)
+  - [Building Locally](#building-locally)
+  - [Running Tests](#running-tests)
+  - [Running the Example CLI](#running-the-example-cli)
+  - [Translating QSQL into Oracle SQL Data Definition Language (DDL)](#translating-qsql-into-oracle-sql-data-definition-language-ddl)
+    - [DDL NodeJS ECMA Script Module (ESM) Example](#ddl-nodejs-ecma-script-module-esm-example)
+    - [DDL NodeJS Common JS (CJS) Example](#ddl-nodejs-common-js-cjs-example)
+    - [DDL Browser ECMA Script Module (ESM) Example](#ddl-browser-ecma-script-module-esm-example)
+    - [DDL Browser Universal Module Definition (UMD) Example](#ddl-browser-universal-module-definition-umd-example)
+  - [Transforming Quick SQL into an Entity-Relationship Diagram (ERD)](#transforming-quick-sql-into-an-entity-relationship-diagram-erd)
+    - [Prerequisites](#prerequisites)
+    - [ERD Browser ESM Example](#erd-browser-esm-example)
+    - [ERD Browser UMD Example](#erd-browser-umd-example)
+    - [ERD Theming](#erd-theming)
+  - [Contributing](#contributing)
+  - [Security](#security)
+  - [License](#license)
 
 <!-- /TOC -->
 
@@ -81,7 +82,7 @@ npm run example-cli -- ./test/department_employees.quicksql
 The QSQL to DDL translator is the product's core component, It allows users
 to transform a QSQL string into an Oracle SQL string.
 
-The Quick SQL Syntax is documented [here](./Quick-SQL-Grammar.pdf)
+The Quick SQL Syntax is documented [here](./quicksql.md)
 
 See below for examples of how to use this library.
 
@@ -190,8 +191,8 @@ You need to add the following dependencies to your HTML:
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Quick ERD</title>
 
-        <!-- Assuming you put the rappid.css file in this path -->
-        <link rel="stylesheet" type="text/css" href="./examples/diagram-generator/libs/rappid.css">
+        <!-- Assuming you put the rappid.min.css file in this path -->
+        <link rel="stylesheet" type="text/css" href="./examples/diagram-generator/libs/rappid.min.css">
         <link rel="stylesheet" href="./dist/quick-erd.css">
 
         <style>
@@ -220,23 +221,25 @@ You need to add the following dependencies to your HTML:
             import { Diagram  } from './dist/quick-erd.js';
 
             new Diagram( toERD(
-`departments /insert 2
+`
+departments
     name /nn
     location
     country
-    employees /insert 4
-        name /nn vc50
-        email /lower
-        cost center num
-        date hired
-        job vc255
+employees
+    departments_id /fk departments
+    name /nn vc50
+    email /lower
+    cost center num
+    date hired
+    job vc255
 
 view emp_v departments employees
 
 # settings = { "prefix": null, "semantics": "CHAR", "DV": false }
 
 `
-            ), document.getElementById( 'quickERD' ) );
+            ), '#quickERD' );
         </script>
     </body>
 </html>
@@ -254,8 +257,8 @@ view emp_v departments employees
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Quick ERD</title>
 
-        <!-- Assuming you put the rappid.css file in this path -->
-        <link rel="stylesheet" type="text/css" href="./examples/diagram-generator/libs/rappid.css">
+        <!-- Assuming you put the rappid.min.css file in this path -->
+        <link rel="stylesheet" type="text/css" href="./examples/diagram-generator/libs/rappid.min.css">
         <link rel="stylesheet" href="./dist/quick-erd.css">
 
         <style>
@@ -284,23 +287,25 @@ view emp_v departments employees
 
         <script>
             new quickERD.Diagram( quickSQL.toERD(
-`departments /insert 2
+`
+departments
     name /nn
     location
     country
-    employees /insert 4
-        name /nn vc50
-        email /lower
-        cost center num
-        date hired
-        job vc255
+employees
+    departments_id /fk departments
+    name /nn vc50
+    email /lower
+    cost center num
+    date hired
+    job vc255
 
 view emp_v departments employees
 
 # settings = { "prefix": null, "semantics": "CHAR", "DV": false }
 
 `
-            ), document.getElementById( 'quickERD' ) );
+            ), '#quickERD' );
         </script>
     </body>
 </html>
