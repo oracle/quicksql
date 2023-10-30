@@ -17,6 +17,9 @@
     <!-- Assuming you put the rappid.min.js file in this path -->
     <script src="libs/rappid.min.js"></script>
 
+    <!-- <script src="../../dist/quick-erd.umd.cjs"></script>
+    <script src="../../dist/quick-sql.umd.cjs"></script> -->
+
     <style>
         html, body {
             height: 100%;
@@ -88,8 +91,10 @@ view emp_v departments employees
 
 # settings = { "prefix": null, "semantics": "CHAR", "DV": false }
 `
-        new Diagram( toERD(input), '#quickERD' );
+        // new quickERD.Diagram( quickSQL.toERD( input ), document.getElementById( 'quickERD' ) );
 
+        new Diagram( toERD(input), '#quickERD' );
+        
         document.querySelector( '#sql > pre' ).innerText = input;
     </script>
 </body>
