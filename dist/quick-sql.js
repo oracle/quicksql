@@ -8992,7 +8992,7 @@ const Y = {
   };
   return Object.defineProperty(D, "version", {
     writable: !1,
-    value: "1.1.3"
+    value: "1.1.4"
   }), D;
 }(), be = X.toDDL, pe = X.toERD, ge = X.toQSQL, Ce = X.errors, ve = X.version;
 export {
