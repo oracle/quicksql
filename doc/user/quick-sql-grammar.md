@@ -94,7 +94,7 @@ sales
 ```
 The more-than symbol `>` hints the many-to-one relationship between the table cardinalities. The opposite -- one-to-many relationship -- is denoted by the `<` prefix, which is default, and is usually omitted from QSQL schema definition.
 
-![Sales-Product-Customer Example](../../test/star/sales_product_customers.qsql)
+[Sales-Product-Customer Example](../../test/star/sales_product_customers.qsql)
  
 
 ## Column Directives
