@@ -3,10 +3,7 @@
 ## Table of Contents <!-- omit in toc -->
 
 - [Overview](#overview)
-- [Installation](#installation)
-- [Building Locally](#building-locally)
-- [Running Tests](#running-tests)
-- [Running the Example CLI](#running-the-example-cli)
+- [Install](#install)
 - [Translating Quick SQL into Oracle SQL Data Definition Language (DDL)](#translating-quick-sql-into-oracle-sql-data-definition-language-ddl)
     - [DDL NodeJS ECMA Script Module (ESM) Example](#ddl-nodejs-ecma-script-module-esm-example)
     - [DDL NodeJS Common JS (CJS) Example](#ddl-nodejs-common-js-cjs-example)
@@ -34,39 +31,10 @@ module that can be used as seen in the example below:
 
 ![Quick ERD](./assets/quick-erd-dark.png)
 
-## Installation
-
-1. Open a terminal window
-2. Clone the repository
-3. Change into the cloned repository directory
-4. Install dependencies by running
-
-    ```bash
-    npm install
-    ```
-
-## Building Locally
-
-Once you have set up the project, you can build the library by executing:
+## Install
 
 ```bash
-npm run build
-```
-
-## Running Tests
-
-Once you have set up the project, you can run the test suite by executing:
-
-```bash
-npm run test
-```
-
-## Running the Example CLI
-
-Once you have built the library, you can run the example CLI by executing:
-
-```bash
-npm run example-cli -- ./test/department_employees.quicksql
+npm install @oracle/quicksql
 ```
 
 ## Translating Quick SQL into Oracle SQL Data Definition Language (DDL)
@@ -81,12 +49,12 @@ See below for examples of how to use this library.
 ### DDL NodeJS ECMA Script Module (ESM) Example
 
 ```js
-import quickSQL from "./dist/quick-sql.js";
+import { toDDL } from "@oracle/quicksql";
 import fs from "fs";
 
 try {
     const text = fs.readFileSync( './test/department_employees.quicksql' );
-    console.log( quickSQL.toDDL( text.toString() ) );
+    console.log( toDDL( text.toString() ) );
 } catch( e ) {
     console.error( e );
 };
@@ -95,12 +63,12 @@ try {
 ### DDL NodeJS Common JS (CJS) Example
 
 ```js
-const quickSQL  = require( "./dist/quick-sql.umd.cjs" );
+const { toDDL } = require( "@oracle/quicksql" );
 const fs = require( "fs" );
 
 try {
     const text = fs.readFileSync( './test/department_employees.quicksql' );
-    console.log( quickSQL.toDDL( text.toString() ) );
+    console.log( toDDL( text.toString() ) );
 } catch( e ) {
     console.error( e );
 };
@@ -110,8 +78,8 @@ try {
 
 ```html
 <script type="module">
-    import quickSQL from './dist/quick-sql.js';
-    document.body.innerText = quickSQL.toDDL(
+    import { toDDL } from './dist/quick-sql.js';
+    document.body.innerText = toDDL(
 `departments /insert 2
     name /nn
     location
