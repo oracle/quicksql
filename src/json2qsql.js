@@ -1,4 +1,4 @@
-import singular from './singular.js';
+import {singular} from './naming.js';
 import  ddl from "../src/ddl.js";
 
 

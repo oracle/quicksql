@@ -95,6 +95,7 @@ function processFile( subdir, file ) {
         output = quicksql.toDDL(text);
         const errors =  quicksql.errorMsgs(text);
         checkNoError(errors, errorMsgs.messages.misalignedAttribute);
+        checkNoError(errors, errorMsgs.messages.undefinedObject);
     }    
 
     let cmp = null;
