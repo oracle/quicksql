@@ -1,0 +1,38 @@
+{
+    "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+    "version": "0.2",
+    "language": "en",
+    "words": [
+        "abnf",
+        "CLOB",
+        "createdbycol",
+        "dname",
+        "ename",
+        "equijoin",
+        "genpk",
+        "LASTUPD",
+        "longvc",
+        "ondelete",
+        "ORDS",
+        "prefixpkwithtname",
+        "qddl",
+        "rappid",
+        "rgba",
+        "tenantid",
+        "Tname",
+        "tstz",
+        "TSWLTZ",
+        "TSWTZ",
+        "updatedbycol"
+    ],
+    "flagWords": [
+        // cSpell:disable
+        "wether",
+        "heigth",
+        "lenght"
+        // cSpell:enable
+    ],
+    "allowCompoundWords": true,
+    "useGitignore": true,
+    "validateDirectives": true
+}
