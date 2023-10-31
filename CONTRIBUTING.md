@@ -31,6 +31,41 @@ git commit --signoff
 Only pull requests from committers that can be verified as having signed the OCA
 can be accepted.
 
+## Getting Started
+
+1. Open a terminal window
+2. Clone the repository
+3. Change into the cloned repository directory
+4. Install dependencies by running
+
+    ```bash
+    npm install
+    ```
+
+## Building Locally
+
+Once you have set up the project, you can build the library by executing:
+
+```bash
+npm run build
+```
+
+## Running Tests
+
+Once you have set up the project, you can run the test suite by executing:
+
+```bash
+npm run test
+```
+
+## Running the Example CLI
+
+Once you have built the library, you can run the example CLI by executing:
+
+```bash
+npm run example-cli
+```
+
 ## Pull request process
 
 1. Ensure there is an issue created to track and discuss the fix or enhancement
