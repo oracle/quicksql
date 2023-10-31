@@ -739,7 +739,7 @@ class de {
     e.rearrangeDiagram(3, !1), this.paperScroller.centerContent();
   }
 }
-const ue = "1.1.1", fe = {
+const ue = "1.1.2", fe = {
   Diagram: de,
   version: ue
 };
