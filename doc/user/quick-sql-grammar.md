@@ -476,4 +476,4 @@ individual_setting::=
       |'updatedbycol'|'updatedcolverbose' ) ':' (string_literal| 'true' | 'false')
 ```
 
-![Syntax Railroad Diagram](./railroad.xhtml)
+[Syntax Railroad Diagram](./railroad.xhtml)
