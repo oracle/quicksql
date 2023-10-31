@@ -21,7 +21,8 @@
     "test": "./test/regression_test.js",
     "lint:markdown": "markdownlint-cli2 *.md, doc/**/*.md",
     "lint": "run-p lint:*",
-    "example-cli": "./examples/cli.js ./test/project_management.quicksql"
+    "example-cli": "./examples/cli.js ./test/project_management.quicksql",
+    "postversion": "run-s build"
   },
   "repository": {
     "type": "git",
