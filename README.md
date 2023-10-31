@@ -1,43 +1,39 @@
-# QuickSQL
+# QuickSQL <!-- omit in toc -->
 
-<!-- TOC -->
+## Table of Contents <!-- omit in toc -->
 
-- [QuickSQL](#quicksql)
-  - [Overview](#overview)
-  - [Installation](#installation)
-  - [Building Locally](#building-locally)
-  - [Running Tests](#running-tests)
-  - [Running the Example CLI](#running-the-example-cli)
-  - [Translating QSQL into Oracle SQL Data Definition Language (DDL)](#translating-qsql-into-oracle-sql-data-definition-language-ddl)
+- [Overview](#overview)
+- [Installation](#installation)
+- [Building Locally](#building-locally)
+- [Running Tests](#running-tests)
+- [Running the Example CLI](#running-the-example-cli)
+- [Translating Quick SQL into Oracle SQL Data Definition Language (DDL)](#translating-quick-sql-into-oracle-sql-data-definition-language-ddl)
     - [DDL NodeJS ECMA Script Module (ESM) Example](#ddl-nodejs-ecma-script-module-esm-example)
     - [DDL NodeJS Common JS (CJS) Example](#ddl-nodejs-common-js-cjs-example)
     - [DDL Browser ECMA Script Module (ESM) Example](#ddl-browser-ecma-script-module-esm-example)
     - [DDL Browser Universal Module Definition (UMD) Example](#ddl-browser-universal-module-definition-umd-example)
-  - [Transforming Quick SQL into an Entity-Relationship Diagram (ERD)](#transforming-quick-sql-into-an-entity-relationship-diagram-erd)
+- [Transforming Quick SQL into an Entity-Relationship Diagram (ERD)](#transforming-quick-sql-into-an-entity-relationship-diagram-erd)
     - [Prerequisites](#prerequisites)
     - [ERD Browser ESM Example](#erd-browser-esm-example)
     - [ERD Browser UMD Example](#erd-browser-umd-example)
     - [ERD Theming](#erd-theming)
-  - [Contributing](#contributing)
-  - [Security](#security)
-  - [License](#license)
-
-<!-- /TOC -->
-
+- [Contributing](#contributing)
+- [Security](#security)
+- [License](#license)
 
 ## Overview
 
-Quick SQL (QSQL) is a markdown-like shorthand syntax that expands to standards-based
+Quick SQL is a markdown-like shorthand syntax that expands to standards-based
 Oracle SQL. It is useful to rapidly design and prototype data models. Take a
 look at the example below:
 
 ![Quick SQL](./assets/quick-sql-dark.png)
 
 Previously, Quick SQL was only available within Oracle Application Express. This
-project reimplements the QSQL parser and translator into a JavaScript
+project reimplements the Quick SQL parser and translator into a JavaScript
 library which can be used in both NodeJS and the browser.
 
-This repository also includes a QSQL to Entity Relationship Diagram
+This repository also includes a Quick SQL to Entity Relationship Diagram
 module that can be used as seen in the example below:
 
 ![Quick ERD](./assets/quick-erd-dark.png)
@@ -77,12 +73,12 @@ Once you have built the library, you can run the example CLI by executing:
 npm run example-cli -- ./test/department_employees.quicksql
 ```
 
-## Translating QSQL into Oracle SQL Data Definition Language (DDL)
+## Translating Quick SQL into Oracle SQL Data Definition Language (DDL)
 
-The QSQL to DDL translator is the product's core component, It allows users
-to transform a QSQL string into an Oracle SQL string.
+The Quick SQL to DDL translator is the product's core component, It allows users
+to transform a Quick SQL string into an Oracle SQL string.
 
-The Quick SQL Syntax is documented [here](./quicksql.md)
+The Quick SQL Syntax and Grammar are documented [here](./grammar.md)
 
 See below for examples of how to use this library.
 
@@ -356,15 +352,15 @@ Which would produce the following:
 
     ![Dark Quick ERD Example](./assets/quick-erd-dark-example.png)
 
-
 ## Contributing
 
-
-This project welcomes contributions from the community. Before submitting a pull request, please [review our contribution guide](./CONTRIBUTING.md)
+This project welcomes contributions from the community. Before submitting a pull
+request, please [review our contribution guide](./CONTRIBUTING.md)
 
 ## Security
 
-Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
+Please consult the [security guide](./SECURITY.md) for our responsible security
+vulnerability disclosure process
 
 ## License
 
