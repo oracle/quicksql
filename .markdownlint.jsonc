@@ -1,0 +1,15 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DavidAnson/markdownlint/v0.27.0/schema/markdownlint-config-schema.json",
+    "default": true,
+    "MD007": {
+        "indent": 4
+    },
+    "MD033": {
+        "allowed_elements": [
+            "details",
+            "summary",
+            "section",
+            "img"
+        ]
+    }
+}
