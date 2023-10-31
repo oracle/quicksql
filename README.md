@@ -1,5 +1,7 @@
 # Quick SQL <!-- omit in toc -->
 
+[![Node.js CI](https://github.com/oracle/quicksql/actions/workflows/node.js.yml/badge.svg)](https://github.com/oracle/quicksql/actions/workflows/node.js.yml)
+
 ## Table of Contents <!-- omit in toc -->
 
 - [Overview](#overview)
