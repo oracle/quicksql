@@ -19,7 +19,7 @@
     "build:ddl": "TARGET_LIBRARY=DDL vite build",
     "build:erd": "TARGET_LIBRARY=ERD vite build",
     "test": "./test/regression_test.js",
-    "lint:markdown": "markdownlint-cli2 *.md",
+    "lint:markdown": "markdownlint-cli2 *.md, doc/**/*.md",
     "lint": "run-p lint:*",
     "example-cli": "./examples/cli.js ./test/project_management.quicksql"
   },
