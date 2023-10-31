@@ -82,7 +82,7 @@ npm run example-cli -- ./test/department_employees.quicksql
 The QSQL to DDL translator is the product's core component, It allows users
 to transform a QSQL string into an Oracle SQL string.
 
-The Quick SQL Syntax is documented [here](./quicksql.md)
+The Quick SQL Syntax is documented [here](./doc/quicksql.md)
 
 See below for examples of how to use this library.
 

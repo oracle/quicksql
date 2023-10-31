@@ -4,7 +4,7 @@ import fs from "fs";
 
 import quicksql from "../src/ddl.js";
 import lexer from '../src/lexer.js'
-
+import errorMsgs from '../src/errorMsgs.js'
 
 const mismatches = { 
     "frc_patients_insurance_provider_fk": "frc_patients_insurance_prov_fk", 
@@ -56,6 +56,9 @@ function compareTokens( so, sc, strict ) {
     return false;
 }
 
+import checkNoError from './error_msg_tests.js'
+
+
 function processFile( subdir, file ) {
     if( file.indexOf('.') < 0 ) {
         const files = fs.readdirSync(subdir+file);
@@ -88,8 +91,11 @@ function processFile( subdir, file ) {
         output = JSON.stringify(quicksql.toERD(text),null,3);
     else if( ext == '.json' )
         output = quicksql.toQSQL(text);
-    else
-        output = quicksql.toDDL(text);    
+    else {
+        output = quicksql.toDDL(text);
+        const errors =  quicksql.errorMsgs(text);
+        checkNoError(errors, errorMsgs.messages.misalignedAttribute);
+    }    
 
     let cmp = null;
     if(  0 < subdir.indexOf('/erd/') )

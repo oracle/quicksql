@@ -444,7 +444,7 @@ const ddl = (function () {
             this.toDDL(input, options);
             this.options = JSON.parse(JSON.stringify(this.appliedOptions));
 
-            const ret = errorMsgs.findErrors(this);
+            const ret = errorMsgs.findErrors(this, input);
  
             this.appliedOptions = JSON.parse(JSON.stringify(this.options));
             this.resetOptions();
