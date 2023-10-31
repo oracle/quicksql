@@ -157,7 +157,7 @@ view emp_v departments employees
 
 By default, the diagram uses a neutral color scheme as per below:
 
-![Quick ERD Example](./assets/quick-erd-example.png)
+![Quick ERD Example](../../assets/quick-erd-example.png)
 
 However, the diagram can be themed using CSS variables as shown in the example below:
 
@@ -191,8 +191,8 @@ Which would produce the following:
 
 - Light Color Scheme
 
-    ![Light Quick ERD Example](./assets/quick-erd-light-example.png)
+    ![Light Quick ERD Example](../../assets/quick-erd-light-example.png)
 
 - Dark Color Scheme
 
-    ![Dark Quick ERD Example](./assets/quick-erd-dark-example.png)
+    ![Dark Quick ERD Example](../../assets/quick-erd-dark-example.png)

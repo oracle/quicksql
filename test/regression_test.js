@@ -150,7 +150,7 @@ import error_msg_tests from './error_msg_tests.js'
 console.log('error_msg_tests.js');   
 
 
-processFile('./test/', '');
+processFile('./test', '');
 
 console.log("All tests are OK");
 
