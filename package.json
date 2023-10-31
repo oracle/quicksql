@@ -1,11 +1,22 @@
 {
   "name": "@oracle/quicksql",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Quick SQL to DDL and ERD translator",
-  "main": "src/index.js",
+  "main": "./dist/quick-sql.umd.cjs",
+  "module": "./dist/quick-sql.js",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/quick-sql.js",
+      "require": "./dist/quick-sql.umd.cjs"
+    },
+    "./erd": {
+      "import": "./dist/quick-erd.js",
+      "require": "./dist/quick-erd.umd.cjs"
+    }
+  },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "config": {
     "ddlLibraryName": "quickSQL",
@@ -21,7 +32,7 @@
     "test": "./test/regression_test.js",
     "lint:markdown": "markdownlint-cli2 *.md, doc/**/*.md",
     "lint": "run-p lint:*",
-    "example-cli": "./examples/cli.js ./test/project_management.quicksql",
+    "example-cli": "./examples/cli.js",
     "postversion": "run-s build"
   },
   "repository": {
@@ -37,12 +48,16 @@
     "Diagram"
   ],
   "files": [
-    "src/*.js"
+    "assets",
+    "!(CONTRIBUTING).md",
+    "doc/user",
+    "dist"
   ],
   "license": "UPL-1.0",
   "dependencies": {
     "chance": "^1.1.11"
   },
+  "bundledDependencies": true,
   "devDependencies": {
     "eslint": "^8.42.0",
     "markdownlint-cli2": "^0.10.0",

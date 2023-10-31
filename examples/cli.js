@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * Reads QuickSQL input from a file in the filesystem and outputs the translated
+ * Reads Quick SQL input from a file in the filesystem and outputs the generated
  * DDL to console
  * 
  * Execution:
  * 
  * ```sh
- * ./translate.js <FILE_PATH>
+ * ./cli.js <FILE_PATH>
  * ```
  */
 
@@ -18,7 +18,7 @@ import quicksql from '../dist/quick-sql.js';
 function print_usage() {
     console.log(
         /* eslint-disable indent */
-`QuickSQL ${ quicksql.version } Translation Example
+`Quick SQL ${ quicksql.version } DDL Generation Example
 
 Usage: ./cli.js <FILE_PATH>
 Example: ./cli.js ../test/project_management.quicksql
