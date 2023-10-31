@@ -74,7 +74,7 @@ npm run example-cli -- ./test/department_employees.quicksql
 The Quick SQL to DDL translator is the product's core component, It allows users
 to transform a Quick SQL string into an Oracle SQL string.
 
-The Quick SQL Syntax and Grammar are documented [here](./quick-sql-grammar.md)
+The Quick SQL Syntax and Grammar are documented [here](./doc/quick-sql-grammar.md)
 
 See below for examples of how to use this library.
 
@@ -160,7 +160,7 @@ view emp_v departments employees
 
 ## Transforming Quick SQL into an Entity-Relationship Diagram (ERD)
 
-Requires a paid library. Review the usage [here](./erd.md)
+Requires a paid library. Review the usage [here](./doc/quick-erd.md)
 
 ## Contributing
 
