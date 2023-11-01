@@ -4,12 +4,12 @@
 
 - [API](#api)
 - [Error Types](#error-types)
-    - [Misaligned Attributes](#misaligned-attributes)
-    - [Invalid Object references](#invalid-object-references)
-        - [Invalid Table reference in a View](#invalid-table-reference-in-a-view)
-        - [Invalid foreign key](#invalid-foreign-key)
-        - [Duplicate ID](#duplicate-id)
-        - [Missconstructed column type](#missconstructed-column-type)
+  - [Misaligned Attributes](#misaligned-attributes)
+  - [Invalid Object references](#invalid-object-references)
+    - [Invalid Table reference in a View](#invalid-table-reference-in-a-view)
+    - [Invalid foreign key](#invalid-foreign-key)
+    - [Duplicate ID](#duplicate-id)
+    - [Missconstructed column type](#missconstructed-column-type)
 
 ## API
 
@@ -44,6 +44,8 @@ function Offset( line, depth ) {
     this.depth = depth;   // 0-based
 }
 ```
+
+(JSFidle with QSQL diagnostics for CodeMirror)[https://jsfiddle.net/mq67Lshz/1/]
 
 ## Error Types
 
