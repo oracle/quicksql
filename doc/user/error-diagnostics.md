@@ -45,7 +45,7 @@ function Offset( line, depth ) {
 }
 ```
 
-(JSFidle with QSQL diagnostics for CodeMirror)[https://jsfiddle.net/mq67Lshz/1/]
+[JSFidle with QSQL diagnostics for CodeMirror](https://jsfiddle.net/mq67Lshz/1/)
 
 ## Error Types
 
