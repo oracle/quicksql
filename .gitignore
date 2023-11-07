@@ -4,4 +4,3 @@ node_modules
 !.env*.example
 build
 examples/diagram-generator/libs/rappid.*
-.vscode/extensions.json
