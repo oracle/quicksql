@@ -1,4 +1,4 @@
-import singular from './singular.js';
+import {singular,concatNames,canonicalObjectName} from './naming.js';
 import translate from './translate.js';
 import sample from './sample.js';
 import lexer from './lexer.js';
@@ -206,7 +206,7 @@ let tree = (function(){
             if (c >= '0' && c <= '9') {
                 rEt = 'x'+rEt;
             } 
-            return amend_reserved_word(ddl.canonicalObjectName(rEt));
+            return amend_reserved_word(canonicalObjectName(rEt));
         };
         this.parseType = function( pure ) {
             if( this.children != null && 0 < this.children.length )
@@ -259,19 +259,20 @@ let tree = (function(){
             if( src[0].value.endsWith('id') && vcPos < 0 && this.indexOf('/')+1 == this.indexOf('pk') ) 
                 ret = 'number';
 
+            let parent_child = concatNames(parent.parseName(),'_',this.parseName());
+
             if( src[0].value.endsWith('_yn') || src[0].value.startsWith('is_') ) {
-                ret = 'varchar2(1 char) constraint '+ddl.objPrefix()+parent.parseName()+'_'+this.parseName()+'\n';
+                ret = 'varchar2(1 char) constraint '+concatNames(ddl.objPrefix(),parent_child)+'\n';
                 ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'check ('+this.parseName()+" in ('Y','N'))";
             }
             for( let i in boolTypes ) {
                 let pos = this.indexOf(boolTypes[i]);
                 if( 0 < pos ) {
-                    ret = 'varchar2(1 char) constraint '+ddl.objPrefix()+parent.parseName()+'_'+this.parseName()+'\n';
+                    ret = 'varchar2(1 char) constraint '+concatNames(ddl.objPrefix(),parent_child)+'\n';
                     ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'check ('+this.parseName()+" in ('Y','N'))";
                     break;
                 }
             }
-
 
             if( this.indexOf('phone_number') == 0 )
                 ret = 'number';
@@ -315,9 +316,10 @@ let tree = (function(){
                 return ret;
             }	
 
+
             if( 0 < this.indexOf('unique') ) {
                 ret += '\n';  
-                ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+parent.parseName()+'_'+this.parseName()+'_unq unique';
+                ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+parent_child+'_unq unique';
             } 
             var optQuote = '\'';
             if(  ret.startsWith('integer') || ret.startsWith('number') || ret.startsWith('date')  ) 
@@ -344,7 +346,7 @@ let tree = (function(){
                     values = values.replace(/,/g,optQuote+','+optQuote);
                 else	
                     values = values.replace(/ /g,optQuote+','+optQuote);
-                ret +=' constraint '+ddl.objPrefix()+parent.parseName()+'_'+this.parseName()+'_ck\n';
+                ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
                 ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'check ('+this.parseName()+' in ('+optQuote+values+optQuote+'))';    
                 ret = ret.replace(/''/gm,"'");    
     		
@@ -352,7 +354,7 @@ let tree = (function(){
             if( 0 < this.indexOf('between') ) {
                 const bi = this.indexOf('between');
                 const values = src[bi+1].value + ' and ' + src[bi+3].value;
-                ret +=' constraint '+parent.parseName()+'_'+this.parseName()+'_bet\n';
+                ret +=' constraint '+concatNames(parent_child,'_bet')+'\n';
                 ret +='           check ('+this.parseName()+' between '+values+')';        		
             }
             if( 0 < this.indexOf('pk') ) {
@@ -366,7 +368,7 @@ let tree = (function(){
                 if( ret.startsWith('number') && ddl.optionEQvalue('pk', ddl.guid) )
                     typeModifier = ' default on null to_number(sys_guid(), \'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\') ';
                 ret += typeModifier +'\n';  
-                ret += tab +  tab + ' '.repeat(parent.maxChildNameLen()) +'constraint '+ddl.objPrefix()+parent.parseName()+'_'+this.parseName()+'_pk primary key';
+                ret += tab + tab + ' '.repeat(parent.maxChildNameLen()) + 'constraint ' + concatNames(ddl.objPrefix(),parent_child,'_pk')+' primary key';
             }
             return ret;
         };
@@ -602,8 +604,9 @@ let tree = (function(){
                     typeModifier = 'default on null '+objName+'_seq.NEXTVAL '.toLowerCase();
                 if( ddl.optionEQvalue('pk', ddl.guid) )
                     typeModifier = 'default on null to_number(sys_guid(), \'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\') ';
-                ret += tab +  idColName + pad + 'number ' + typeModifier + '\n';  
-                ret += tab +  tab+' '.repeat(this.maxChildNameLen()) +'constraint '+objName+'_'+idColName+'_pk primary key,\n';
+                ret += tab +  idColName + pad + 'number ' + typeModifier + '\n';
+                const obj_col = concatNames(objName,'_',idColName);  
+                ret += tab +  tab+' '.repeat(this.maxChildNameLen()) +'constraint '+concatNames(obj_col,'_pk')+' primary key,\n';
             } else {
                 let pkNode = this.getExplicitPkNode();
                 if( pkNode != null ) {
