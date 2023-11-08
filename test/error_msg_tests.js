@@ -1,4 +1,4 @@
-import  ddl from "../src/ddl.js";
+import  {errors, ddl} from "../src/ddl.js";
 import errorMsgs from '../src/errorMsgs.js'
 
 
@@ -22,45 +22,45 @@ export function checkNoError(msgList, msgPrefix) {
 
 export default function error_msg_tests() {
 
-    let output = ddl.errorMsgs(`dept
+    let output =errors(`dept
     id
     `);
     checkError(output, 1, 4, errorMsgs.messages.duplicateId);
   
-    output = ddl.errorMsgs(`dept
+    output = new ddl(`dept
     name vc-200
     name vc0
-    `);
+    `).getErrors();
     checkError(output, 1, 4+4+2+1, errorMsgs.messages.invalidDatatype);
     checkError(output, 2, 4+4+1, errorMsgs.messages.invalidDatatype);
     checkNoError(output, errorMsgs.messages.misalignedAttribute);
 
-    output = ddl.errorMsgs(`dept
+    output = new ddl(`dept
     name
 customer
     dept /fk department    
-    `);
+    `).getErrors();
     checkError(output, 3, 4+4+1+3+1, errorMsgs.messages.undefinedObject+'department');
     checkNoError(output, errorMsgs.messages.misalignedAttribute);
 
-    output = ddl.errorMsgs(`dept
+    output = new ddl(`dept
     name
 view customer_view customer
-    `);
+    `).getErrors();
     checkError(output, 2, 4+1+13+1, errorMsgs.messages.undefinedObject+'customer');
     checkNoError(output, errorMsgs.messages.misalignedAttribute);
 
-    output = ddl.errorMsgs(`dept
+    output = new ddl(`dept
    col1
     "is this table or misaligned column?"
-    `);
+    `).getErrors();
     checkError(output, 2, 4, errorMsgs.messages.misalignedAttribute+"3");
 
-    output = ddl.errorMsgs(`dept
+    output = new ddl(`dept
    col1
    col2
     "is this table or misaligned column?"
-    `);
+    `).getErrors();
     checkError(output, 3, 4, errorMsgs.messages.misalignedAttribute+"3");
 
 }

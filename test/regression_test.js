@@ -2,7 +2,7 @@
 
 import fs from "fs";
 
-import quicksql from "../src/ddl.js";
+import {ddl, toQSQL} from "../src/ddl.js";
 import lexer from '../src/lexer.js'
 import errorMsgs from '../src/errorMsgs.js'
 
@@ -88,12 +88,13 @@ function processFile( subdir, file ) {
 
     let output = null;
     if( 0 < subdir.indexOf('/erd/') )
-        output = JSON.stringify(quicksql.toERD(text),null,3);
+        output = JSON.stringify(new ddl(text).getERD(),null,3);
     else if( ext == '.json' )
-        output = quicksql.toQSQL(text);
+        output = toQSQL(text);
     else {
-        output = quicksql.toDDL(text);
-        const errors =  quicksql.errorMsgs(text);
+        const parsed = new ddl(text);
+        output = parsed.getDDL();
+        const errors =  parsed.getErrors(text);
         checkNoError(errors, errorMsgs.messages.misalignedAttribute);
         checkNoError(errors, errorMsgs.messages.undefinedObject);
     }    

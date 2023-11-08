@@ -1,5 +1,5 @@
 import {singular} from './naming.js';
-import  ddl from "../src/ddl.js";
+import  {ddl} from "../src/ddl.js";
 
 
 var json2qsql = (function () {
