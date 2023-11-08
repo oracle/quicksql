@@ -451,10 +451,6 @@ export const ddl = (function () {
 
     }
  
-    /*Object.defineProperty( this, 'version', {
-        writable: false,
-        value: typeof __PACKAGE_VERSION__ === 'undefined' ? 'development' : __PACKAGE_VERSION__
-    });*/
     return Parsed;
 }());
 
