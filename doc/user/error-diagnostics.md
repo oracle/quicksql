@@ -16,9 +16,9 @@
 Error diagnostics procedure is called like this
 
 ```js
-let output = ddl.errorMsgs(`dept
+let output = new parsed.(`dept
    col1
- "is this table or misaligned column?"`);
+ "is this table or misaligned column?"`).getErrors();
 ```
 
 It returns an array of the Error objects

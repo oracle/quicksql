@@ -1,4 +1,4 @@
-import  {ddl, toERD} from "../src/ddl.js";
+import  {parsed, toERD} from "../src/ddl.js";
 
 import fs from "fs";
 
@@ -44,10 +44,8 @@ export default function diagram_tests() {
 `Bug35827754
     data file
     `
-    output = new ddl(input).getERD();
+    output = new parsed(input).getERD();
 
-    //console.log(ddl.toDDL(input));    
-    //console.log(JSON.stringify(output, null, 4));    
     assert( "output.items[0].columns[2].name == 'data_filename'" );
     assert( "output.items[0].columns[2].datatype == 'varchar2(255 char)'" );
     assert( "output.items[0].columns[5].name == 'data_lastupd'" );

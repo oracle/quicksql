@@ -18,7 +18,7 @@ The former calls `toDDL` and `toERD`
 are encouraged to be replaced with
 
 ```
-   let parsed = new ddl(input,opt);
+   let parsed = new parsed(input,opt);
    let output = parsed.getDDL();
    let errors = parsed.getErrors();
 ```

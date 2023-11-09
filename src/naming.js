@@ -1,5 +1,4 @@
 export function singular( name ) {
-    // ddl.options["Duality View"].value != 'yes'
     // identity columns in JSON document are singular
     if( name == null )
         return name;

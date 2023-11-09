@@ -11,7 +11,7 @@ export const guid = 'guid';
 export const tswtz = 'Timestamp with time zone';
 export const tswltz = 'Timestamp with local time zone';
 
-export const ddl = (function () {
+export const parsed = (function () {
 
     const defaultOptions = { 
         apex: {label: 'APEX', value:'no',check:['yes','no']},
@@ -471,8 +471,7 @@ export function toQSQL( input ) {
  * @returns JSON object listing tables and links
  */
 export function toERD( input, options ) {
-    const parsed = new ddl(input, options);
-    return parsed.getERD();
+    return new parsed(input, options).getERD();
 };
 
 /**
@@ -482,8 +481,7 @@ export function toERD( input, options ) {
  * @returns translated DDL 
  */
 export function toDDL( input, options ) {
-    const parsed = new ddl(input, options);
-    return parsed.getDDL();
+    return new parsed(input, options).getDDL();
 }; 
 /**
  * @deprecated since version 1.2.0. 
@@ -492,8 +490,7 @@ export function toDDL( input, options ) {
  * @returns list of SyntaxError objects 
  */
 export function errors( input, options ) {
-    const parsed = new ddl(input, options);
-    return parsed.getErrors();
+    return new parsed(input, options).getErrors();
 }; 
 
 export const version = {
@@ -501,8 +498,8 @@ export const version = {
     value: typeof __PACKAGE_VERSION__ === 'undefined' ? 'development' : __PACKAGE_VERSION__
 };
 
-ddl.version = version;
-ddl.toDDL = toDDL;  // legacy, deprecated
-ddl.toERD = toERD;  // legacy, deprecated
+parsed.version = version;
+parsed.toDDL = toDDL;  // legacy, deprecated
+parsed.toERD = toERD;  // legacy, deprecated
 
-export default ddl;
+export default parsed;
