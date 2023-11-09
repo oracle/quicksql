@@ -12,7 +12,7 @@ var output1;
 
 export default function small_tests() {
 
-    output = toDDL(   // backward compatible but deprecated function call
+    output = toDDL(   // 1.1.5 compatible but deprecated function call
         `departments
             name
 # settings = {"prefix": "RIGHT"}  

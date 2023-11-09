@@ -28,7 +28,7 @@ export default function diagram_tests() {
     emp
         name
     `
-    output = JSON.stringify(toERD(input,opt), null, 4); // legacy compatibility
+    output = JSON.stringify(toERD(input,opt), null, 4); // 1.1.5 compatibility
     //console.log(output);
 
     assert( "0 < output.indexOf('prefix_dept')" );

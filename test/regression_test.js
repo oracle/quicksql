@@ -142,6 +142,9 @@ function processFile( subdir, file ) {
 
 let t1 = Date.now();
 
+import compatibility_tests from './compatibility_tests.js'
+console.log('compatibility_tests.js'); 
+
 import small_tests from './small_tests.js'
 console.log('small_tests.js'); 
 
