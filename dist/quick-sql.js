@@ -666,16 +666,16 @@ var re = { exports: {} };
       }
       return f = u(e, f), f.email || (f.email = this.email()), f.protocol = s[f.protocol] ? f.protocol + ":" : "", f.size = parseInt(f.size, 0) ? f.size : "", f.rating = P[f.rating] ? f.rating : "", f.fallback = g[f.fallback] ? f.fallback : "", f.fileExtension = c[f.fileExtension] ? f.fileExtension : "", a = f.protocol + n + this.bimd5.md5(f.email) + (f.fileExtension ? "." + f.fileExtension : "") + (f.size || f.rating || f.fallback ? "?" : "") + (f.size ? "&s=" + f.size.toString() : "") + (f.rating ? "&r=" + f.rating : "") + (f.fallback ? "&d=" + f.fallback : ""), a;
     }, i.prototype.color = function(e) {
-      function a(U, Q) {
-        return [U, U, U].join(Q || "");
+      function a(U, $) {
+        return [U, U, U].join($ || "");
       }
       function n(U) {
-        var Q = U ? "rgba" : "rgb", ne = U ? "," + this.floating({ min: W, max: K }) : "", ie = c ? a(this.natural({ min: g, max: P }), ",") : this.natural({ min: C, max: A }) + "," + this.natural({ min: H, max: _ }) + "," + this.natural({ max: 255 });
-        return Q + "(" + ie + ne + ")";
+        var $ = U ? "rgba" : "rgb", ne = U ? "," + this.floating({ min: W, max: K }) : "", ie = c ? a(this.natural({ min: g, max: P }), ",") : this.natural({ min: C, max: A }) + "," + this.natural({ min: H, max: _ }) + "," + this.natural({ max: 255 });
+        return $ + "(" + ie + ne + ")";
       }
-      function s(U, Q, ne) {
-        var ie = ne ? "#" : "", X = "";
-        return c ? (X = a(this.pad(this.hex({ min: g, max: P }), 2)), e.format === "shorthex" && (X = a(this.hex({ min: 0, max: 15 })))) : e.format === "shorthex" ? X = this.pad(this.hex({ min: Math.floor(f / 16), max: Math.floor(v / 16) }), 1) + this.pad(this.hex({ min: Math.floor(C / 16), max: Math.floor(A / 16) }), 1) + this.pad(this.hex({ min: Math.floor(H / 16), max: Math.floor(_ / 16) }), 1) : f !== void 0 || v !== void 0 || C !== void 0 || A !== void 0 || H !== void 0 || _ !== void 0 ? X = this.pad(this.hex({ min: f, max: v }), 2) + this.pad(this.hex({ min: C, max: A }), 2) + this.pad(this.hex({ min: H, max: _ }), 2) : X = this.pad(this.hex({ min: g, max: P }), 2) + this.pad(this.hex({ min: g, max: P }), 2) + this.pad(this.hex({ min: g, max: P }), 2), ie + X;
+      function s(U, $, ne) {
+        var ie = ne ? "#" : "", q = "";
+        return c ? (q = a(this.pad(this.hex({ min: g, max: P }), 2)), e.format === "shorthex" && (q = a(this.hex({ min: 0, max: 15 })))) : e.format === "shorthex" ? q = this.pad(this.hex({ min: Math.floor(f / 16), max: Math.floor(v / 16) }), 1) + this.pad(this.hex({ min: Math.floor(C / 16), max: Math.floor(A / 16) }), 1) + this.pad(this.hex({ min: Math.floor(H / 16), max: Math.floor(_ / 16) }), 1) : f !== void 0 || v !== void 0 || C !== void 0 || A !== void 0 || H !== void 0 || _ !== void 0 ? q = this.pad(this.hex({ min: f, max: v }), 2) + this.pad(this.hex({ min: C, max: A }), 2) + this.pad(this.hex({ min: H, max: _ }), 2) : q = this.pad(this.hex({ min: g, max: P }), 2) + this.pad(this.hex({ min: g, max: P }), 2) + this.pad(this.hex({ min: g, max: P }), 2), ie + q;
       }
       e = u(e, {
         format: this.pick(["hex", "shorthex", "rgb", "rgba", "0x", "name"]),
@@ -7256,7 +7256,7 @@ var Y = new be(), le = function() {
     return "'N/A'";
   }
   return m;
-}(), ee = function() {
+}(), ae = function() {
   function m(b, E) {
     for (var k = [], M = "", x = 0; x < b.length; x++) {
       for (var p = b.charAt(x), h = k.length, y = 0; y < E.length; y++) {
@@ -7271,7 +7271,7 @@ var Y = new be(), le = function() {
     return 0 < M.length && k.push(M), k;
   }
   return m;
-}(), $ = function() {
+}(), ee = function() {
   function m(M, x, p, h, y, S) {
     this.type = h, this.value = M, this.begin = x, this.end = p, this.line = y, this.col = S, this.toString = function() {
       return "{type:" + h + ",value:" + M + "}";
@@ -7312,7 +7312,7 @@ var Y = new be(), le = function() {
   }
   function b(M, x, p) {
     for (var h = [], y = `(){}[]^-|!*+.><='",;:%@?/\\#~` + p, S = ` 
-\r	`, i = ee(
+\r	`, i = ae(
       M,
       //".*-+/|><=()\'\", \n\r\t"
       y + S
@@ -7411,7 +7411,7 @@ var Y = new be(), le = function() {
     if (0 > M.indexOf("e") && 0 > M.indexOf("f") && 0 > M.indexOf("d"))
       return !1;
     0 <= M.indexOf("e"), 0 <= M.indexOf("e"), !(0 <= M.indexOf("e")) && 0 <= M.indexOf("f");
-    for (var y = ee(M, "efd"), S = 0; S < y.length; S++) {
+    for (var y = ae(M, "efd"), S = 0; S < y.length; S++) {
       var i = y[S];
       p += i.length, "0" <= i.charAt(0) && i.charAt(0) <= "9" ? x.push(new m(i, p - i.length, p, "constant.numeric", h)) : x.push(new m(i, p - i.length, p, "identifier", h));
     }
@@ -7616,7 +7616,7 @@ let se = function() {
     }, this.trimmedContent = function() {
       var r = this.content.trim(), t = r.indexOf("["), l = r.indexOf("]");
       return this.comment == null && 0 < t && (this.comment = r.substr(t + 1, l - t - 1)), 0 < t && (r = r.substr(0, t) + r.substr(l + 2)), t = r.indexOf("--"), this.comment == null && 0 < t && (this.comment = r.substr(t + 2)), 0 < t && (r = r.substr(0, t)), r.trim();
-    }, this.src = $(this.content.toLowerCase(), !1, !0, ""), this.parseName = function() {
+    }, this.src = ee(this.content.toLowerCase(), !1, !0, ""), this.parseName = function() {
       let r = this.trimmedContent();
       r = r.replace(/\t/, b);
       const t = r.indexOf('"'), l = r.indexOf('"', t + 1);
@@ -7709,7 +7709,7 @@ let se = function() {
       }
       if (0 < this.indexOf("pk")) {
         let D = " not null";
-        T.startsWith("number") && m.optionEQvalue("pk", q) && (D = " GENERATED BY DEFAULT ON NULL AS IDENTITY".toLowerCase()), T.startsWith("number") && m.optionEQvalue("pk", "seq") && (D = " default on null " + (m.objPrefix() + this.parent.parseName()) + "_seq.NEXTVAL ".toLowerCase()), T.startsWith("number") && m.optionEQvalue("pk", Z) && (D = " default on null to_number(sys_guid(), 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX') "), T += D + `
+        T.startsWith("number") && m.optionEQvalue("pk", Z) && (D = " GENERATED BY DEFAULT ON NULL AS IDENTITY".toLowerCase()), T.startsWith("number") && m.optionEQvalue("pk", "seq") && (D = " default on null " + (m.objPrefix() + this.parent.parseName()) + "_seq.NEXTVAL ".toLowerCase()), T.startsWith("number") && m.optionEQvalue("pk", Q) && (D = " default on null to_number(sys_guid(), 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX') "), T += D + `
 `, T += b + b + " ".repeat(i.maxChildNameLen()) + "constraint " + J(m.objPrefix(), N, "_pk") + " primary key";
       }
       return T;
@@ -7804,7 +7804,7 @@ let se = function() {
       let B = this.getGenIdColName();
       if (B != null) {
         let a = "not null";
-        m.optionEQvalue("pk", q) && (a = "GENERATED BY DEFAULT ON NULL AS IDENTITY".toLowerCase()), m.optionEQvalue("pk", "seq") && (a = "default on null " + d + "_seq.NEXTVAL ".toLowerCase()), m.optionEQvalue("pk", Z) && (a = "default on null to_number(sys_guid(), 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX') "), o += b + B + L + "number " + a + `
+        m.optionEQvalue("pk", Z) && (a = "GENERATED BY DEFAULT ON NULL AS IDENTITY".toLowerCase()), m.optionEQvalue("pk", "seq") && (a = "default on null " + d + "_seq.NEXTVAL ".toLowerCase()), m.optionEQvalue("pk", Q) && (a = "default on null to_number(sys_guid(), 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX') "), o += b + B + L + "number " + a + `
 `;
         const n = J(d, "_", B);
         o += b + b + " ".repeat(this.maxChildNameLen()) + "constraint " + J(n, "_pk") + ` primary key,
@@ -8115,7 +8115,7 @@ end;
 `.toLowerCase(), l += `    end if;
 `, l += "    :new." + m.getOptionValue("updatedcol") + ` := SYSDATE;
 `.toLowerCase(), l += "    :new." + m.getOptionValue("updatedbycol") + " := " + L + `;
-`.toLowerCase(), d = !0), m.optionEQvalue("genpk", "yes") && m.optionEQvalue("pk", Z) && (l += `    if :new.id is null then
+`.toLowerCase(), d = !0), m.optionEQvalue("genpk", "yes") && m.optionEQvalue("pk", Q) && (l += `    if :new.id is null then
 `, l += `        :new.id := to_number(sys_guid(), 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX');
 `, l += `    end if;
 `, d = !0);
@@ -8409,7 +8409,7 @@ modify ` + I + " generated always  as identity restart start with " + (B + 1) + 
     m = y;
     const S = y.input;
     let i = [], u = [];
-    const r = $(S + `
+    const r = ee(S + `
 `, !0, !0, "");
     m.data = null;
     let t = null, l = "", o = 0;
@@ -8457,7 +8457,7 @@ modify ` + I + " generated always  as identity restart start with " + (B + 1) + 
           if (t += L.value, L.value != `
 ` && L.value != "}")
             continue;
-          const B = $(t, !1, !0, "");
+          const B = ee(t, !1, !0, "");
           if (B.length % 4 == 3 && B[1].value == ":") {
             y.setOptions(t), t = null, l = "";
             continue;
@@ -8585,7 +8585,7 @@ dv ` + E + "_dv " + E, h += `
 
 #settings = { genpk: false, drop: true }`, h += `
 
--- Generated by json2qsql.js ${ae.version} ` + (/* @__PURE__ */ new Date()).toLocaleString() + `
+-- Generated by json2qsql.js ${X.version} ` + (/* @__PURE__ */ new Date()).toLocaleString() + `
 
 `, h += `#document = 
 `, h += JSON.stringify(k, null, 3), h += `
@@ -8639,7 +8639,7 @@ const Ce = function() {
   function k(p, h) {
     var y = [], S = h.content.toLowerCase();
     if (h.parseType() == "view") {
-      var i = ee(S, " ");
+      var i = ae(S, " ");
       let t = 0;
       for (var u = 0; u < i.length; u++)
         if (t += i[u].length, i[u] != " " && i[u] != "view" && u != 1) {
@@ -8655,7 +8655,7 @@ const Ce = function() {
   function M(p, h) {
     var y = [], S = h.content.toLowerCase();
     if (0 < S.indexOf("/fk") || 0 < S.indexOf("/reference")) {
-      let r = ee(S, " "), t = 0, l = !1;
+      let r = ae(S, " "), t = 0, l = !1;
       for (var i = 0; i < r.length; i++)
         if (t += r[i].length, r[i] != " ") {
           if (r[i] == "/fk" || r[i].indexOf("/reference") == 0) {
@@ -8732,7 +8732,7 @@ const j = {
   invalidDatatype: "Invalid Datatype",
   undefinedObject: "Undefined Object: ",
   misalignedAttribute: "Misaligned Table or Column; apparent indent = "
-}, ye = { findErrors: Ce, messages: j }, q = "identityDataType", Z = "guid", ce = "Timestamp with time zone", ue = "Timestamp with local time zone", ae = function() {
+}, ye = { findErrors: Ce, messages: j }, Z = "identityDataType", Q = "guid", ce = "Timestamp with time zone", ue = "Timestamp with local time zone", X = function() {
   const m = {
     apex: { label: "APEX", value: "no", check: ["yes", "no"] },
     auditcols: { label: "Audit Columns", value: "no", check: ["yes", "no"] },
@@ -8756,7 +8756,7 @@ const j = {
     overridesettings: { label: "Ignore toDDL() second parameter", value: "no", check: ["yes", "no"] },
     prefix: { label: "Object Prefix", value: "" },
     //ondelete: {label: 'On Delete', value:'Cascade',check:['restrict','cascade','set null']},
-    pk: { label: "Primary Key Maintenance", value: q, check: [q, Z, "SEQ", "NONE"] },
+    pk: { label: "Primary Key Maintenance", value: Z, check: [Z, Q, "SEQ", "NONE"] },
     prefixpkwithtname: { label: "Prefix primary keys with table name", value: "no", check: ["yes", "no"] },
     rowkey: { label: "Alphanumeric Row Identifier", value: "no", check: ["yes", "no"] },
     rowversion: { label: "Row Version Number", value: "no", check: ["yes", "no"] },
@@ -8770,7 +8770,7 @@ const j = {
     if (k == null)
       return null;
     let M = k;
-    return typeof M == "string" && (M = M.toLowerCase()), M == "yes" ? !0 : M == "no" ? !1 : M == "y" ? !0 : M == "n" ? !1 : M == "true" ? !0 : M == "false" ? !1 : M == q.toLowerCase() ? "identity" : M == Z.toLowerCase() ? "guid" : M == ce.toLowerCase() ? "tswtz" : M == ue.toLowerCase() ? "tswltz" : M;
+    return typeof M == "string" && (M = M.toLowerCase()), M == "yes" ? !0 : M == "no" ? !1 : M == "y" ? !0 : M == "n" ? !1 : M == "true" ? !0 : M == "false" ? !1 : M == Z.toLowerCase() ? "identity" : M == Q.toLowerCase() ? "guid" : M == ce.toLowerCase() ? "tswtz" : M == ue.toLowerCase() ? "tswltz" : M;
   }
   function E(k, M) {
     this.ddl = null, this.erd = null, this.errors = null, this.options = JSON.parse(JSON.stringify(m)), this.input = k, this.getOptionValue = function(p) {
@@ -8825,7 +8825,7 @@ const j = {
       const h = p.indexOf("=");
       let y = p.substring(h + 1).trim();
       y.indexOf("{") < 0 && (y = "{" + p + "}");
-      let S = "", i = $(y, !0, !0, "");
+      let S = "", i = ee(y, !0, !0, "");
       for (let r in i) {
         let t = i[r];
         t.type == "identifier" && t.value != "true" && t.value != "false" && t.value != "null" ? S += '"' + t.value + '"' : S += t.value;
@@ -8995,32 +8995,36 @@ const j = {
   }
   return E;
 }();
-function Se(m) {
+function Ie(m) {
   const b = JSON.parse(m);
   return ge.introspect(null, b, 0);
 }
+function Se(m, b) {
+  return new X(m, b).getERD();
+}
 function Me(m, b) {
-  return new ae(m, b).getERD();
+  return new X(m, b).getDDL();
 }
-function Te(m, b) {
-  return new ae(m, b).getDDL();
+function Be(m, b) {
+  return new X(m, b).getErrors();
 }
-function Ie(m, b) {
-  return new ae(m, b).getErrors();
-}
-const Be = {
+const Te = {
   writable: !1,
   value: "1.2.0"
 };
+X.version = Te;
+X.toDDL = Me;
+X.toERD = Se;
 export {
-  ae as ddl,
-  Ie as errors,
-  Z as guid,
-  q as identityDataType,
-  Te as toDDL,
-  Me as toERD,
-  Se as toQSQL,
+  X as ddl,
+  X as default,
+  Be as errors,
+  Q as guid,
+  Z as identityDataType,
+  Me as toDDL,
+  Se as toERD,
+  Ie as toQSQL,
   ue as tswltz,
   ce as tswtz,
-  Be as version
+  Te as version
 };

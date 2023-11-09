@@ -51,12 +51,12 @@ See below for examples of how to use this library.
 ### DDL NodeJS ECMA Script Module (ESM) Example
 
 ```js
-import { toDDL } from "@oracle/quicksql";
+import { ddl } from "@oracle/quicksql";
 import fs from "fs";
 
 try {
     const text = fs.readFileSync( './test/department_employees.quicksql' );
-    console.log( toDDL( text.toString() ) );
+    console.log( new ddl( text.toString() ).getDDL() );
 } catch( e ) {
     console.error( e );
 };
@@ -65,12 +65,12 @@ try {
 ### DDL NodeJS Common JS (CJS) Example
 
 ```js
-const { toDDL } = require( "@oracle/quicksql" );
+const { ddl } = require( "@oracle/quicksql" );
 const fs = require( "fs" );
 
 try {
     const text = fs.readFileSync( './test/department_employees.quicksql' );
-    console.log( toDDL( text.toString() ) );
+    console.log( new ddl( text.toString() ).getDDL() );
 } catch( e ) {
     console.error( e );
 };
@@ -80,8 +80,8 @@ try {
 
 ```html
 <script type="module">
-    import { toDDL } from './dist/quick-sql.js';
-    document.body.innerText = toDDL(
+    import { ddl } from './dist/quick-sql.js';
+    document.body.innerText = new ddl(
 `departments /insert 2
     name /nn
     location
@@ -98,7 +98,7 @@ view emp_v departments employees
 # settings = { "prefix": null, "semantics": "CHAR", "DV": false }
 
 `
-    );
+    ).getDDL();
 </script>
 ```
 
@@ -107,7 +107,7 @@ view emp_v departments employees
 ```html
 <script src="./dist/quick-sql.umd.cjs"></script>
 <script>
-    document.body.innerText = quickSQL.toDDL(
+    document.body.innerText = new quickSQL.ddl(
 `departments /insert 2
     name /nn
     location
@@ -124,7 +124,7 @@ view emp_v departments employees
 # settings = { "prefix": null, "semantics": "CHAR", "DV": false }
 
 `
-    );
+    ).toDDL();
 </script>
 ```
 

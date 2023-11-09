@@ -501,4 +501,8 @@ export const version = {
     value: typeof __PACKAGE_VERSION__ === 'undefined' ? 'development' : __PACKAGE_VERSION__
 };
 
-//export default ddl;
+ddl.version = version;
+ddl.toDDL = toDDL;  // legacy, deprecated
+ddl.toERD = toERD;  // legacy, deprecated
+
+export default ddl;
