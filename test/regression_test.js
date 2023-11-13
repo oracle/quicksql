@@ -2,7 +2,7 @@
 
 import fs from "fs";
 
-import {parsed, toQSQL} from "../src/ddl.js";
+import {fromJSON} from "../src/ddl.js";
 import lexer from '../src/lexer.js'
 import errorMsgs from '../src/errorMsgs.js'
 
@@ -88,11 +88,11 @@ function processFile( subdir, file ) {
 
     let output = null;
     if( 0 < subdir.indexOf('/erd/') )
-        output = JSON.stringify(new parsed(text).getERD(),null,3);
+        output = JSON.stringify(new quicksql(text).getERD(),null,3);
     else if( ext == '.json' )
-        output = toQSQL(text);
+        output = fromJSON(text);
     else {
-        const p = new parsed(text);
+        const p = new quicksql(text);
         output = p.getDDL();
         const errors =  p.getErrors(text);
         checkNoError(errors, errorMsgs.messages.misalignedAttribute);
@@ -165,5 +165,5 @@ console.log("Compared with 364-412 ms as of 10/2/2023");
 console.log("              506 ms     as of 11/8/2023");
 
 
-import quicksql from '../dist/quick-sql.js';
+import {quicksql} from '../dist/quick-sql.js';
 console.log("Version "+quicksql.version.value);

@@ -22,9 +22,9 @@ try {
         input = output;
     } 
     if( 0 <= file.indexOf('/erd/') ) {
-        output = JSON.stringify(new parsed(input).toERD(), null, 4);
+        output = JSON.stringify(new quicksql(input).toERD(), null, 4);
     } else
-        output = new parsed(input).toDDL();
+        output = new quicksql(input).toDDL();
     console.log(output);    
 } catch(e) {
     console.error(e);

@@ -51,12 +51,12 @@ See below for examples of how to use this library.
 ### DDL NodeJS ECMA Script Module (ESM) Example
 
 ```js
-import { parsed } from "@oracle/quicksql";
+import { quicksql } from "@oracle/quicksql";
 import fs from "fs";
 
 try {
     const text = fs.readFileSync( './test/department_employees.quicksql' );
-    console.log( new parsed( text.toString() ).getDDL() );
+    console.log( new quicksql( text.toString() ).getDDL() );
 } catch( e ) {
     console.error( e );
 };
@@ -65,12 +65,12 @@ try {
 ### DDL NodeJS Common JS (CJS) Example
 
 ```js
-const { parsed } = require( "@oracle/quicksql" );
+const { quicksql } = require( "@oracle/quicksql" );
 const fs = require( "fs" );
 
 try {
     const text = fs.readFileSync( './test/department_employees.quicksql' );
-    console.log( new parsed( text.toString() ).getDDL() );
+    console.log( new quicksql( text.toString() ).getDDL() );
 } catch( e ) {
     console.error( e );
 };
@@ -80,8 +80,8 @@ try {
 
 ```html
 <script type="module">
-    import { parsed } from './dist/quick-sql.js';
-    document.body.innerText = new parsed(
+    import { quicksql } from './dist/quick-sql.js';
+    document.body.innerText = new quicksql(
 `departments /insert 2
     name /nn
     location
@@ -107,7 +107,7 @@ view emp_v departments employees
 ```html
 <script src="./dist/quick-sql.umd.cjs"></script>
 <script>
-    document.body.innerText = new quickSQL.parsed(
+    document.body.innerText = new quickSQL.quicksql(
 `departments /insert 2
     name /nn
     location

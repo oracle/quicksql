@@ -16,7 +16,7 @@
 Error diagnostics procedure is called like this
 
 ```js
-let output = new parsed(`dept
+let output = new quicksql(`dept
    col1
  "is this table or misaligned column?"`).getErrors();
 ```

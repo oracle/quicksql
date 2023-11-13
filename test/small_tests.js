@@ -1,4 +1,4 @@
-import {toDDL, parsed} from "../src/ddl.js";
+import {quicksql, toDDL} from "../src/ddl.js";
 
 function assert( condition ) {
     if( !eval(condition) ) {
@@ -23,7 +23,7 @@ export default function small_tests() {
     assert( "0 < output.indexOf('create table right_departments')" );
     //                                         ^^^^     
 
-    output = new parsed(
+    output = new quicksql(
         `Bug35683432
             name
         `, 
@@ -32,14 +32,14 @@ export default function small_tests() {
     assert( "0 < output.indexOf('Unknown setting: notanoption1')" );
 
 
-    output = new parsed(
+    output = new quicksql(
         `Bug35683432
             name
 # settings = {"notAnOption2": "should raise an Error"}            ` 
     ).getDDL();
     assert( "0 < output.indexOf('Unknown setting: notanoption2')" );
 
-    output = new parsed(
+    output = new quicksql(
         `departments
             name
         # settings = {"genpk": false}            
@@ -48,7 +48,7 @@ export default function small_tests() {
 
     assert( "-1 == output.indexOf('ID     NUMBER GENERATED'.toLowerCase())" );
  
-    output = new parsed(
+    output = new quicksql(
         `departments
             name
         # settings = {genpk: false}            
@@ -58,7 +58,7 @@ export default function small_tests() {
     assert( "-1 == output.indexOf('ID     NUMBER GENERATED'.toLowerCase())" );
  
     // ddl.setOptionValue('genpk',false);
-    output = new parsed(
+    output = new quicksql(
         `departments
             name
         `,
@@ -67,7 +67,7 @@ export default function small_tests() {
 
     assert( "-1 == output.indexOf('ID     NUMBER GENERATED'.toLowerCase())" );
 
-    output = new parsed(`
+    output = new quicksql(`
 departments
     name
 # settings = { "api": true }
@@ -75,7 +75,7 @@ departments
 
     assert( "0 < output.indexOf('DEPARTMENTS_API'.toLowerCase())" );
 
-    output = new parsed(`
+    output = new quicksql(`
 departments
         name
     # settings = { "Compress": "yEs" }
@@ -83,21 +83,21 @@ departments
 
     assert( "0 < output.indexOf(') compress;')" );
     
-    output = new parsed(`
+    output = new quicksql(`
 Bug35650456
     name  vc32k
     `).getDDL();
 
     assert( "0 < output.indexOf('name    varchar2(32767 char)')" );
 
-    output = new parsed(`
+    output = new quicksql(`
 Bug35668454
 # settings = { drop: "Y"}
     `).getDDL();
            
     assert( "0 <= output.indexOf('drop table bug35668454')" ); 
     
-    output = new parsed(`
+    output = new quicksql(`
 Bugs35692739_35692703_35692625
    inventory json
    name vc50
@@ -114,7 +114,7 @@ Bugs35692739_35692703_35692625
     assert( "0 < output.indexOf('date_packed        timestamp with time zone,')" );
     assert( "0 < output.indexOf('date_production    timestamp with local time zone')" );
     
-    output = new parsed(`
+    output = new quicksql(`
 Bug35683307 /insert 1
   # settings = { inserts: false}
             `).getDDL();
@@ -122,7 +122,7 @@ Bug35683307 /insert 1
     assert( "-1 == output.indexOf('insert into')" );
 
     // NOTE: This test can't be performed anymore since it uses an internal method of ddl.js
-    /*output = new parsed(`
+    /*output = new quicksql(`
 ER_35698875 
       # settings = { inserts: false}
                 `);
@@ -131,7 +131,7 @@ ER_35698875
     //console.log(ddl.getOptionValue('inserts'));
     //console.log(ddl.appliedOptions['inserts'].value);
 
-    output = new parsed(`
+    output = new quicksql(`
 Bug_35683200 /insert 1
 view bv Bug_35683200
 # settings = { inserts: false}
@@ -142,7 +142,7 @@ view bv Bug_35683200
     assert( "0 < output.indexOf('replace view hr.the_bv')" );
     assert( "0 < output.indexOf('# settings = {\"inserts\":false,\"prefix\":\"The\",\"schema\":\"HR\"}')" );
     
-    output = new parsed(`
+    output = new quicksql(`
 Bug_35677264
    product
    amt number
@@ -154,7 +154,7 @@ Bug_35677264
     assert( "0 < output.indexOf('number default on null to_number(sys_guid(), ')" );
     assert( "0 < output.indexOf('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX')" );
     
-    output = new parsed(`
+    output = new quicksql(`
 Bug_35677301
 
 # settings = { semantics: "CHAR", auditCols: true, language: "EN", APEX: true, createdCol: "created_col", createdByCol: "created_by_col", updatedCol: "updated_col", updatedByCol: "updated_by_col" }
@@ -166,7 +166,7 @@ Bug_35677301
     assert( "0 < output.indexOf('updated_col')" );
     assert( "0 < output.indexOf('updated_by_col')" );
 
-    output = new parsed(`
+    output = new quicksql(`
 Bug35714241
     proficiency /check 'Test'
     `).getDDL();
@@ -174,7 +174,7 @@ Bug35714241
     assert( "0 < output.indexOf(\"in ('Test'\")" );
    
     // 35714343
-    output = new parsed(`
+    output = new quicksql(`
 departments
     dname
     emp
@@ -185,7 +185,7 @@ departments
     assert( " output.indexOf('department_id    number') ==  output.lastIndexOf('department_id    number') " );
 
     // 35715610
-    output = new parsed(`
+    output = new quicksql(`
 dept
     dname
     emp /cascade
@@ -198,7 +198,7 @@ dept
     assert( "0 < output.indexOf('references dept on delete cascade')" );
 
     // 35724078
-    output = new parsed(`
+    output = new quicksql(`
 dept
     name
     
@@ -210,28 +210,28 @@ dept
 
     assert( "0 < output.indexOf('# settings = {\"apex\":\"Y\",\"db\":\"19c\"}')" );
 
-    output = new parsed(`
+    output = new quicksql(`
 dept /insert 5
     name
 # inserts : N`,'{"inserts":"N"}').getDDL();
 
     assert( "0 > output.indexOf('# inserts : N')" );
     
-    output = new parsed(`
+    output = new quicksql(`
 Bug35737572
     flight_json json
     `).getDDL();
 
     assert( "0 < output.indexOf('clob check (flight_json is json)')" );
      
-    output = new parsed(`
+    output = new quicksql(`
 Bug35737578
     flight_file file
     `).getDDL();
    
     assert( "0 < output.indexOf('flight_file_filename')" );
          
-    output = new parsed(`
+    output = new quicksql(`
 bug35748389
     name
     
@@ -241,7 +241,7 @@ bug35748389
     assert( "output.indexOf('trigger') < 0" );
     assert( "0 < output.indexOf('constraint bug35748389_id_pk primary key,')" );
          
-    output = new parsed(`
+    output = new quicksql(`
 bug35748389_2
     name
     
@@ -252,7 +252,7 @@ bug35748389_2
     assert( "0 < output.indexOf('number default on null bug35748389_2_seq.nextval')" );
     assert( "0 < output.indexOf('constraint bug35748389_2_id_pk primary key,')" );
          
-    output = new parsed(
+    output = new quicksql(
     `bug35748389_3
         name
     
@@ -262,7 +262,7 @@ bug35748389_2
     assert( "output.indexOf('trigger') < 0" );
     assert( "output.indexOf('id') < 0" );
          
-    output = new parsed(
+    output = new quicksql(
     `bug35748389_4
         name
     
@@ -273,7 +273,7 @@ bug35748389_2
     assert( "0 < output.indexOf('number generated by default on null as identity')" );
     assert( "0 < output.indexOf('constraint bug35748389_4_id_pk primary key,')" );
  
-    output = new parsed(
+    output = new quicksql(
     `Bug 35756025
     deptno                         num(2,0)  /nn /pk 
     dname                          vc(14) 
@@ -283,7 +283,7 @@ bug35748389_2
     assert( "0 < output.indexOf('number(2,0) generated by default on null as identity')" );
     assert( "0 < output.indexOf('constraint bug_35756025_deptno_pk primary key,')" );
 
-    output = new parsed(
+    output = new quicksql(
     `Bug 35757130
     file_name                      vc(512) 
     file_mimetype                  vc(512) 
@@ -297,7 +297,7 @@ bug35748389_2
     assert( "output.indexOf('file_mimetype_mimetype') < 0" );
     assert( "output.indexOf('file_lastupd_filename') < 0" );
     
-    output = new parsed(
+    output = new quicksql(
     `Bug35737917 /auditcols
         name
     # settings = {"apex":"false"}
@@ -307,7 +307,7 @@ bug35748389_2
     assert( "0 < output.indexOf(':new.created_by := user;')" );
     assert( "output.indexOf('APEX$SESSION') < 0" );
 
-    output = new parsed(
+    output = new quicksql(
     `Bug35757000 
             name
     # settings = {"overrideSettings":"true"}
@@ -315,7 +315,7 @@ bug35748389_2
                    
     assert( "output.indexOf('x_') < 0" );
     
-    output = new parsed(
+    output = new quicksql(
     `Bug35650456_2
         job vc5000
     
@@ -326,7 +326,7 @@ bug35748389_2
     assert( " output.indexOf('Non-default options') ==  output.lastIndexOf('Non-default options') " );
 
     // Bug 35775121
-    output = new parsed( 
+    output = new quicksql( 
 `dept
     name
 
@@ -339,20 +339,20 @@ emp
     assert( " 0 < output.indexOf('references dept on delete cascade,') " );
     assert( " output.indexOf('dept_id    integer') < 0 " );
     
-    output = new parsed( 
+    output = new quicksql( 
         `demo_item_order
             comment vc80`).getDDL();
                 
     assert( " 0 < output.indexOf('the_comment') " );
 
-    output = new parsed( 
+    output = new quicksql( 
 `team_members /insert 1
     username /nn /upper
 projects /insert 1
     name /nn
     project_lead /nn /references team_members`).getDDL();
                                       
-    output = new parsed( 
+    output = new quicksql( 
 `person
     id num /pk
     name vc40
@@ -364,26 +364,26 @@ projects /insert 1
     assert( " 0 < output.indexOf('id               number') " );    
     assert( " 0 < output.indexOf('person_id_pk primary key') " );    
 
-    output = new parsed( 
+    output = new quicksql( 
 `countries
     code vc2 /pk
     `).getDDL();
     assert( " 0 < output.indexOf('code    varchar2(2 char) not null') " ); 
 
-    output = new parsed( 
+    output = new quicksql( 
 `countries
     country_id vc2 /pk 
     `).getDDL();
     assert( " 0 < output.indexOf('country_id    varchar2(2 char) not null') " ); 
                     
-    output = new parsed( 
+    output = new quicksql( 
 `Bug35827840
     col1 vc
     `).getDDL();
         
     assert( " 0 < output.indexOf('col1    varchar2(4000 char)') " );     
 
-    output = new parsed( 
+    output = new quicksql( 
 `Bug35827927
     colstr string
     colvarchar varchar
@@ -396,7 +396,7 @@ projects /insert 1
     assert( " 0 < output.indexOf('colvarchar2    varchar2(4000 char)') " );                                     
     assert( " 0 < output.indexOf('colchar    ') " );   
     
-    output = new parsed( 
+    output = new quicksql( 
 `Bug35814922
     important_yn
     important1 yn
@@ -409,7 +409,7 @@ projects /insert 1
     assert( " 0 < output.indexOf('important2      varchar2(1 char) constraint bug35814922_important2') " );    
     assert( " 0 < output.indexOf('is_important    varchar2(1 char) constraint bug35814922_is_important') " );    
     
-    output = new parsed( 
+    output = new quicksql( 
 `Bug35842845 
     ファーストネーム vc200 
     Das Gedöns	vc200 
@@ -422,7 +422,7 @@ projects /insert 1
     assert( " 0 < output.indexOf('\"locatilon;drop user sys;\"') " );                                     
     assert( " 0 < output.indexOf('\"country;shutdown abort;a\"') " ); 
     
-    output = new parsed( 
+    output = new quicksql( 
         `"Test" 
             "CamelCase"
             x   [coMment]  
@@ -436,19 +436,19 @@ projects /insert 1
     assert( " 0 < output.indexOf('comment on column \"Test\".x2 is ') " );                                     
          
     // 35936560
-    output = new parsed( 
+    output = new quicksql( 
     `mytable /rest
         name
     `).getDDL();
     assert( " output.indexOf('p_object')+5 < output.indexOf('MYTABLE') " );    
                                      
-    output = new parsed( 
+    output = new quicksql( 
     `"yourTable" /rest
     name      
     `).getDDL();
     assert( " output.indexOf('p_object')+5 < output.lastIndexOf('yourTable') " ); 
 
-    output = new parsed( 
+    output = new quicksql( 
     `customers
         cid /pk
     
@@ -458,7 +458,7 @@ projects /insert 1
     assert( " 0 < output.indexOf('cid    number default on null customers_seq.nextval') " ); 
     assert( " output.indexOf('trigger') < 0 " ); 
                                             
-    output = new parsed( 
+    output = new quicksql( 
     `customers
         id
     `).getDDL();
@@ -466,6 +466,5 @@ projects /insert 1
     //console.log(output);
     assert( " output.indexOf('id    varchar2') < 0 " ); 
 }    
-
 
 small_tests();

@@ -6,12 +6,12 @@ import json2qsql from './json2qsql.js'
 import errorMsgs from './errorMsgs.js'
 import {canonicalObjectName} from './naming.js'
 
-export const identityDataType = 'identityDataType';
-export const guid = 'guid';
-export const tswtz = 'Timestamp with time zone';
-export const tswltz = 'Timestamp with local time zone';
+const identityDataType = 'identityDataType';
+const guid = 'guid';
+const tswtz = 'Timestamp with time zone';
+const tswltz = 'Timestamp with local time zone';
 
-export const parsed = (function () {
+export const quicksql = (function () {
 
     const defaultOptions = { 
         apex: {label: 'APEX', value:'no',check:['yes','no']},
@@ -459,38 +459,35 @@ export const parsed = (function () {
  * @param {*} input 
  * @returns 
  */
-export function toQSQL( input ) {
+export function fromJSON( input ) {
     const obj = JSON.parse(input); 
     return json2qsql.introspect(null, obj, 0);
 }
 
 /**
- * @deprecated since version 1.2.0. The Parsed object can be created once only with all info accessible by getter method
  * @param {*} input schema in QSQL notation
  * @param {*} options 
  * @returns JSON object listing tables and links
  */
 export function toERD( input, options ) {
-    return new parsed(input, options).getERD();
+    return new quicksql(input, options).getERD();
 };
 
 /**
- * @deprecated since version 1.2.0. 
  * @param {*} input schema in QSQL notation
  * @param {*} options 
  * @returns translated DDL 
  */
 export function toDDL( input, options ) {
-    return new parsed(input, options).getDDL();
+    return new quicksql(input, options).getDDL();
 }; 
 /**
- * @deprecated since version 1.2.0. 
  * @param {*} input schema in QSQL notation
  * @param {*} options 
  * @returns list of SyntaxError objects 
  */
-export function errors( input, options ) {
-    return new parsed(input, options).getErrors();
+export function toErrors( input, options ) {
+    return new quicksql(input, options).getErrors();
 }; 
 
 export const version = {
@@ -498,8 +495,10 @@ export const version = {
     value: typeof __PACKAGE_VERSION__ === 'undefined' ? 'development' : __PACKAGE_VERSION__
 };
 
-parsed.version = version;
-parsed.toDDL = toDDL;  // legacy, deprecated
-parsed.toERD = toERD;  // legacy, deprecated
+quicksql.version = version;
+quicksql.toDDL = toDDL;  
+quicksql.toERD = toERD;  
+quicksql.toErrors = toErrors;  
+quicksql.fromJSON = fromJSON;  
 
-export default parsed;
+export default quicksql;

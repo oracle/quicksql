@@ -10,13 +10,13 @@ with old API marked as deprecated
 
 The former calls `toDDL` and `toERD`
 ```
-   let output = ddl.toDDL(input,opt);
+   let output = toDDL(input,opt);
 ```
 are encouraged to be replaced with
 
 ```
-   let parsed = new parsed(input,opt);
-   let output = parsed.getDDL();
-   let errors = parsed.getErrors();
+   let qsql = new quicksql(input,opt); // parse once only
+   let output = qsql.getDDL();
+   let errors = qsql.getErrors();
 ```
 

@@ -1,4 +1,4 @@
-import  {parsed, toERD} from "../src/ddl.js";
+import  {quicksql, toERD} from "../src/ddl.js";
 
 import fs from "fs";
 
@@ -44,7 +44,7 @@ export default function diagram_tests() {
 `Bug35827754
     data file
     `
-    output = new parsed(input).getERD();
+    output = new quicksql(input).getERD();
 
     assert( "output.items[0].columns[2].name == 'data_filename'" );
     assert( "output.items[0].columns[2].datatype == 'varchar2(255 char)'" );
