@@ -271,7 +271,7 @@ export class Diagram {
     exportAsSVG = () => {
         const downloadArea = this.graph.getBBox().inflate(50);
         this.paper.toSVG((svgString) => {
-            var fileName = 'quicksqlDiagram-';
+            var fileName = 'QuickSqlDiagram-';
             this.saveDiagram(fileName, svgString);
         }, {
             area: downloadArea,
