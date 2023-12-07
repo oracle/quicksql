@@ -18,8 +18,9 @@ const findErrors = (function () {
         this.depth = depth;   // 0-based
     }
     
-    function checkSyntax( ddlInstance, input ) {
-        const ddl = ddlInstance;
+    function checkSyntax( parsed ) {
+        const ddl = parsed;
+        const input = parsed.input;
 
         let ret = [];
 

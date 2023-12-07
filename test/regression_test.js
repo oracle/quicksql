@@ -2,7 +2,7 @@
 
 import fs from "fs";
 
-import quicksql from "../src/ddl.js";
+import {fromJSON} from "../src/ddl.js";
 import lexer from '../src/lexer.js'
 import errorMsgs from '../src/errorMsgs.js'
 
@@ -88,12 +88,13 @@ function processFile( subdir, file ) {
 
     let output = null;
     if( 0 < subdir.indexOf('/erd/') )
-        output = JSON.stringify(quicksql.toERD(text),null,3);
+        output = JSON.stringify(new quicksql(text).getERD(),null,3);
     else if( ext == '.json' )
-        output = quicksql.toQSQL(text);
+        output = fromJSON(text);
     else {
-        output = quicksql.toDDL(text);
-        const errors =  quicksql.errorMsgs(text);
+        const p = new quicksql(text);
+        output = p.getDDL();
+        const errors =  p.getErrors(text);
         checkNoError(errors, errorMsgs.messages.misalignedAttribute);
         checkNoError(errors, errorMsgs.messages.undefinedObject);
     }    
@@ -141,6 +142,9 @@ function processFile( subdir, file ) {
 
 let t1 = Date.now();
 
+import compatibility_tests from './compatibility_tests.js'
+console.log('compatibility_tests.js'); 
+
 import small_tests from './small_tests.js'
 console.log('small_tests.js'); 
 
@@ -153,7 +157,13 @@ console.log('error_msg_tests.js');
 
 processFile('./test', '');
 
+
 console.log("All tests are OK");
 
-console.log( "Time = "+(Date.now()-t1));
-console.log( "(Compared with 364-412 ms as of 10/2/2023)");
+console.log("Time = "+(Date.now()-t1));
+console.log("Compared with 364-412 ms as of 10/2/2023");
+console.log("              506 ms     as of 11/8/2023");
+
+
+import {quicksql} from '../dist/quick-sql.js';
+console.log("Version "+quicksql.version.value);

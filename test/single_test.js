@@ -1,4 +1,4 @@
-import  ddl from "../src/ddl.js";
+import  parsed from "../src/ddl.js";
 import  json2qsql from "../src/json2qsql.js";
 
 
@@ -22,9 +22,9 @@ try {
         input = output;
     } 
     if( 0 <= file.indexOf('/erd/') ) {
-        output = JSON.stringify(ddl.toERD(input), null, 4);
+        output = JSON.stringify(new quicksql(input).toERD(), null, 4);
     } else
-        output = ddl.toDDL(input);
+        output = new quicksql(input).toDDL();
     console.log(output);    
 } catch(e) {
     console.error(e);

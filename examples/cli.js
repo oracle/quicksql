@@ -21,13 +21,14 @@ function print_usage() {
 `Quick SQL ${ quicksql.version } DDL Generation Example
 
 Usage: ./cli.js <FILE_PATH>
-Example: ./cli.js ../test/project_management.quicksql
+Example: ./cli.js ../test/apex/project_management.quicksql
 `
         /* eslint-enable indent */
     );
 }
 
 let file_path = process.argv[2];
+//let file_path = './test/apex/project_management.quicksql';
 if ( !file_path ) {
     print_usage();
     console.error( 'ERROR: A file path was not provided' );

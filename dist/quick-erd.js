@@ -249,11 +249,11 @@ function ne() {
     return !0;
   };
 }
-function S(n, e, s, l) {
+function q(n, e, s, l) {
   var o = this;
   o.x = n, o.y = e, o.width = s, o.height = l, o.union = function(i) {
     var d = Math.min(this.x, i.x), T = Math.min(this.y, i.y), L = Math.max(this.x + this.width, i.x + i.width), R = Math.max(this.y + this.height, i.y + i.height);
-    return new S(d, T, L - d, R - T);
+    return new q(d, T, L - d, R - T);
   };
 }
 function P(n, e) {
@@ -269,10 +269,10 @@ function ie(n, e) {
 function oe(n, e) {
   return n.referredBy_count < e.referredBy_count ? 1 : n.referredBy_count > e.referredBy_count ? -1 : n.refer_count < e.refer_count ? 1 : n.refer_count > e.refer_count ? -1 : 0;
 }
-function Q(n, e) {
+function J(n, e) {
   return n.refer_count < e.refer_count ? 1 : n.refer_count > e.refer_count ? -1 : n.referredBy_count < e.referredBy_count ? 1 : n.referredBy_count > e.referredBy_count ? -1 : 0;
 }
-function J(n, e) {
+function Q(n, e) {
   return n.init_dim.height > e.init_dim.height ? 1 : n.init_dim.height < e.init_dim.height ? -1 : 0;
 }
 function le(n, e) {
@@ -292,10 +292,10 @@ function se(n) {
     O = [];
     for (var a = [], t = e.buildTH_Map(v, u), B = [], _ = t.length, c = 0; c < _; c++) {
       var f = t[c];
-      f.refer_count === 0 && f.referredBy_count === 0 ? g.push(f) : (p.push(f), f.refer.length > 0 && (r == 1 ? f.refer.sort(Y) : r == 2 ? f.refer.sort(ie) : f.refer.sort(oe)), f.referredBy_count == 0 && !f.usedInStar && O.push(f), f.referredBy.length > 0 && f.referredBy.sort(Q));
+      f.refer_count === 0 && f.referredBy_count === 0 ? g.push(f) : (p.push(f), f.refer.length > 0 && (r == 1 ? f.refer.sort(Y) : r == 2 ? f.refer.sort(ie) : f.refer.sort(oe)), f.referredBy_count == 0 && !f.usedInStar && O.push(f), f.referredBy.length > 0 && f.referredBy.sort(J));
     }
     if (p.length > 0) {
-      O.length == 0 && e.findRoots(p, O), O = O.concat(B), O.sort(Q);
+      O.length == 0 && e.findRoots(p, O), O = O.concat(B), O.sort(J);
       for (var y = Z, m = ee, x = 0; x < O.length; x++) {
         var f = O[x];
         if (!f.arranged && !f.usedInStar) {
@@ -336,7 +336,7 @@ function se(n) {
         }
       } while (u.length === 0);
   }, e.arrangeStar = function(r, u, h) {
-    var v = new S(u, h, 1, 1);
+    var v = new q(u, h, 1, 1);
     r.nodes.push(r);
     for (var g = [], p = r.referredBy.length, a = 0; a < p; a++) {
       var t = r.referredBy[a];
@@ -346,7 +346,7 @@ function se(n) {
       var t = r.refer[_];
       !g.indexOf(t) >= 0 && g.push(t);
     }
-    g.sort(J);
+    g.sort(Q);
     for (var c = 0, f = g.length, y = 0; y < f; y++) {
       var t = g[y];
       c = c + t.init_dim.width + E;
@@ -354,12 +354,12 @@ function se(n) {
     for (var m = u, x = h, A = u + c / 2, C = 0, k = 0, N = u, a = g.length - 1; a >= 0 && m < A; a--) {
       C = a;
       var t = g[a];
-      k = Math.max(k, t.init_dim.height), N = m + t.init_dim.width, r.nodes.push(t), t.nodes.push(t), t.location = new P(m, x), t.rect = new S(t.location.x, t.location.y, t.init_dim.width, t.init_dim.height), m = m + E + t.init_dim.width, v = v.union(t.rect), t.arranged = !0;
+      k = Math.max(k, t.init_dim.height), N = m + t.init_dim.width, r.nodes.push(t), t.nodes.push(t), t.location = new P(m, x), t.rect = new q(t.location.x, t.location.y, t.init_dim.width, t.init_dim.height), m = m + E + t.init_dim.width, v = v.union(t.rect), t.arranged = !0;
     }
-    x = x + k + 2 * D, m = u + (N - u) / 2, r.location = new P(m, x), r.rect = new S(r.location.x, r.location.y, r.init_dim.width, r.init_dim.height), v = v.union(r.rect), r.arranged = !0, x = x + r.init_dim.height + 2 * D, m = u;
+    x = x + k + 2 * D, m = u + (N - u) / 2, r.location = new P(m, x), r.rect = new q(r.location.x, r.location.y, r.init_dim.width, r.init_dim.height), v = v.union(r.rect), r.arranged = !0, x = x + r.init_dim.height + 2 * D, m = u;
     for (var a = C - 1; a >= 0; a--) {
       var t = g[a];
-      r.nodes.push(t), t.nodes.push(t), t.location = new P(m, x), t.rect = new S(t.location.x, t.location.y, t.init_dim.width, t.init_dim.height), m = m + E + t.init_dim.width, v = v.union(t.rect), t.arranged = !0;
+      r.nodes.push(t), t.nodes.push(t), t.location = new P(m, x), t.rect = new q(t.location.x, t.location.y, t.init_dim.width, t.init_dim.height), m = m + E + t.init_dim.width, v = v.union(t.rect), t.arranged = !0;
     }
     return r.rect = v, v;
   }, e.setLevel2 = function(r, u) {
@@ -397,7 +397,7 @@ function se(n) {
   }, e.arrange = function(r, u, h, v, g, p) {
     if (!r.arranged) {
       var a = v;
-      r.location = new P(u, h), r.nodes.push(r), a === null ? a = new S(r.location.x, r.location.y, r.init_dim.width, r.init_dim.height) : a = a.union(new S(r.location.x, r.location.y, r.init_dim.width, r.init_dim.height)), r.arranged = !0;
+      r.location = new P(u, h), r.nodes.push(r), a === null ? a = new q(r.location.x, r.location.y, r.init_dim.width, r.init_dim.height) : a = a.union(new q(r.location.x, r.location.y, r.init_dim.width, r.init_dim.height)), r.arranged = !0;
       var t, B = e.getNotArranged(r.refer), _ = e.getNotArranged(r.referredBy), c = [];
       if (!b && e.canGoLeft(g, u, h + r.init_dim.height + D, _))
         for (var f = _.length, y = 0; y < f; y++) {
@@ -413,7 +413,7 @@ function se(n) {
         c.length = 0;
       }
       if (B.length > 0)
-        b || !x ? (_ = _.concat(B), t = e.orderDown(r, _, u, h + r.init_dim.height + D, [], r.nodes, g), a = a.union(t)) : _.length > 0 ? (t = e.orderLeft(r, _, u, h + r.init_dim.height + D, c, r.nodes, g), g == null ? g = new S(t.x, t.y, t.width, t.height) : g = g.union(t), a = a.union(t), t = e.orderDown(r, B, Math.max(u, t.x + t.width), h + r.init_dim.height + D, c, r.nodes, g), a = a.union(t)) : (t = e.orderDown(r, B, u, h + r.init_dim.height + D, c, r.nodes, g), a = a.union(t));
+        b || !x ? (_ = _.concat(B), t = e.orderDown(r, _, u, h + r.init_dim.height + D, [], r.nodes, g), a = a.union(t)) : _.length > 0 ? (t = e.orderLeft(r, _, u, h + r.init_dim.height + D, c, r.nodes, g), g == null ? g = new q(t.x, t.y, t.width, t.height) : g = g.union(t), a = a.union(t), t = e.orderDown(r, B, Math.max(u, t.x + t.width), h + r.init_dim.height + D, c, r.nodes, g), a = a.union(t)) : (t = e.orderDown(r, B, u, h + r.init_dim.height + D, c, r.nodes, g), a = a.union(t));
       else if (_.length > 0)
         if (b || !e.canGoLeft(g, u, h + r.init_dim.height + D, _))
           _ = _.concat(B), t = e.orderDown(r, _, u, h + r.init_dim.height + D, [], r.nodes, g), a = a.union(t);
@@ -421,8 +421,8 @@ function se(n) {
           var N = _[_.length - 1];
           t = e.orderLeftCenter(r, _, u + N.init_dim.width + E, h + r.init_dim.height + D, c, r.nodes, g), a = a.union(t);
         }
-      if (r.rect = new S(a.x, a.y, a.width, a.height), p != null)
-        for (var q = r.nodes.length, V = 0; V < q; V++) {
+      if (r.rect = new q(a.x, a.y, a.width, a.height), p != null)
+        for (var S = r.nodes.length, V = 0; V < S; V++) {
           var N = r.nodes[V];
           p.indexOf(N) >= 0 || p.push(N);
         }
@@ -448,15 +448,15 @@ function se(n) {
       var c = u[_];
       !c.arranged && !c.booked && !(g.indexOf(c) >= 0) && !c.isConnectedToBetterLevel(r, r.level) && (c.booked = !0, t.push(c));
     }
-    var f = h, y = v, m = new S(h, v, 1, 1), x;
-    a === null ? x = null : x = new S(a.x, a.y, a.width, a.height);
+    var f = h, y = v, m = new q(h, v, 1, 1), x;
+    a === null ? x = null : x = new q(a.x, a.y, a.width, a.height);
     var A = [], C = t.length;
     if (C > 1) {
       var k = e.getReferOnly(t, r);
       if (k.length > 0) {
-        k.length > 1 && k.sort(J);
-        for (var U = r.location.y, j = D / 3, N = U + r.init_dim.height + j, q = 0; q < k.length; q++) {
-          var c = k[q], V = U + c.init_dim.height;
+        k.length > 1 && k.sort(Q);
+        for (var U = r.location.y, j = D / 3, N = U + r.init_dim.height + j, S = 0; S < k.length; S++) {
+          var c = k[S], V = U + c.init_dim.height;
           if (V <= N) {
             A.push(c);
             var H = t.indexOf(c);
@@ -470,9 +470,9 @@ function se(n) {
       }
     }
     C = t.length;
-    for (var q = 0; q < C; q++) {
-      var c = t[q];
-      if (C > 1 && q === C - 1 && A.length === 0)
+    for (var S = 0; S < C; S++) {
+      var c = t[S];
+      if (C > 1 && S === C - 1 && A.length === 0)
         if (A.length === 0 && c.referOnlyAndArranged(r)) {
           var F = r.location.x + E + r.init_dim.width, M = e.arrange(c, F, r.location.y, null, x, p);
           m = m.union(M);
@@ -481,11 +481,11 @@ function se(n) {
           m = m.union(M);
         }
       var re = f, M = e.arrange(c, re, y, null, x, p);
-      x == null ? x = new S(M.x, M.y, M.width, M.height) : x = x.union(M), f = Math.max(f, M.x + M.width) + E, m = m.union(M);
+      x == null ? x = new q(M.x, M.y, M.width, M.height) : x = x.union(M), f = Math.max(f, M.x + M.width) + E, m = m.union(M);
     }
-    for (var U = r.location.y, j = D / 3, F = r.location.x + E + r.init_dim.width, q = 0; q < A.length; q++) {
-      var c = A[q];
-      c.nodes.push(c), p != null && p.push(c), c.location = new P(F, U), c.arranged = !0, c.booked = !1, c.rect = new S(c.location.x, c.location.y, c.init_dim.width, c.init_dim.height), m = m.union(c.rect), U = U + c.init_dim.height + j;
+    for (var U = r.location.y, j = D / 3, F = r.location.x + E + r.init_dim.width, S = 0; S < A.length; S++) {
+      var c = A[S];
+      c.nodes.push(c), p != null && p.push(c), c.location = new P(F, U), c.arranged = !0, c.booked = !1, c.rect = new q(c.location.x, c.location.y, c.init_dim.width, c.init_dim.height), m = m.union(c.rect), U = U + c.init_dim.height + j;
     }
     return m;
   }, e.getReferOnly = function(r, u) {
@@ -495,7 +495,7 @@ function se(n) {
     }
     return v;
   }, e.orderLeft = function(r, u, h, v, g, p, a) {
-    for (var t = h - E, B = v, _ = new S(h, v, 1, 1), c = u.length - 1; c >= 0; c--) {
+    for (var t = h - E, B = v, _ = new q(h, v, 1, 1), c = u.length - 1; c >= 0; c--) {
       var f = u[c];
       if (!f.arranged && !f.isConnectedToBetterLevel(r, r.level) && (!f.booked || g.indexOf(f) >= 0)) {
         var y = t - f.init_dim.width, m = e.arrange(f, y, B, null, a, p);
@@ -504,7 +504,7 @@ function se(n) {
     }
     return _;
   }, e.orderLeftCenter = function(r, u, h, v, g, p, a) {
-    for (var t = h - E, B = v, _ = [], c = new S(h, v, 1, 1), f = u.length - 1; f >= 0; f--) {
+    for (var t = h - E, B = v, _ = [], c = new q(h, v, 1, 1), f = u.length - 1; f >= 0; f--) {
       var y = u[f];
       !y.arranged && !y.isConnectedToBetterLevel(r, r.level) && (!y.booked || g.indexOf(y) >= 0) && _.unshift(y);
     }
@@ -608,7 +608,7 @@ class de {
     I(this, "exportAsSVG", () => {
       const e = this.graph.getBBox().inflate(50);
       this.paper.toSVG((s) => {
-        var l = "QuickSqlDiagram-";
+        var l = "quicksqlDiagram-";
         this.saveDiagram(l, s);
       }, {
         area: e,
@@ -739,7 +739,7 @@ class de {
     e.rearrangeDiagram(3, !1), this.paperScroller.centerContent();
   }
 }
-const ue = "1.1.5", fe = {
+const ue = "1.2.0", fe = {
   Diagram: de,
   version: ue
 };

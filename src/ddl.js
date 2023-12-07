@@ -1,85 +1,79 @@
 /* globals __PACKAGE_VERSION__ */
 
-/*
- * main method: ddl.toDDL()
- */
-
 import tree from './tree.js';
 import lexer from './lexer.js';
 import json2qsql from './json2qsql.js'
 import errorMsgs from './errorMsgs.js'
 import {canonicalObjectName} from './naming.js'
 
-const ddl = (function () {
-    function DDL() {
-        this.identityDataType = 'identityDataType';
-        this.guid = 'guid';
-        this.tswtz = 'Timestamp with time zone';
-        this.tswltz = 'Timestamp with local time zone';
-        this.defaultOptions = { 
-            apex: {label: 'APEX', value:'no',check:['yes','no']},
-            auditcols: {label: 'Audit Columns', value:'no',check:['yes','no']},
-                createdcol: {label: 'Created Column Name', value: 'created'},
-                createdbycol: {label: 'Created By Column Name', value: 'created_by'},
-                updatedcol: {label: 'Updated Column Name', value: 'updated'},
-                updatedbycol: {label: 'Updated By Column Name', value: 'updated_by'},
-            genpk: {label:'Auto Primary Key', value:'yes',check:['yes','no']},
-            semantics: {label: 'Character Strings',value:'CHAR',check:['BYTE','CHAR','Default']},
-            language: {label: 'Data Language', value:'EN',check:['EN','JP','KO']},
-            datalimit: {label: 'Data Limit Rows', value: 10000},
-            date: {label: 'Date Data Type', value:'DATE',check:['DATE','TIMESTAMP',this.tswtz,this.tswltz]},
-            db: {label: 'DB', value:'no',check:['not used']},  
-            dv: {label: 'Duality View', value:'no',check:['yes','no']},  // switched default to 'no' until thorough development&testig
-            drop: {label: 'Include Drops', value:'no',check:['yes','no']},
-            editionable: {label: 'Editinable', value:'no',check:['yes','no']},
-            inserts: {label: 'Generate Inserts', value:true, check:['yes','no']},
-            //longvc: {label: 'Longer Varchars', value:'yes',check:['yes','no']},    // not used, if a user specified the length, presumably he knows what he is doing
-            //columnNamePrefix: "?",
-            overridesettings: {label: 'Ignore toDDL() second parameter', value:'no',check:['yes','no']},    
-            prefix: {label: 'Object Prefix', value:'' },
-            //ondelete: {label: 'On Delete', value:'Cascade',check:['restrict','cascade','set null']},
-            pk: { label: 'Primary Key Maintenance', value: this.identityDataType, check: [this.identityDataType, this.guid,'SEQ', 'NONE']},
-            prefixpkwithtname: {label:'Prefix primary keys with table name', value:'no',check:['yes','no']}, 
-            rowkey: {label: 'Alphanumeric Row Identifier', value:'no',check:['yes','no']},
-            rowversion: {label: 'Row Version Number', value:'no',check:['yes','no']},
-            schema: {label: 'Schema', value:'', },
-            api: {label: 'Table API', value:'no',check:['yes','no']},
-            compress: {label: 'Table Compression', value:'no',check:['yes','no']},
-            //"Auxiliary Columns": {label: "Auxiliary Columns", value:''}, // e.g. security_group_id integer
+const identityDataType = 'identityDataType';
+const guid = 'guid';
+const tswtz = 'Timestamp with time zone';
+const tswltz = 'Timestamp with local time zone';
 
-            //namecase: {label: 'Object and Field name convention', value:'canonic',check:['canonic','json']},
-        };
-        this.options = JSON.parse(JSON.stringify(this.defaultOptions));
-        this.forest = null;
+export const quicksql = (function () {
 
-        this
+    const defaultOptions = { 
+        apex: {label: 'APEX', value:'no',check:['yes','no']},
+        auditcols: {label: 'Audit Columns', value:'no',check:['yes','no']},
+            createdcol: {label: 'Created Column Name', value: 'created'},
+            createdbycol: {label: 'Created By Column Name', value: 'created_by'},
+            updatedcol: {label: 'Updated Column Name', value: 'updated'},
+            updatedbycol: {label: 'Updated By Column Name', value: 'updated_by'},
+        genpk: {label:'Auto Primary Key', value:'yes',check:['yes','no']},
+        semantics: {label: 'Character Strings',value:'CHAR',check:['BYTE','CHAR','Default']},
+        language: {label: 'Data Language', value:'EN',check:['EN','JP','KO']},
+        datalimit: {label: 'Data Limit Rows', value: 10000},
+        date: {label: 'Date Data Type', value:'DATE',check:['DATE','TIMESTAMP',tswtz,tswltz]},
+        db: {label: 'DB', value:'no',check:['not used']},  
+        dv: {label: 'Duality View', value:'no',check:['yes','no']},  // switched default to 'no' until thorough development&testig
+        drop: {label: 'Include Drops', value:'no',check:['yes','no']},
+        editionable: {label: 'Editinable', value:'no',check:['yes','no']},
+        inserts: {label: 'Generate Inserts', value:true, check:['yes','no']},
+        //longvc: {label: 'Longer Varchars', value:'yes',check:['yes','no']},    // not used, if a user specified the length, presumably he knows what he is doing
+        //columnNamePrefix: "?",
+        overridesettings: {label: 'Ignore toDDL() second parameter', value:'no',check:['yes','no']},    
+        prefix: {label: 'Object Prefix', value:'' },
+        //ondelete: {label: 'On Delete', value:'Cascade',check:['restrict','cascade','set null']},
+        pk: { label: 'Primary Key Maintenance', value: identityDataType, check: [identityDataType, guid,'SEQ', 'NONE']},
+        prefixpkwithtname: {label:'Prefix primary keys with table name', value:'no',check:['yes','no']}, 
+        rowkey: {label: 'Alphanumeric Row Identifier', value:'no',check:['yes','no']},
+        rowversion: {label: 'Row Version Number', value:'no',check:['yes','no']},
+        schema: {label: 'Schema', value:'', },
+        api: {label: 'Table API', value:'no',check:['yes','no']},
+        compress: {label: 'Table Compression', value:'no',check:['yes','no']},
+        //"Auxiliary Columns": {label: "Auxiliary Columns", value:''}, // e.g. security_group_id integer
+
+        //namecase: {label: 'Object and Field name convention', value:'canonic',check:['canonic','json']},
+    };
+
+    function normalize( iNput ) {
+        if( iNput == null )
+            return null;
+        let input = iNput;
+        if( typeof input === 'string' ) 
+            input = input.toLowerCase();
+        if( input == 'yes') return true;
+        if( input == 'no') return false;
+        if( input == 'y') return true;
+        if( input == 'n') return false;
+        if( input == 'true') return true;
+        if( input == 'false') return false;
+        if( input == identityDataType.toLowerCase() ) return 'identity';
+        if( input == guid.toLowerCase() ) return 'guid';
+        if( input == tswtz.toLowerCase() ) return 'tswtz';
+        if( input == tswltz.toLowerCase() ) return 'tswltz';
+        return input;
+    };
 
 
-        this.normalize = function( iNput ) {
-            if( iNput == null )
-                return null;
-            let input = iNput;
-            if( typeof input === 'string' ) 
-                input = input.toLowerCase();
-            if( input == 'yes') return true;
-            if( input == 'no') return false;
-            if( input == 'y') return true;
-            if( input == 'n') return false;
-            if( input == 'true') return true;
-            if( input == 'false') return false;
-            if( input == this.identityDataType.toLowerCase() ) return 'identity';
-            if( input == this.guid.toLowerCase() ) return 'guid';
-            if( input == this.tswtz.toLowerCase() ) return 'tswtz';
-            if( input == this.tswltz.toLowerCase() ) return 'tswltz';
-            return input;
-        };
+    function Parsed( fullInput, options ) {
+        this.ddl = null;
+        this.erd = null;
+        this.errors = null;
+        this.options = JSON.parse(JSON.stringify(defaultOptions));
+        this.input = fullInput;
 
-        this.optionEQvalue = function( key, value ) {
-            var v = this.getOptionValue(key);
-
-            let ret = this.normalize(v) == this.normalize(value);
-            return ret;
-        };
         this.getOptionValue = function( kEy ) {
             const key = kEy.toLowerCase(); 
             let option = this.options[key];
@@ -97,6 +91,28 @@ const ddl = (function () {
                 return null;
             return option.value;
         };
+        this.optionEQvalue = function( key, value ) {
+            var v = this.getOptionValue(key);
+
+            let ret = normalize(v) == normalize(value);
+            return ret;
+        };
+        this.nonDefaultOptions = function() {
+            let ret = {};
+            for( let x in this.options ) {
+                if( defaultOptions[x] && !this.optionEQvalue(x,defaultOptions[x].value) )
+                    ret[x] = this.options[x].value;
+            }
+            return ret;
+        };
+        this.unknownOptions = function() {
+            let ret = [];
+            for( let x in this.options ) {
+                if( defaultOptions[x] == null )
+                    ret.push(x); 
+            }
+            return ret;
+        };
         this.setOptionValue = function( kEy, value ) {
             let key = kEy.toLowerCase(); 
             // var option = this.options[key];
@@ -108,31 +124,16 @@ const ddl = (function () {
                         return;
                     }
                 }
-                return;
             }
             if( value == null )
                 value = '';
-            this.options[key].value = value;
-        };
-
-        this.resetOptions = function() {
-            this.options = JSON.parse(JSON.stringify(this.defaultOptions));
-        };
-
-        this.nonDefaultOptions = function() {
-            let ret = {};
-            for( let x in this.defaultOptions ) {
-                if( !this.optionEQvalue(x,this.defaultOptions[x].value) )
-                    ret[x] = this.options[x].value;
+            let option = this.options[key];
+            if( option == null ) {
+                option = {};
+                this.options[key] = option;
             }
-            return ret;
+            option.value = value;
         };
-
-        this.renderNonDefaultOptions = function() {
-            let nonDefaults = this.nonDefaultOptions();
-            return '# settings = '+JSON.stringify(nonDefaults);
-        };
-
         this.semantics = function() {
             var char = '';
             if( this.optionEQvalue('semantics','CHAR') )
@@ -141,7 +142,6 @@ const ddl = (function () {
                 char = ' byte';
             return char;	
         };
-
         this.find = function( name ) {
             for( var i = 0; i < this.forest.length; i++ ) {
                 var descendants = this.forest[i].descendants();
@@ -154,14 +154,94 @@ const ddl = (function () {
             return null;
         };
 
+        this.setOptions = function( line ) {
+            line = line.trim();
+            if( line.startsWith('#') )
+                line = line.substring(1).trim();
+            const eqPos = line.indexOf('=');
+            let tmp = line.substring(eqPos + 1).trim();
+            if( tmp.indexOf('{') < 0 ) {
+                tmp = '{' + line + '}';
+            }
+            let json = '';
+            let src= lexer( tmp, true, true, '' );
+            for( let i in src ) {
+                let t = src[i];
+                if( t.type == 'identifier' 
+                   && t.value != 'true'
+                   && t.value != 'false'
+                   && t.value != 'null'
+                )
+                    json += '"'+t.value+'"';
+                else
+                    json += t.value;	
+            }
+            let settings = JSON.parse(json);
+            for( let x in settings ) 
+                this.setOptionValue(x.toLowerCase(),settings[x]);
+            
+        }
+    
+        this.descendants = function () { 
+            var ret = [];
+            for( var i = 0; i < this.forest.length; i++ ) {
+                ret = ret.concat(this.forest[i].descendants());
+            }
+            return ret;
+        };
+        
+        this.additionalColumns = function() {
+            var ret = []; 
+            var input = this.getOptionValue('Auxiliary Columns');
+            if( input == null )
+                return ret;
+            var tmps = input.split(',');
+            for( var i = 0; i < tmps.length; i++ ) {
+                var attr = tmps[i].trim();
+                var type = 'VARCHAR2(4000)';
+                var pos = attr.indexOf(' ');
+                if( 0 < pos ) {
+                    type = attr.substring(pos+1).toUpperCase();
+                    attr = attr.substring(0,pos);
+                }
+                ret[attr] = type;
+            }
+            return ret;
+        };
+
+        this.objPrefix = function ( withoutSchema ) {
+            var ret = this.getOptionValue('schema');
+            if( ret == null )
+                ret = '';
+            if( '' != ret && withoutSchema == null )
+                ret = ret + '.';
+            else 
+                ret = '';
+            var value = '';
+            if( this.getOptionValue('prefix') != null )
+                value = this.getOptionValue('prefix');
+            ret = ret + value;
+            if( value != '' )
+                ret = ret + '_';
+            return ret.toLowerCase();
+        };
+
+        let settings = '';
+        if( 0 < fullInput.toLowerCase().indexOf('overridesettings') )
+            tree(this);  // little excessive to read just one option
+        if( options != undefined && this.optionEQvalue('overrideSettings',false) ) {
+            settings = '# settings = '+options+'\n\n';
+        } 
+        this.input = settings + fullInput;   
+        this.forest = tree(this);
+ 
 
         /**
-         * @param {*} input 
          * @returns JSON object for tables and fk relationships
          */
-        this.toERD = function (input, options) {
-            this.toDDL(input, options);
-            this.options = JSON.parse(JSON.stringify(this.appliedOptions));
+        this.getERD = function () {
+            if( this.erd != null )
+                return this.erd;
 
             let descendants = this.descendants();
  
@@ -232,6 +312,8 @@ const ddl = (function () {
                 if( descendants[i].parseType() != 'table' ) 
                     continue;
 
+                descendants[i].toDDL();    // to setup fks
+
                 for( let fk in descendants[i].fks ) {	
                     let parent = descendants[i].fks[fk];
                     let pkNode = this.find(parent);
@@ -247,27 +329,15 @@ const ddl = (function () {
                 }
             }
 
-            this.appliedOptions = JSON.parse(JSON.stringify(this.options));
-            this.resetOptions();
-
+            this.erd = output;
             return output;
         };
-        
-        this.unknownSettings = [];
-        this.appliedOptions;
-        this.data;
-        this.toDDL = function (fullInput, options) {
+
+        this.getDDL = function () {
+            if( this.ddl != null )
+                return this.ddl;
 
             var output = '';
-
-            this.unknownSettings = [];
-
-            this.forest = tree(this, fullInput);
-            let settings = '';
-            if( options != undefined && this.optionEQvalue('overrideSettings',false) ) {
-                settings = '# settings = '+options+'\n\n';
-                this.forest = tree(this, settings + fullInput);
-            }
 
             var descendants = this.descendants();
 
@@ -350,14 +420,15 @@ const ddl = (function () {
 
             output += '/*\n';
             //input = input.replace(/# ?settings ?= ?{.+}/gm,'');
-            fullInput = fullInput.replace(/#.+/g,'\n');
-            fullInput = fullInput.replace(/\/\*/g,'--<--');
-            fullInput = fullInput.replace(/\*\//g,'-->--');
-            fullInput = fullInput.replace(/\/* Non-default options:/g,"");
-            output += fullInput;
+            let inputWithoutComments = fullInput;
+            inputWithoutComments = inputWithoutComments.replace(/#.+/g,'\n');
+            inputWithoutComments = inputWithoutComments.replace(/\/\*/g,'--<--');
+            inputWithoutComments = inputWithoutComments.replace(/\*\//g,'-->--');
+            inputWithoutComments = inputWithoutComments.replace(/\/* Non-default options:/g,"");
+            output += inputWithoutComments;
             output += '\n';
-            for( let i = 0; i < this.unknownSettings.length; i++ ) {
-                output += '*** Unknown setting: '+this.unknownSettings[i]+'\n';
+            for( let i = 0; i < this.unknownOptions().length; i++ ) {
+                output += '*** Unknown setting: '+this.unknownOptions()[i]+'\n';
             }
             
 
@@ -365,95 +436,69 @@ const ddl = (function () {
 
             output += '\n*/';
 
-            this.appliedOptions = JSON.parse(JSON.stringify(this.options));
-            this.resetOptions();
-
+            this.ddl = output;
             return output;
         }; 
 
-        this.errors = function (input, options) {
-            this.toDDL(input, options);
-            this.options = JSON.parse(JSON.stringify(this.appliedOptions));
+        this.getErrors = function () {
+            if( this.errors != null )
+                return this.errors;
 
-            const ret = errorMsgs.findErrors(this, input);
- 
-            this.appliedOptions = JSON.parse(JSON.stringify(this.options));
-            this.resetOptions();
+            this.errors = errorMsgs.findErrors(this, this.fullInput);
 
-            return ret;
-        }
-                
-
-        this.toQSQL = function( input ) {
-            const obj = JSON.parse(input); 
-            return json2qsql.introspect(null, obj, 0);
+            return this.errors;
         }
 
-
-        this.descendants = function () { 
-            var ret = [];
-            for( var i = 0; i < this.forest.length; i++ ) {
-                ret = ret.concat(this.forest[i].descendants());
-            }
-            return ret;
-        };
-        
-        this.additionalColumns = function() {
-            var ret = []; 
-            var input = this.getOptionValue('Auxiliary Columns');
-            if( input == null )
-                return ret;
-            var tmps = input.split(',');
-            for( var i = 0; i < tmps.length; i++ ) {
-                var attr = tmps[i].trim();
-                var type = 'VARCHAR2(4000)';
-                var pos = attr.indexOf(' ');
-                if( 0 < pos ) {
-                    type = attr.substring(pos+1).toUpperCase();
-                    attr = attr.substring(0,pos);
-                }
-                ret[attr] = type;
-            }
-            return ret;
-        };
-
-        this.objPrefix = function ( withoutSchema ) {
-            var ret = this.getOptionValue('schema');
-            if( ret == null )
-                ret = '';
-            if( '' != ret && withoutSchema == null )
-                ret = ret + '.';
-            else 
-                ret = '';
-            var value = '';
-            if( this.getOptionValue('prefix') != null )
-                value = this.getOptionValue('prefix');
-            ret = ret + value;
-            if( value != '' )
-                ret = ret + '_';
-            return ret.toLowerCase();
-        };
     }
-
-    const instance = new DDL();
-
-    let exportObject = {
-        toDDL: instance.toDDL.bind( instance ),
-        toERD: instance.toERD.bind( instance ),
-        toQSQL: instance.toQSQL.bind( instance ),
-        errorMsgs: instance.errors.bind( instance )
-    };
-    Object.defineProperty( exportObject, 'version', {
-        writable: false,
-        value: typeof __PACKAGE_VERSION__ === 'undefined' ? 'development' : __PACKAGE_VERSION__
-    } );
-    return exportObject;
+ 
+    return Parsed;
 }());
 
-export const toDDL = ddl.toDDL;
-export const toERD = ddl.toERD;
-export const toQSQL = ddl.toQSQL;
-export const errors = ddl.errors;
-export const version = ddl.version;
+/**
+ * Translates JSON document into QSQL (experimental)
+ * @param {*} input 
+ * @returns 
+ */
+export function fromJSON( input ) {
+    const obj = JSON.parse(input); 
+    return json2qsql.introspect(null, obj, 0);
+}
 
-export default ddl;
+/**
+ * @param {*} input schema in QSQL notation
+ * @param {*} options 
+ * @returns JSON object listing tables and links
+ */
+export function toERD( input, options ) {
+    return new quicksql(input, options).getERD();
+};
+
+/**
+ * @param {*} input schema in QSQL notation
+ * @param {*} options 
+ * @returns translated DDL 
+ */
+export function toDDL( input, options ) {
+    return new quicksql(input, options).getDDL();
+}; 
+/**
+ * @param {*} input schema in QSQL notation
+ * @param {*} options 
+ * @returns list of SyntaxError objects 
+ */
+export function toErrors( input, options ) {
+    return new quicksql(input, options).getErrors();
+}; 
+
+export const version = {
+    writable: false,
+    value: typeof __PACKAGE_VERSION__ === 'undefined' ? 'development' : __PACKAGE_VERSION__
+};
+
+quicksql.version = version;
+quicksql.toDDL = toDDL;  
+quicksql.toERD = toERD;  
+quicksql.toErrors = toErrors;  
+quicksql.fromJSON = fromJSON;  
+
+export default quicksql;

@@ -1,4 +1,4 @@
-import  ddl from "../src/ddl.js";
+import  {quicksql, toERD} from "../src/ddl.js";
 
 import fs from "fs";
 
@@ -28,7 +28,8 @@ export default function diagram_tests() {
     emp
         name
     `
-    output = JSON.stringify(ddl.toERD(input,opt), null, 4);
+    output = JSON.stringify(toERD(input,opt), null, 4); // 1.1.5 compatibility
+    //console.log(output);
 
     assert( "0 < output.indexOf('prefix_dept')" );
     assert( "0 < output.indexOf('\"schema\": \"my_schema\",')" );
@@ -43,10 +44,8 @@ export default function diagram_tests() {
 `Bug35827754
     data file
     `
-    output = ddl.toERD(input);
+    output = new quicksql(input).getERD();
 
-    //console.log(ddl.toDDL(input));    
-    //console.log(JSON.stringify(output, null, 4));    
     assert( "output.items[0].columns[2].name == 'data_filename'" );
     assert( "output.items[0].columns[2].datatype == 'varchar2(255 char)'" );
     assert( "output.items[0].columns[5].name == 'data_lastupd'" );
