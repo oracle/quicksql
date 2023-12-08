@@ -259,7 +259,7 @@ let tree = (function(){
             if( src[0].value.endsWith('id') && vcPos < 0 && this.indexOf('/')+1 == this.indexOf('pk') ) 
                 ret = 'number';
 
-            let parent_child = concatNames(parent.parseName(),'_',this.parseName());
+            const parent_child = concatNames(parent.parseName(),'_',this.parseName());
 
             if( src[0].value.endsWith('_yn') || src[0].value.startsWith('is_') ) {
                 ret = 'varchar2(1 char) constraint '+concatNames(ddl.objPrefix(),parent_child)+'\n';
@@ -333,24 +333,7 @@ let tree = (function(){
                     ret += ' not null';
             if( 0 < this.indexOf('hidden') || 0 < this.indexOf('invincible') ) 
                 ret += ' invisible';
-            if( 0 < this.indexOf('check') ) {
-                const TMP = this.trimmedContent().toUpperCase();
-                start = TMP.indexOf('/CHECK');
-                end = TMP.lastIndexOf('/');
-                if( end == start)
-                    end = TMP.length;
-                values = this.trimmedContent().substr(start+'/CHECK'.length, end-start-'/CHECK'.length).trim();
-                if( 0 < values.indexOf(', ') )
-                    values = values.replace(/, /g,optQuote+','+optQuote);
-                else if( 0 < values.indexOf(',') )
-                    values = values.replace(/,/g,optQuote+','+optQuote);
-                else	
-                    values = values.replace(/ /g,optQuote+','+optQuote);
-                ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
-                ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'check ('+this.parseName()+' in ('+optQuote+values+optQuote+'))';    
-                ret = ret.replace(/''/gm,"'");    
-    		
-            }
+            ret += this.genConstraint(optQuote);
             if( 0 < this.indexOf('between') ) {
                 const bi = this.indexOf('between');
                 const values = src[bi+1].value + ' and ' + src[bi+3].value;
@@ -372,6 +355,47 @@ let tree = (function(){
             }
             return ret;
         };
+
+        this.genConstraint = function ( optQuote ) {
+            let ret = '';
+            if( 0 < this.indexOf('check') ) {
+                let parentPref = '';
+                if( parent != null )
+                    parentPref = parent.parseName()+'_';
+                const parent_child = concatNames(parentPref,this.parseName());
+                const tmp = this.trimmedContent().toLowerCase();
+                const start = tmp.indexOf('/check');
+                let end = tmp.lastIndexOf('/');
+                if( end == start)
+                    end = tmp.length;
+                let values = this.trimmedContent().substr(start+'/check'.length, end-start-'/check'.length).trim();
+                const srcConstr = lexer( values, false, true, '' ); 
+                let offset = tab;
+                if( parent != null )
+                    offset = ' '.repeat(parent.maxChildNameLen());
+                if( this.children != null && 0 < this.children.length  ) {  // table level
+                    if( srcConstr[0].value != '(' )
+                        values = '( ' + values + ')';
+                    ret += tab + 'constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck');
+                    ret += '  check '+values+',\n';    
+                } else  if( srcConstr[0].value == '(' && srcConstr[srcConstr.length-1].value == ')'  ) {  
+                    ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
+                    ret += tab +  tab+offset +'check '+values;    
+                } else {
+                    if( 0 < values.indexOf(', ') )
+                        values = values.replace(/, /g,optQuote+','+optQuote);
+                    else if( 0 < values.indexOf(',') )
+                        values = values.replace(/,/g,optQuote+','+optQuote);
+                    else	
+                        values = values.replace(/ /g,optQuote+','+optQuote);
+                    ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
+                    ret += tab +  tab+offset +'check ('+this.parseName()+' in ('+optQuote+values+optQuote+'))';    
+                    ret = ret.replace(/''/gm,"'");    
+                }
+    		
+            }
+            return ret;
+        }
 
         this.isMany2One = function() {
             var tmp = this.trimmedContent();
@@ -710,6 +734,7 @@ let tree = (function(){
                 pad = tab+' '.repeat(this.maxChildNameLen() - col.length);
                 ret += tab +  col.toUpperCase() + pad + type + ' not null,\n';  
             }
+            ret += this.genConstraint();
             if( ret.lastIndexOf(',\n') == ret.length-2 )
                 ret = ret.substr(0,ret.length-2)+'\n';
             ret += ')'+(ddl.optionEQvalue('compress','yes') || 0 < nodeContent.indexOf('/COMPRESS')?' compress':'')+';\n\n';

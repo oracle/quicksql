@@ -4,7 +4,8 @@ function assert( condition ) {
     if( !eval(condition) ) {
         console.error("Failed: "+condition);
         throw new Error('Test failed');
-    }   
+    } 
+    console.log('.\r');  
 }
 
 var output;
@@ -514,7 +515,7 @@ students /insert 2
     assert( "output.indexOf('audit all') < 0 " );  
     assert( "output.indexOf('created       date not null') <  output.lastIndexOf('created          date not null,')" );  
 
-// https://github.com/oracle/quicksql/issues/32
+    // https://github.com/oracle/quicksql/issues/32
     output = new quicksql( `queues
     created /default sysdate
     created dt /default systimestamp
