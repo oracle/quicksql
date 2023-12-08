@@ -46,7 +46,7 @@ let tree = (function(){
                 maxLen = 'row_key'.length;
             if( ddl.optionEQvalue('Row Version Number','yes') || 0 < tmp.indexOf('/ROWVERSION') )
                 maxLen = 'row_version'.length;
-            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') ) {
+            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') || 0 < tmp.indexOf('/AUDIT COL') ) {
                 let len = ddl.getOptionValue('createdcol').length;
                 if( maxLen < len )
                     maxLen = len;
@@ -284,8 +284,8 @@ let tree = (function(){
                 ret += this.content.toLowerCase().substring(src[from+1].begin, src[to].end);
             if( 0 <= this.indexOf('date') || 0 == this.indexOf('hiredate') || src[0].value.endsWith('_date') || src[0].value.startsWith('date_of_')
              || 1 < src.length && src[1].value == 'd' //0 < type.indexOf(' d') && type.indexOf(' d') == type.length-' d'.length 
-             || src[0].value == 'CREATED_ON'.toLowerCase()
-             || src[0].value == 'UPDATED_ON'.toLowerCase()
+             || src[0].value.startsWith('created')
+             || src[0].value.startsWith('updated')
             )        		
                 ret = ddl.getOptionValue('Date Data Type').toLowerCase();
             if( vcPos < 0 ) {              	
@@ -587,7 +587,7 @@ let tree = (function(){
             //var indexedColumns = [];
             var ret = '';
 
-            let objName = ddl.objPrefix()  + this.parseName();
+            const objName = ddl.objPrefix()  + this.parseName();
             if( ddl.optionEQvalue('pk', 'SEQ') && ddl.optionEQvalue('genpk', true) ) {
                 ret =  ret + 'create sequence  '+objName+'_seq;\n\n';                
             }
@@ -604,8 +604,8 @@ let tree = (function(){
                     typeModifier = 'default on null '+objName+'_seq.NEXTVAL '.toLowerCase();
                 if( ddl.optionEQvalue('pk', 'guid') )
                     typeModifier = 'default on null to_number(sys_guid(), \'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\') ';
-                ret += tab +  idColName + pad + 'number ' + typeModifier + '\n';
-                const obj_col = concatNames(objName,'_',idColName);  
+                ret += tab +  idColName + pad + 'number ' + typeModifier + '\n';                
+                const obj_col = concatNames(ddl.objPrefix('no schema')  + this.parseName(),'_',idColName);  
                 ret += tab +  tab+' '.repeat(this.maxChildNameLen()) +'constraint '+concatNames(obj_col,'_pk')+' primary key,\n';
             } else {
                 let pkNode = this.getExplicitPkNode();
@@ -690,7 +690,7 @@ let tree = (function(){
                 let pad = tab+' '.repeat(this.maxChildNameLen() - 'row_version'.length);
                 ret += tab +  'row_version' + pad + 'integer not null,\n';              	
             }            	
-            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < nodeContent.indexOf('/AUDITCOLS') ) {
+            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < nodeContent.indexOf('/AUDITCOLS') || 0 < nodeContent.indexOf('/AUDIT COL')  ) {
                 let created = ddl.getOptionValue('createdcol');
                 let pad = tab+' '.repeat(this.maxChildNameLen() - created.length);
                 ret += tab +  created + pad + ddl.getOptionValue('Date Data Type').toLowerCase() + ' not null,\n';  
@@ -714,9 +714,10 @@ let tree = (function(){
                 ret = ret.substr(0,ret.length-2)+'\n';
             ret += ')'+(ddl.optionEQvalue('compress','yes') || 0 < nodeContent.indexOf('/COMPRESS')?' compress':'')+';\n\n';
             
-            let auditPos = nodeContent.indexOf('/AUDIT');
-            let auditcolsPos = nodeContent.indexOf('/AUDITCOLS');
-            if( 0 < auditPos && auditPos != auditcolsPos ) {
+            const auditPos = nodeContent.indexOf('/AUDIT');
+            const auditcolsPos = nodeContent.indexOf('/AUDITCOLS');
+            const auditcolPos = nodeContent.indexOf('/AUDIT COL');
+            if( 0 < auditPos && auditcolsPos < 0 && auditcolPos < 0 ) {
                 ret += 'audit all on '+objName+';\n\n';
             }
      
@@ -857,7 +858,7 @@ let tree = (function(){
                     let pad = tab+' '.repeat(tbl.maxChildNameLen() - 'ROW_KEY'.length);
                     ret += tab + chunks[i]+'.'+ 'ROW_KEY' + singular(pad + chunks[i])+'_'+ 'ROW_KEY,\n';              	
                 }            	
-                if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') ) {
+                if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') || 0 < tmp.indexOf('/AUDIT COL') ) {
                     let created = ddl.getOptionValue('createdcol');
                     let pad = tab+' '.repeat(tbl.maxChildNameLen() - created.length);
                     ret += tab + chunks[i]+'.'+  created + singular(pad + chunks[i])+'_'+ created+',\n';  
@@ -879,7 +880,7 @@ let tree = (function(){
                 let pad = ' '.repeat(maxLen - chunks[i].length);
                 var tbl = chunks[i];
                 if( ddl.objPrefix() != null && ddl.objPrefix() != '' )
-                    ddl.objPrefix()+chunks[i] + pad + chunks[i];
+                    tbl = ddl.objPrefix()+chunks[i] + pad + chunks[i];
                 ret += tab + tbl + ',\n';
             }
             if( ret.lastIndexOf(',\n') == ret.length-2 )
@@ -1004,7 +1005,7 @@ let tree = (function(){
                 ret += '    end if;\n';
                 OK = true;
             }
-            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') ) {
+            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') || 0 < tmp.indexOf('/AUDIT COL') ) {
                 ret += '    if inserting then\n';
                 ret += '        :new.'+ddl.getOptionValue('createdcol')+' := SYSDATE;\n'.toLowerCase();
                 ret += '        :new.'+ddl.getOptionValue('createdbycol')+' := '+user+';\n'.toLowerCase();
@@ -1013,14 +1014,14 @@ let tree = (function(){
                 ret += '    :new.'+ddl.getOptionValue('updatedbycol')+' := '+user+';\n'.toLowerCase();
                 OK = true;
             }
-            if( ddl.optionEQvalue('genpk','yes') 
+            /*if( ddl.optionEQvalue('genpk','yes') perhaps 'no'?
                 && ddl.optionEQvalue('pk','guid')  
             )  {
                 ret += '    if :new.id is null then\n';
                 ret += '        :new.id := to_number(sys_guid(), \'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\');\n';
                 ret += '    end if;\n';
                 OK = true;
-            }
+            }*/
             var cols = ddl.additionalColumns();
             for( var col in cols ) {
                 var type = cols[col];
@@ -1323,7 +1324,7 @@ let tree = (function(){
                 ret += 'commit;\n\n';
 
             let idColName = this.getGenIdColName();
-            if( idColName != null && 1 < i) {
+            if( idColName != null && 1 < i && !ddl.optionEQvalue('pk','guid') ) {
                 ret += 'alter table '+objName+'\n'
               + 'modify '+idColName+' generated '+'always '/*'by default on null'*/+' as identity restart start with '+(i+1)+';\n\n';
             }

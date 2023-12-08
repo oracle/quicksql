@@ -65,7 +65,7 @@ var sample = (function(){
             let max = 100;
             return Math.floor(Math.random() * (max - min)) + min;
         }
-        if( type.startsWith('DATE')  ) {
+        if( type.startsWith('DATE') || type.startsWith('TIMESTAMP')  ) {
             let min = 0;
             let max = 100;
             var offset = Math.floor(Math.random() * (max - min)) + min;

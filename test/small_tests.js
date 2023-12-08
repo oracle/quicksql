@@ -463,8 +463,69 @@ projects /insert 1
         id
     `).getDDL();
         
-    //console.log(output);
     assert( " output.indexOf('id    varchar2') < 0 " ); 
+
+    // https://github.com/oracle/quicksql/issues/26
+    output = new quicksql( 
+`dept
+    name
+
+view v dept
+
+# settings = {prefix: "abc"}
+    `).getDDL();
+        
+    assert( "output.indexOf('from') <  output.lastIndexOf('abc_dept') " ); 
+
+    // https://github.com/oracle/quicksql/issues/27
+    output = new quicksql( `dept
+    name
+        
+    # settings = {prefix: "prefix", schema: "schema"}
+    `).getDDL();
+                    
+    assert( "output.indexOf('schema.prefix_dept_id_pk') < 0 " ); 
+            
+    // https://github.com/oracle/quicksql/issues/28
+    output = new quicksql( `# settings = {"pk":"GUID"}
+students /insert 2 
+        name
+    `).getDDL();
+                    
+    assert( "output.indexOf('trigger') < 0 " ); 
+    assert( "output.indexOf('alter') < 0 " ); 
+
+    // https://github.com/oracle/quicksql/issues/29
+    output = new quicksql( `employees /insert 1
+       date hired
+   
+   #settings={ date:timestamp}
+    `).getDDL();
+                       
+    assert( "output.indexOf('N/A') < 0 " );  
+
+    // https://github.com/oracle/quicksql/issues/31
+    output = new quicksql( `departments /audit cols
+   name 
+   employees /audit columns
+       name 
+    `).getDDL();
+                   
+    assert( "output.indexOf('audit all') < 0 " );  
+    assert( "output.indexOf('created       date not null') <  output.lastIndexOf('created          date not null,')" );  
+
+// https://github.com/oracle/quicksql/issues/32
+    output = new quicksql( `queues
+    created /default sysdate
+    created dt /default systimestamp
+    `).getDDL();
+                   
+    //console.log(output);
+    assert( "0 < output.indexOf('default on null sysdate')" );  
+    assert( "0 < output.indexOf('default on null systimestamp')" );  
+
+
 }    
+ 
 
 small_tests();

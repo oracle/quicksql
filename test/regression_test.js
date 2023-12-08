@@ -166,4 +166,5 @@ console.log("              506 ms     as of 11/8/2023");
 
 
 import {quicksql} from '../dist/quick-sql.js';
-console.log("Version "+quicksql.version.value);
+console.log("Version "+quicksql.version());
+

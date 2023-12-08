@@ -5,7 +5,7 @@ import  json2qsql from "../src/json2qsql.js";
 import fs from "fs";
   
 try {
-    let file = '//DV/car_racing/2.qsql';//'DV/donuts.json';
+    let file = 'constraints.qsql';//'//DV/car_racing/2.qsql';//'DV/donuts.json';
     let args = process.argv.slice(2);
     if( 0 < args.length )
         file = args[0];
@@ -24,7 +24,7 @@ try {
     if( 0 <= file.indexOf('/erd/') ) {
         output = JSON.stringify(new quicksql(input).toERD(), null, 4);
     } else
-        output = new quicksql(input).toDDL();
+        output = new parsed(input).getDDL();
     console.log(output);    
 } catch(e) {
     console.error(e);
