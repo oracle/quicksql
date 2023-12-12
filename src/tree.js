@@ -1086,6 +1086,8 @@ let tree = (function(){
             }
             for( let i = 0; i < this.children.length; i++ ) {
                 var child = this.children[i]; 
+                if( child.refId() != null  )
+                    continue;
                 if( child.children.length != 0 ) 
                     continue;
                 ret += ',\n';
@@ -1101,11 +1103,11 @@ let tree = (function(){
             let prelude =    tab+tab+'for c1 in (select * from '+objName+' where id = p_id) loop \n';
             if( kind == 'insert' ) {
                 prelude =    tab+tab+'insert into '+objName+' ( \n';
-                prelude += tab+tab+'id';
+                prelude += tab+tab+tab+'id';
             }
             if( kind == 'update' ) {
                 prelude =    tab+tab+'update  '+objName+' set \n';
-                prelude += tab+tab+'id = p_id';
+                prelude += tab+tab+tab+'id = p_id';
             }
             ret += prelude;
             for( let fk in this.fks ) {	
@@ -1117,48 +1119,52 @@ let tree = (function(){
                 //pad = tab+tab+' '.repeat(this.maxChildNameLen() - fk.length);
                 if( kind == 'insert' || kind == 'update' ) 
                     ret += ',\n';
-                let row = '        P_'+fk+' := c1.'+fk+';\n';	
+                let row = tab+tab+tab+'P_'+fk+' := c1.'+fk+';\n';	
                 if( kind == 'insert' ) 
-                    row = '        '+fk;
+                    row = tab+tab+tab+fk;
                 if( kind == 'update' ) 
-                    row = '        '+fk+' = P_'+fk+'\n';	
+                    row = tab+tab+tab+fk+' = P_'+fk+'\n';	
                 ret += row;
             }
             for( var i = 0; i < this.children.length; i++ ) {
                 var child = this.children[i]; 
+                if( child.refId() != null  )
+                    continue;
                 if( child.children.length != 0 ) 
                     continue;
                 if( kind == 'insert' || kind == 'update' ) 
                     ret += ',\n';
-                let row = '        P_'+child.parseName().toLowerCase()+' := c1.'+child.parseName().toLowerCase()+';\n';	
+                let row = tab+tab+tab+'P_'+child.parseName().toLowerCase()+' := c1.'+child.parseName().toLowerCase()+';\n';	
                 if( kind == 'insert' ) 
-                    row = '        '+child.parseName().toLowerCase();
+                    row = tab+tab+tab+child.parseName().toLowerCase();
                 if( kind == 'update' ) 
-                    row = '        '+child.parseName().toLowerCase()+' = P_'+child.parseName().toLowerCase()+'\n';	
+                    row = tab+tab+tab+child.parseName().toLowerCase()+' = P_'+child.parseName().toLowerCase()+'\n';	
                 ret += row;
             }
             if( kind == 'insert' ) {
-                ret +=    '        ) values ( \n';
-                ret +=    '            p_id';
+                ret +=    '\n'+tab+tab+') values ( \n';
+                ret +=    tab+tab+tab+'p_id';
                 for( let fk in this.fks ) {	
                     ret += ',\n';
-                    ret += '        p_'+fk;
+                    ret += tab+tab+tab+'p_'+fk;
                 }
                 for( let i = 0; i < this.children.length; i++ ) {
                     let child = this.children[i]; 
+                    if (child.refId() != null  )
+                        continue;
                     if( child.children.length != 0 ) 
                         continue;
                     ret += ',\n';
-                    ret += '        p_'+child.parseName();
+                    ret += tab+tab+tab+'p_'+child.parseName();
                 }
             }
             let finale = '\n        end loop;\n';
             if( kind == 'insert' )
-                finale = '        );';
+                finale = '\n'+tab+tab+');';
             if( kind == 'update' )
-                finale = '    where id = p_id;';
+                finale = tab+tab+'where id = p_id;';
             ret += finale;
-            ret += '    end '+kind+'_row;\n ';
+            ret += '\n'+tab+'end '+kind+'_row;\n ';
             ret += '\n ';
             return ret;
         };

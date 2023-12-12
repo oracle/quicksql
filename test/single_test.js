@@ -5,7 +5,7 @@ import  json2qsql from "../src/json2qsql.js";
 import fs from "fs";
   
 try {
-    let file = 'constraints.qsql';//'//DV/car_racing/2.qsql';//'DV/donuts.json';
+    let file = '//bugs/35.qsql';//'//DV/car_racing/2.qsql';//'DV/donuts.json';
     let args = process.argv.slice(2);
     if( 0 < args.length )
         file = args[0];
