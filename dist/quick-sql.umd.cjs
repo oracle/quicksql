@@ -57,6 +57,7 @@
 `;for(let n=0;n<s.length;n++)l+=s[n].toDDL();return l},this.generateDrop=function(){let i=m.objPrefix()+this.parseName(),t="";return this.parseType()=="view"&&(t="drop view "+i+`;
 `),this.parseType()=="table"&&(t="drop table "+i+` cascade constraints;
 `,m.optionEQvalue("api","yes")&&(t+="drop package "+i+`_api;
+`),m.optionEQvalue("pk","SEQ")&&(t+="drop sequence "+i+`_seq;
 `)),t.toLowerCase()},this.generateView=function(){if(this.parseType()!="view"&&this.parseType()!="dv")return"";if(m.optionEQvalue("Duality View","yes")||this.parseType()=="dv")return this.generateDualityView();let i=m.objPrefix()+this.parseName();var s=this.trimmedContent().split(" "),l="create or replace view "+i+` as
 `;l+=`select
 `;for(var h=0,y=2;y<s.length;y++){let u=m.find(s[y]);if(u==null)return"";var P=(s[y]+".id").length;h<P&&(h=P);for(var T=0;T<u.children.length;T++){var k=u.children[T];P=(s[y]+"."+k.parseName()).length,h<P&&(h=P)}}var D={};for(let u=2;u<s.length;u++){let g=m.find(s[u]);if(g!=null)for(let B=0;B<g.children.length;B++){var w=g.children[B].parseName(),N=D[w];N==null&&(N=0),D[w]=N+1}}for(let u=2;u<s.length;u++){let g=m.find(s[u]);if(g==null)continue;let B=" ".repeat(h-(s[u]+".id").length);l+=d+s[u]+".id"+d+B+W(s[u])+`_id,

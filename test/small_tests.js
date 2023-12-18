@@ -521,12 +521,19 @@ students /insert 2
     created dt /default systimestamp
     `).getDDL();
                    
-    //console.log(output);
     assert( "0 < output.indexOf('default on null sysdate')" );  
     assert( "0 < output.indexOf('default on null systimestamp')" );  
 
-
+    // https://github.com/oracle/quicksql/issues/32
+    output = new quicksql( `# pk: SEQ
+    # drop: Y
+students 
+    name
+    `).getDDL();
+                   
+    //console.log(output);
+    assert( "0 < output.indexOf('drop sequence students_seq')" );  
 }    
- 
 
+ 
 small_tests();

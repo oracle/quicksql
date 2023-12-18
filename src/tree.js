@@ -813,6 +813,8 @@ let tree = (function(){
                 ret = 'drop table '+objName+' cascade constraints;\n';
                 if( ddl.optionEQvalue('api','yes') )
                     ret+= 'drop package '+objName+'_api;\n';
+                if( ddl.optionEQvalue('pk','SEQ') )
+                    ret+= 'drop sequence '+objName+'_seq;\n';
             }
             return ret.toLowerCase();
         };

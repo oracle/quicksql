@@ -7950,6 +7950,7 @@ let se = function() {
       return this.parseType() == "view" && (t = "drop view " + i + `;
 `), this.parseType() == "table" && (t = "drop table " + i + ` cascade constraints;
 `, m.optionEQvalue("api", "yes") && (t += "drop package " + i + `_api;
+`), m.optionEQvalue("pk", "SEQ") && (t += "drop sequence " + i + `_seq;
 `)), t.toLowerCase();
     }, this.generateView = function() {
       if (this.parseType() != "view" && this.parseType() != "dv")
