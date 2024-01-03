@@ -6,6 +6,7 @@ var json2qsql = (function () {
         this.aggrCounts = {};   // key -> #of insert starements
 
         this.calculateCounts = function ( key, value ) {
+
             let tmp = this.aggrSizes[key];
             if( tmp == null )
                 tmp = 0;
@@ -15,8 +16,7 @@ var json2qsql = (function () {
             this.aggrSizes[key] = tmp + incr;      
 
             for( let property in value ) {
-                const type = typeof value[property];
-                if( type == "object" )    
+                if( value[property] != null && typeof value[property] == "object" )    
                     this.calculateCounts( property, value[property] )
             }
             
@@ -25,7 +25,7 @@ var json2qsql = (function () {
         this.introspect = function( key, value, level, isM2O ) {
             if( level == 0 ) {
                 this.aggrSizes = {};
-                if( key == null ) {
+                if( level == 0 ) {
                     for( let property in value ) {
                         //const field = value[property];
                         let suffixes = ["_address", "_id", "_name", "Id"];
@@ -39,9 +39,10 @@ var json2qsql = (function () {
                                 break;
                             }
                         }
-                        if( !found  )
-                            tmp += "unnamed_entity";  
-                        key = tmp; //.toLowerCase(); 
+                        if( !found && key == null )
+                            key = "unnamed_entity"; 
+                        else if( found )
+                            key = tmp;  
                         break;
                     }
                 }

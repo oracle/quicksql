@@ -459,11 +459,12 @@ export const quicksql = (function () {
 /**
  * Translates JSON document into QSQL (experimental)
  * @param {*} input 
+ * @param {*} key optional filename to have the named 
  * @returns 
  */
-export function fromJSON( input ) {
+export function fromJSON( input, key ) {
     const obj = JSON.parse(input); 
-    return json2qsql.introspect(null, obj, 0);
+    return json2qsql.introspect(key, obj, 0);
 }
 
 /**

@@ -566,8 +566,12 @@ let tree = (function(){
         }
         this.getPkName = function () {
             let id = this.getGenIdColName();
-            if( id == null )
-                return this.getExplicitPkNode().parseName();
+            if( id == null ) {
+                let pkn = this.getExplicitPkNode();
+                if( pkn == null )
+                    return null;
+                return pkn.parseName();
+            }
             return id;
         }
 
@@ -824,7 +828,13 @@ let tree = (function(){
                 return '';
 
             if( ddl.optionEQvalue('Duality View','yes') || this.parseType() == 'dv' ) {
-                return this.generateDualityView();
+                try {
+                    return this.generateDualityView();
+                } catch ( e ) {
+                    if( e.message == this.one2many2oneUnsupoported  )
+                        return '';
+                    throw e;
+                }
             }
             let objName = ddl.objPrefix()  + this.parseName();
             let tmp = this.trimmedContent(); //.toLowerCase();
@@ -1300,6 +1310,8 @@ let tree = (function(){
                                 values.push(k);    
                             if( parObj != null && refNode != null ) {
                                 const field = refNode.getPkName();
+                                if( field == null )
+                                    continue;
                                 let v = parObj[field];
                                 if( v != null ) {
                                     values = [];
@@ -1309,7 +1321,10 @@ let tree = (function(){
                             if( elem != null ) {
                                 let refData = elem[ref];
                                 if( refData != null ) {
-                                    let v = refData[refNode.getPkName()];
+                                    const field = refNode.getPkName();
+                                    if( field == null )
+                                        continue;
+                                    let v = refData[field];
                                     if( v != null ) {
                                         values = [];
                                         values[0] = v;
@@ -1395,8 +1410,9 @@ let tree = (function(){
             return this.children.some((c) => c.children.length > 0 &&
              c.parseName() == name && !c.isArray());
         };
-        /*this.generateSelectJsonBottomUp = function( indent) {
-            var name = this.parseName();
+        this.generateSelectJsonBottomUp = function( indent) {
+            throw new Error("generateSelectJsonBottomUp() not implemented yet");
+            /*var name = this.parseName();
             var ret = indent + '\'' + this.getGenIdColName() + '\' : ' + name +'.id,\n';
             for( var j = 0; j < this.children.length; j++ ) {
                 var child = this.children[j];
@@ -1411,7 +1427,7 @@ let tree = (function(){
                 ret += indent + '\'' + pname + '\' : (\n';
                 indent += '  ';
                 ret += indent + 'select JSON {\n';
-                ret += this.generateSelectJsonBottomUp( ptbl, indent + '  ');
+                ret += ptbl.generateSelectJsonBottomUp( indent + '  ');
                 ret += indent + '} from ' + ptbl.parseName() + ' ' + pname + ' with (UPDATE)\n';
                 ret += indent + 'where ' + name + '.' + pname + '_id = ' + pname + '.ID\n';
                 indent = indent.slice(0, -2);
@@ -1419,8 +1435,9 @@ let tree = (function(){
             } else {
                 ret = ret.slice(0, -2) + '\n';
             }
-            return ret;	
-        };*/
+            return ret;	*/
+        };
+        this.one2many2oneUnsupoported = "one to many to one is not supported";
         this.generateSelectJsonTopDown = function( indent ) {
             var name = this.parseName();
             let ret = '';
@@ -1438,6 +1455,8 @@ let tree = (function(){
                     var isArray = !child.isMany2One();
                     indent += '  ';
                     ret += indent + 'select ' + /*(isArray?'JSON_ARRAYAGG(':'') +*/ 'JSON {\n';
+                    if( this.isMany2One() )
+                        throw new Error(this.one2many2oneUnsupoported);
                     ret += child.generateSelectJsonTopDown(indent + '  ');
                     ret += indent + ' WITH NOCHECK }' +  ' from ' + cname + ' with INSERT UPDATE\n';
                     var names = /*isArray? [name, cname] :*/ [cname, name];
@@ -1469,7 +1488,7 @@ let tree = (function(){
             if( tbl != null) {
                 ret += 'create or replace json relational duality view ' + chunks[1] + ' as\n';
                 ret += 'select JSON {\n';
-                ret += // tbl.isLeaf()? tbl.generateSelectJsonBottomUp('  ') :        what if middle?
+                ret += tbl.isMany2One()? tbl.generateSelectJsonBottomUp('  ') :        
                        tbl.generateSelectJsonTopDown('  ');
                 ret += '} from ' + tbl.parseName() /*+ ' ' + chunks[2]*/ + ' with INSERT UPDATE DELETE;\n\n';
             }
