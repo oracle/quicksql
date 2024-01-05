@@ -8,7 +8,8 @@ try {
     let file = '//experimental/events.json';
     file = '//bugs/35.qsql';
     file = '//DV/car_racing/2.qsql';
-    file = '//experimental/donuts.json';
+    file = '//apex/forrestclinic.quicksql';
+    //file = '//experimental/donuts.json';
     let args = process.argv.slice(2);
     if( 0 < args.length )
         file = args[0];

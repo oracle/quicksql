@@ -1,11 +1,13 @@
 import {quicksql, toDDL} from "../src/ddl.js";
 
+var assertionCnt = 0;
+
 function assert( condition ) {
     if( !eval(condition) ) {
         console.error("Failed: "+condition);
         throw new Error('Test failed');
     } 
-    console.log('.\r');  
+    assertionCnt++; 
 }
 
 var output;
@@ -537,3 +539,11 @@ students
 
  
 small_tests();
+
+console.log(assertionCnt);
+
+const minimalTestCnt = 95;
+if( assertionCnt < minimalTestCnt ) {
+    console.error("assertionCnt < "+minimalTestCnt);
+    throw new Error('Test failed');
+} 
