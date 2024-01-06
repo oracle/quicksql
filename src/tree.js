@@ -1,6 +1,6 @@
 import {singular,concatNames,canonicalObjectName} from './naming.js';
 import translate from './translate.js';
-import sample from './sample.js';
+import {generateSample} from './sample.js';
 import lexer from './lexer.js';
 import amend_reserved_word from './reserved_words.js';
 //import { quicksql.quicksql.identityDataType, guid, quicksql.tswtz, tswltz } from './ddl.js';
@@ -1238,7 +1238,21 @@ let tree = (function(){
             return ret.toLowerCase();
         };
 
-        this.rows = 0;       
+        this.cardinality = function() {
+            let tmp = this.trimmedContent().toLowerCase();
+            let start = tmp.indexOf('/insert ');
+            if( 0 < start ) {
+                tmp = tmp.substr(start+'/insert '.length);
+                let tmps = tmp.split(' ');
+                let ret =  parseInt(tmps[0]);
+                const limit = ddl.getOptionValue('datalimit');
+                if( limit < ret )
+                    ret = limit;
+                return ret;
+            }
+            return 0;
+        }
+
         this.generateData = function( curObj, parObj ) {
             if( ddl.optionEQvalue('inserts',false) )
                 return '';
@@ -1262,153 +1276,142 @@ let tree = (function(){
             
             let objName = ddl.objPrefix()  + this.parseName();
             let insert = '';
-            let tmp = this.trimmedContent().toLowerCase();
-            let start = tmp.indexOf('/insert ');
-            let i = 0;
-            if( 0 < start ) {
-                tmp = tmp.substr(start+'/insert '.length);
-                let tmps = tmp.split(' ');
-                this.rows = parseInt(tmps[0]);
-                if( 0 < this.rows ) {
-                    if( ddl.getOptionValue('datalimit') < this.rows )
-                        this.rows = ddl.getOptionValue('datalimit');
-                    for( i = 0; i < this.rows; i++ ) {
-                        let elem = curObj;
-                        if( curObj != null && Array.isArray(curObj) )
-                            //val('elem = curObj['+i+']');
-                            elem = curObj[i];
+            for( let i = 0; i < this.cardinality(); i++ ) {
+                let elem = curObj;
+                if( curObj != null && Array.isArray(curObj) )
+                    //val('elem = curObj['+i+']');
+                    elem = curObj[i];
 
-                        insert += 'insert into '+objName+' (\n';
-                            
-                        let idColName = this.getGenIdColName();
-                        if( idColName != null ) {
-                            insert += tab + idColName +',\n';
-                        } else {
-                            let pkNode = this.getExplicitPkNode();
-                            if( pkNode != null ) {
-                                insert += tab + pkNode.parseName() +',\n';
-                            }
+                insert += 'insert into '+objName+' (\n';
+                    
+                let idColName = this.getGenIdColName();
+                if( idColName != null ) {
+                    insert += tab + idColName +',\n';
+                } else {
+                    let pkNode = this.getExplicitPkNode();
+                    if( pkNode != null ) {
+                        insert += tab + pkNode.parseName() +',\n';
+                    }
+                }
+                for( let fk in this.fks ) {
+                    let parent = this.fks[fk];				
+                    let refNode = ddl.find(parent);
+                    let _id = '';    
+                    if( refNode == null ) {
+                        refNode = ddl.find(fk);
+                        if( refNode.isMany2One() & !fk.endsWith('_id') ) {
+                            parent = fk;
+                            fk = singular(fk);
+                            _id = '_id';  
                         }
-                        for( let fk in this.fks ) {
-                            let parent = this.fks[fk];				
-                            let refNode = ddl.find(parent);
-                            let _id = '';    
-                            if( refNode == null ) {
-                                refNode = ddl.find(fk);
-                                if( refNode.isMany2One() & !fk.endsWith('_id') ) {
-                                    parent = fk;
-                                    fk = singular(fk);
-                                    _id = '_id';  
-                                }
-                            }
-                            insert += tab+fk+_id+',\n';
+                    }
+                    insert += tab+fk+_id+',\n';
+                }
+                for( let j = 0; j < this.children.length; j++ ) {
+                    let child = this.children[j];
+                    if( idColName != null && child.parseName() == 'id' )
+                        continue;
+                    if (child.refId() == null  ) {
+                        if( child == this.getExplicitPkNode() )
+                            continue; //insert += '--';
+                        if( 0 == child.children.length ) 
+                            insert += tab+child.parseName()+',\n';
+                    }
+                }
+                if( insert.lastIndexOf(',\n') == insert.length-2 )
+                    insert = insert.substr(0,insert.length-2)+'\n';
+
+                insert += ') values (\n';
+
+                if( idColName != null ) {
+                    insert += tab + (i+1)+ ',\n'; 
+                } else {
+                    let pkNode = this.getExplicitPkNode();
+                    if( pkNode != null ) {
+                        const field = pkNode.parseName();
+                        let tmp = getValue(ddl.data, null /*no name at level 0*/, field, this.parseName());
+                        let v = -1;
+                        if( elem != null )
+                            v = elem[field];
+                        if( tmp != null && tmp[i] != null ) {
+                                v = tmp[i];
                         }
-                        for( let j = 0; j < this.children.length; j++ ) {
-                            let child = this.children[j];
-                            if( idColName != null && child.parseName() == 'id' )
+                        insert += tab + (v != -1 ? v : i+1)+ ',\n';  
+                    }
+                }
+                
+                if( this.parseName()=='donut_batters' )  
+                    console.log('');             
+                for( let fk in this.fks ) {
+                    let ref = this.fks[fk];
+                    let refNode = ddl.find(ref);
+                    let values = [];
+                    for( let k = 1; k <= refNode.cardinality() ; k++ )
+                        values.push(k);    
+                    if( parObj != null && refNode != null ) {
+                        const field = refNode.getPkName();
+                        if( field == null )
+                            continue;
+                        let v = parObj[field];
+                        if( v != null ) {
+                            values = [];
+                            values[0] = v;
+                        }                                   
+                    }   
+                    if( elem != null ) {
+                        let refData = elem[ref];
+                        if( refData != null ) {
+                            const field = refNode.getPkName();
+                            if( field == null )
                                 continue;
-                            if (child.refId() == null  ) {
-                                if( child == this.getExplicitPkNode() )
-                                    continue; //insert += '--';
-                                if( 0 == child.children.length ) 
-                                    insert += tab+child.parseName()+',\n';
-                            }
+                            let v = refData[field];
+                            if( v != null ) {
+                                values = [];
+                                values[0] = v;
+                            }                                   
                         }
-                        if( insert.lastIndexOf(',\n') == insert.length-2 )
-                            insert = insert.substr(0,insert.length-2)+'\n';
-
-                        insert += ') values (\n';
-
-                        if( idColName != null ) {
-                            insert += tab + (i+1)+ ',\n'; 
-                        } else {
-                            let pkNode = this.getExplicitPkNode();
-                            if( pkNode != null ) {
-                                const field = pkNode.parseName();
-                                let tmp = getValue(ddl.data, null /*no name at level 0*/, field, this.parseName());
-                                let v = -1;
-                                if( elem != null )
-                                    v = elem[field];
-                                if( tmp != null && tmp[i] != null ) {
-                                     v = tmp[i];
-                                }
-                                insert += tab + (v != null ? v : i+1)+ ',\n';  
-                            }
-                        }
-                       
-                        for( let fk in this.fks ) {
-                            let ref = this.fks[fk];
-                            let refNode = ddl.find(ref);
-                            let values = [];
-                            for( let k = 1; k <= refNode.rows ; k++ )
-                                values.push(k);    
-                            if( parObj != null && refNode != null ) {
-                                const field = refNode.getPkName();
-                                if( field == null )
-                                    continue;
-                                let v = parObj[field];
+                    }
+                    insert += tab+translate(ddl.getOptionValue('Data Language'),generateSample(objName,singular(ref)+'_id', 'INTEGER', values))+',\n';
+                }
+                for( let j = 0; j < this.children.length; j++ ) {
+                    let child = this.children[j]; 
+                    if( idColName != null && child.parseName() == 'id' )
+                        continue;
+                    if (child.refId() == null  ) {
+                        if( child == this.getExplicitPkNode() )
+                            continue; //insert += '--';
+                        if( 0 == child.children.length )  {
+                            let values = child.parseValues();
+                            let cname = child.parseName();
+                            if( elem != null ) {
+                                let v = elem[cname];
                                 if( v != null ) {
                                     values = [];
                                     values[0] = v;
                                 }                                   
-                            }   
-                            if( elem != null ) {
-                                let refData = elem[ref];
-                                if( refData != null ) {
-                                    const field = refNode.getPkName();
-                                    if( field == null )
-                                        continue;
-                                    let v = refData[field];
-                                    if( v != null ) {
-                                        values = [];
-                                        values[0] = v;
-                                    }                                   
-                                }
                             }
-                            insert += tab+translate(ddl.getOptionValue('Data Language'),sample(objName,singular(ref)+'_id', 'INTEGER', values))+',\n';
-                        }
-                        for( let j = 0; j < this.children.length; j++ ) {
-                            let child = this.children[j]; 
-                            if( idColName != null && child.parseName() == 'id' )
-                                continue;
-                            if (child.refId() == null  ) {
-                                if( child == this.getExplicitPkNode() )
-                                    continue; //insert += '--';
-                                if( 0 == child.children.length )  {
-                                    let values = child.parseValues();
-                                    let cname = child.parseName();
-                                    if( elem != null ) {
-                                        let v = elem[cname];
-                                        if( v != null ) {
-                                            values = [];
-                                            values[0] = v;
-                                        }                                   
-                                    }
-                                    let tmp = getValue(ddl.data, null /*no name at level 0*/, cname, this.parseName());
-                                    if( tmp != null && tmp[i] != null ) {
-                                        values = [];
-                                        values[0] = tmp[i];
-                                    }
-                                    let datum = sample(objName, cname, child.parseType(), values);
-                                    insert += tab + translate(ddl.getOptionValue('Data Language'), datum)+',\n';
-                                }
+                            let tmp = getValue(ddl.data, null /*no name at level 0*/, cname, this.parseName());
+                            if( tmp != null && tmp[i] != null ) {
+                                values = [];
+                                values[0] = tmp[i];
                             }
+                            let datum = generateSample(objName, cname, child.parseType(), values);
+                            insert += tab + translate(ddl.getOptionValue('Data Language'), datum)+',\n';
                         }
-                        if( insert.lastIndexOf(',\n') == insert.length-2 )
-                            insert = insert.substr(0,insert.length-2)+'\n';
-                        insert += ');\n';
                     }
-                    insert += '\n';
                 }
+                if( insert.lastIndexOf(',\n') == insert.length-2 )
+                    insert = insert.substr(0,insert.length-2)+'\n';
+                insert += ');\n';
             }
  
             if( insert != '' )    
-                insert += 'commit;\n\n';
+                insert += '\ncommit;\n\n';
 
             let idColName = this.getGenIdColName();
-            if( idColName != null && 1 < i && !ddl.optionEQvalue('pk','guid') ) {
+            if( idColName != null && 1 < this.cardinality() && !ddl.optionEQvalue('pk','guid') ) {
                 insert += 'alter table '+objName+'\n'
-              + 'modify '+idColName+' generated '+'always '/*'by default on null'*/+' as identity restart start with '+(i+1)+';\n\n';
+              + 'modify '+idColName+' generated '+'always '/*'by default on null'*/+' as identity restart start with '+(this.cardinality()+1)+';\n\n';
             }
 
             tab2inserts[objName] = insert;

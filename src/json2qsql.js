@@ -23,7 +23,8 @@ var json2qsql = (function () {
         }
 
         this.introspect = function( key, value, level, isM2O ) {
-            if( level == 0 ) {
+            const isTopCall = this.aggrSizes == null;
+            if( isTopCall ) {
                 this.aggrSizes = {};
                 if( level == 0 ) {
                     for( let property in value ) {
@@ -53,7 +54,9 @@ var json2qsql = (function () {
                 m2o = '>'
             }
 
-            let output = '\n'+indent(level)+m2o+key;
+            let output = key;
+            if( 0 < level )
+                output = '\n'+indent(level)+m2o+key;
 
             if( typeof value == 'number' ) {
                 output += ' num';
@@ -63,13 +66,14 @@ var json2qsql = (function () {
                 }
             }
 
-            if( typeof value == "object" ) {
+            tofinal: if( typeof value == "object" ) {
                 if( Array.isArray(value) ) {
                     for( let property in value ) {
                         if( 1 <= property )
                             console.log('1 <= property !');
                         const field = value[property];
-                        return this.introspect(key, field, level, false);
+                        output = this.introspect(key, field, level, false);
+                        break tofinal;
                     }
                 } else {
                     if( key != "" ) {
@@ -98,7 +102,7 @@ var json2qsql = (function () {
                 //output += '=' + value;
             }
 
-            if( level == 0 ) {
+            if( isTopCall ) {
                 output += "\n\ndv "+key+"_dv "+key +"";
                 output += '\n\n#settings = { genpk: false, drop: true }';
 
@@ -106,7 +110,8 @@ var json2qsql = (function () {
 
                 output += '#document = \n';
                 output += JSON.stringify(value, null, 3);    
-                output += '\n';    
+                output += '\n';  
+                this.aggrSizes = null;  
             }
 
             return output;

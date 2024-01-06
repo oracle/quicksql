@@ -1,0 +1,13 @@
+donuts  /insert 2
+   id /pk
+   type
+   donut_batters  /insert 5
+      >batters  /insert 3
+         id /pk
+         type
+   donut_toppings  /insert 7
+       >toppings  /insert 4
+         id vc100 /pk
+         type    
+      
+#settings = { genpk: false, pk: none }     

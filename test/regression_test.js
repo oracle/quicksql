@@ -5,6 +5,7 @@ import fs from "fs";
 import {fromJSON} from "../src/ddl.js";
 import lexer from '../src/lexer.js'
 import errorMsgs from '../src/errorMsgs.js'
+import {resetSeed} from '../src/sample.js'
 
 const mismatches = { 
     "frc_patients_insurance_provider_fk": "frc_patients_insurance_prov_fk", 
@@ -87,6 +88,7 @@ function processFile( subdir, file ) {
     const text = fs.readFileSync(subdir+file+ext).toString();  
 
     let output = null;
+    resetSeed();
     if( 0 < subdir.indexOf('/erd/') )
         output = JSON.stringify(new quicksql(text).getERD(),null,3);
     else if( ext == '.json' )
@@ -113,7 +115,7 @@ function processFile( subdir, file ) {
     let sc= lexer( cmp, false, true, "" );
     let i = 0;
     while (i < so.length && i < sc.length ) {
-        const strict = 0 < subdir.indexOf('/DV/');
+        const strict = 0 < subdir.indexOf('/DV/') || 0 <= file.indexOf('donuts');
         if( !compareTokens(so[i], sc[i], strict) ) {
             //var linec = Service.charPos2LineNo(cmp, sc[i].begin);
             //var linecOffset = Service.lineNo2CharPos(cmp, linec);

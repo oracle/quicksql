@@ -5,11 +5,10 @@ import  json2qsql from "../src/json2qsql.js";
 import fs from "fs";
   
 try {
-    let file = '//experimental/events.json';
-    file = '//bugs/35.qsql';
-    file = '//DV/car_racing/2.qsql';
-    file = '//apex/forrestclinic.quicksql';
-    //file = '//experimental/donuts.json';
+    let file = '//Bug35756025/1.qsql';
+    //file = '//DV/car_racing/2.qsql';
+    file = '//star/donuts.qsql';
+    //file = '//experimental/donuts1.qsql';
     let args = process.argv.slice(2);
     if( 0 < args.length )
         file = args[0];
