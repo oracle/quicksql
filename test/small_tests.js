@@ -1,10 +1,13 @@
 import {quicksql, toDDL} from "../src/ddl.js";
 
+var assertionCnt = 0;
+
 function assert( condition ) {
     if( !eval(condition) ) {
         console.error("Failed: "+condition);
         throw new Error('Test failed');
-    }   
+    } 
+    assertionCnt++; 
 }
 
 var output;
@@ -463,8 +466,84 @@ projects /insert 1
         id
     `).getDDL();
         
-    //console.log(output);
     assert( " output.indexOf('id    varchar2') < 0 " ); 
+
+    // https://github.com/oracle/quicksql/issues/26
+    output = new quicksql( 
+`dept
+    name
+
+view v dept
+
+# settings = {prefix: "abc"}
+    `).getDDL();
+        
+    assert( "output.indexOf('from') <  output.lastIndexOf('abc_dept') " ); 
+
+    // https://github.com/oracle/quicksql/issues/27
+    output = new quicksql( `dept
+    name
+        
+    # settings = {prefix: "prefix", schema: "schema"}
+    `).getDDL();
+                    
+    assert( "output.indexOf('schema.prefix_dept_id_pk') < 0 " ); 
+            
+    // https://github.com/oracle/quicksql/issues/28
+    output = new quicksql( `# settings = {"pk":"GUID"}
+students /insert 2 
+        name
+    `).getDDL();
+                    
+    assert( "output.indexOf('trigger') < 0 " ); 
+    assert( "output.indexOf('alter') < 0 " ); 
+
+    // https://github.com/oracle/quicksql/issues/29
+    output = new quicksql( `employees /insert 1
+       date hired
+   
+   #settings={ date:timestamp}
+    `).getDDL();
+                       
+    assert( "output.indexOf('N/A') < 0 " );  
+
+    // https://github.com/oracle/quicksql/issues/31
+    output = new quicksql( `departments /audit cols
+   name 
+   employees /audit columns
+       name 
+    `).getDDL();
+                   
+    assert( "output.indexOf('audit all') < 0 " );  
+    assert( "output.indexOf('created       date not null') <  output.lastIndexOf('created          date not null,')" );  
+
+    // https://github.com/oracle/quicksql/issues/32
+    output = new quicksql( `queues
+    created /default sysdate
+    created dt /default systimestamp
+    `).getDDL();
+                   
+    assert( "0 < output.indexOf('default on null sysdate')" );  
+    assert( "0 < output.indexOf('default on null systimestamp')" );  
+
+    // https://github.com/oracle/quicksql/issues/32
+    output = new quicksql( `# pk: SEQ
+    # drop: Y
+students 
+    name
+    `).getDDL();
+                   
+    //console.log(output);
+    assert( "0 < output.indexOf('drop sequence students_seq')" );  
 }    
 
+ 
 small_tests();
+
+console.log(assertionCnt);
+
+const minimalTestCnt = 95;
+if( assertionCnt < minimalTestCnt ) {
+    console.error("assertionCnt < "+minimalTestCnt);
+    throw new Error('Test failed');
+} 

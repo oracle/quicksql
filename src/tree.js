@@ -1,6 +1,6 @@
 import {singular,concatNames,canonicalObjectName} from './naming.js';
 import translate from './translate.js';
-import sample from './sample.js';
+import {generateSample} from './sample.js';
 import lexer from './lexer.js';
 import amend_reserved_word from './reserved_words.js';
 //import { quicksql.quicksql.identityDataType, guid, quicksql.tswtz, tswltz } from './ddl.js';
@@ -46,7 +46,7 @@ let tree = (function(){
                 maxLen = 'row_key'.length;
             if( ddl.optionEQvalue('Row Version Number','yes') || 0 < tmp.indexOf('/ROWVERSION') )
                 maxLen = 'row_version'.length;
-            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') ) {
+            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') || 0 < tmp.indexOf('/AUDIT COL') ) {
                 let len = ddl.getOptionValue('createdcol').length;
                 if( maxLen < len )
                     maxLen = len;
@@ -259,7 +259,7 @@ let tree = (function(){
             if( src[0].value.endsWith('id') && vcPos < 0 && this.indexOf('/')+1 == this.indexOf('pk') ) 
                 ret = 'number';
 
-            let parent_child = concatNames(parent.parseName(),'_',this.parseName());
+            const parent_child = concatNames(parent.parseName(),'_',this.parseName());
 
             if( src[0].value.endsWith('_yn') || src[0].value.startsWith('is_') ) {
                 ret = 'varchar2(1 char) constraint '+concatNames(ddl.objPrefix(),parent_child)+'\n';
@@ -284,8 +284,8 @@ let tree = (function(){
                 ret += this.content.toLowerCase().substring(src[from+1].begin, src[to].end);
             if( 0 <= this.indexOf('date') || 0 == this.indexOf('hiredate') || src[0].value.endsWith('_date') || src[0].value.startsWith('date_of_')
              || 1 < src.length && src[1].value == 'd' //0 < type.indexOf(' d') && type.indexOf(' d') == type.length-' d'.length 
-             || src[0].value == 'CREATED_ON'.toLowerCase()
-             || src[0].value == 'UPDATED_ON'.toLowerCase()
+             || src[0].value.startsWith('created')
+             || src[0].value.startsWith('updated')
             )        		
                 ret = ddl.getOptionValue('Date Data Type').toLowerCase();
             if( vcPos < 0 ) {              	
@@ -333,24 +333,7 @@ let tree = (function(){
                     ret += ' not null';
             if( 0 < this.indexOf('hidden') || 0 < this.indexOf('invincible') ) 
                 ret += ' invisible';
-            if( 0 < this.indexOf('check') ) {
-                const TMP = this.trimmedContent().toUpperCase();
-                start = TMP.indexOf('/CHECK');
-                end = TMP.lastIndexOf('/');
-                if( end == start)
-                    end = TMP.length;
-                values = this.trimmedContent().substr(start+'/CHECK'.length, end-start-'/CHECK'.length).trim();
-                if( 0 < values.indexOf(', ') )
-                    values = values.replace(/, /g,optQuote+','+optQuote);
-                else if( 0 < values.indexOf(',') )
-                    values = values.replace(/,/g,optQuote+','+optQuote);
-                else	
-                    values = values.replace(/ /g,optQuote+','+optQuote);
-                ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
-                ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'check ('+this.parseName()+' in ('+optQuote+values+optQuote+'))';    
-                ret = ret.replace(/''/gm,"'");    
-    		
-            }
+            ret += this.genConstraint(optQuote);
             if( 0 < this.indexOf('between') ) {
                 const bi = this.indexOf('between');
                 const values = src[bi+1].value + ' and ' + src[bi+3].value;
@@ -372,6 +355,47 @@ let tree = (function(){
             }
             return ret;
         };
+
+        this.genConstraint = function ( optQuote ) {
+            let ret = '';
+            if( 0 < this.indexOf('check') ) {
+                let parentPref = '';
+                if( parent != null )
+                    parentPref = parent.parseName()+'_';
+                const parent_child = concatNames(parentPref,this.parseName());
+                const tmp = this.trimmedContent().toLowerCase();
+                const start = tmp.indexOf('/check');
+                let end = tmp.lastIndexOf('/');
+                if( end == start)
+                    end = tmp.length;
+                let values = this.trimmedContent().substr(start+'/check'.length, end-start-'/check'.length).trim();
+                const srcConstr = lexer( values, false, true, '' ); 
+                let offset = tab;
+                if( parent != null )
+                    offset = ' '.repeat(parent.maxChildNameLen());
+                if( this.children != null && 0 < this.children.length  ) {  // table level
+                    if( srcConstr[0].value != '(' )
+                        values = '( ' + values + ')';
+                    ret += tab + 'constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck');
+                    ret += '  check '+values+',\n';    
+                } else  if( srcConstr[0].value == '(' && srcConstr[srcConstr.length-1].value == ')'  ) {  
+                    ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
+                    ret += tab +  tab+offset +'check '+values;    
+                } else {
+                    if( 0 < values.indexOf(', ') )
+                        values = values.replace(/, /g,optQuote+','+optQuote);
+                    else if( 0 < values.indexOf(',') )
+                        values = values.replace(/,/g,optQuote+','+optQuote);
+                    else	
+                        values = values.replace(/ /g,optQuote+','+optQuote);
+                    ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
+                    ret += tab +  tab+offset +'check ('+this.parseName()+' in ('+optQuote+values+optQuote+'))';    
+                    ret = ret.replace(/''/gm,"'");    
+                }
+    		
+            }
+            return ret;
+        }
 
         this.isMany2One = function() {
             var tmp = this.trimmedContent();
@@ -542,17 +566,16 @@ let tree = (function(){
         }
         this.getPkName = function () {
             let id = this.getGenIdColName();
-            if( id == null )
-                return this.getExplicitPkNode().parseName();
+            if( id == null ) {
+                let pkn = this.getExplicitPkNode();
+                if( pkn == null )
+                    return null;
+                return pkn.parseName();
+            }
             return id;
         }
 
-        this.toDDL = function() {
-            if (this.parseType() == 'view' || this.parseType() == 'dv' ) 
-                return ''; // postponed
-
-            //if (this.parseType() == 'comment' ) 
-                //return this.content;
+        this.singleDDL = function() {
             
             if( this.children.length == 0 && 0 < this.apparentDepth() ) {
                 let pad = tab;
@@ -564,6 +587,8 @@ let tree = (function(){
             if( this.fks == null ) {
                 this.fks = [];
             }
+
+
             if( !this.isMany2One() ) {
                 if( this.parent != null && this.parseType() == 'table' )
                     this.fks[singular(this.parent.parseName())+'_id']=this.parent.parseName();
@@ -583,11 +608,10 @@ let tree = (function(){
                 this.colprefix= cuts[0];
             }
 
-            var postponed = [];
             //var indexedColumns = [];
             var ret = '';
 
-            let objName = ddl.objPrefix()  + this.parseName();
+            const objName = ddl.objPrefix()  + this.parseName();
             if( ddl.optionEQvalue('pk', 'SEQ') && ddl.optionEQvalue('genpk', true) ) {
                 ret =  ret + 'create sequence  '+objName+'_seq;\n\n';                
             }
@@ -604,8 +628,8 @@ let tree = (function(){
                     typeModifier = 'default on null '+objName+'_seq.NEXTVAL '.toLowerCase();
                 if( ddl.optionEQvalue('pk', 'guid') )
                     typeModifier = 'default on null to_number(sys_guid(), \'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\') ';
-                ret += tab +  idColName + pad + 'number ' + typeModifier + '\n';
-                const obj_col = concatNames(objName,'_',idColName);  
+                ret += tab +  idColName + pad + 'number ' + typeModifier + '\n';                
+                const obj_col = concatNames(ddl.objPrefix('no schema')  + this.parseName(),'_',idColName);  
                 ret += tab +  tab+' '.repeat(this.maxChildNameLen()) +'constraint '+concatNames(obj_col,'_pk')+' primary key,\n';
             } else {
                 let pkNode = this.getExplicitPkNode();
@@ -662,13 +686,12 @@ let tree = (function(){
                 if( idColName != null && child.parseName() == 'id' )
                     continue;
                 if( 0 < child.children.length ) {
-                    postponed.push(child);
                     continue;
                 }
                 if (child.refId() == null  ) {
                     if( child == this.getExplicitPkNode() )
                         continue; //ret += '--';
-                    ret += tab + child.toDDL([]) +',\n';
+                    ret += tab + child.singleDDL() +',\n';
                     if( 0 < child.indexOf('file') ) {
                         const col = child.parseName().toUpperCase();
                         let extraCol  = col+'_FILENAME';
@@ -690,7 +713,7 @@ let tree = (function(){
                 let pad = tab+' '.repeat(this.maxChildNameLen() - 'row_version'.length);
                 ret += tab +  'row_version' + pad + 'integer not null,\n';              	
             }            	
-            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < nodeContent.indexOf('/AUDITCOLS') ) {
+            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < nodeContent.indexOf('/AUDITCOLS') || 0 < nodeContent.indexOf('/AUDIT COL')  ) {
                 let created = ddl.getOptionValue('createdcol');
                 let pad = tab+' '.repeat(this.maxChildNameLen() - created.length);
                 ret += tab +  created + pad + ddl.getOptionValue('Date Data Type').toLowerCase() + ' not null,\n';  
@@ -710,13 +733,15 @@ let tree = (function(){
                 pad = tab+' '.repeat(this.maxChildNameLen() - col.length);
                 ret += tab +  col.toUpperCase() + pad + type + ' not null,\n';  
             }
+            ret += this.genConstraint();
             if( ret.lastIndexOf(',\n') == ret.length-2 )
                 ret = ret.substr(0,ret.length-2)+'\n';
             ret += ')'+(ddl.optionEQvalue('compress','yes') || 0 < nodeContent.indexOf('/COMPRESS')?' compress':'')+';\n\n';
             
-            let auditPos = nodeContent.indexOf('/AUDIT');
-            let auditcolsPos = nodeContent.indexOf('/AUDITCOLS');
-            if( 0 < auditPos && auditPos != auditcolsPos ) {
+            const auditPos = nodeContent.indexOf('/AUDIT');
+            const auditcolsPos = nodeContent.indexOf('/AUDITCOLS');
+            const auditcolPos = nodeContent.indexOf('/AUDIT COL');
+            if( 0 < auditPos && auditcolsPos < 0 && auditcolPos < 0 ) {
                 ret += 'audit all on '+objName+';\n\n';
             }
      
@@ -771,14 +796,36 @@ let tree = (function(){
             }
             ret += '\n';
             
-            for( let i = 0; i < postponed.length; i++ ) {
-                ret += postponed[i].toDDL();
-            }
-            
             return ret;
         };
 
-        this.generateDrop= function() {
+        this.toDDL = function() {
+            if (this.parseType() == 'view' || this.parseType() == 'dv' ) 
+                return ''; 
+
+            var tables = this.orderedTableNodes();
+            let ret = '';
+            for( let i = 0; i < tables.length; i++ ) {
+                ret += tables[i].singleDDL();
+            }
+            return ret;
+        } 
+
+        this.orderedTableNodes = function() {
+            var ret = [this,];
+            for( let i = 1; i < this.descendants().length; i++ ) {
+                var desc = this.descendants()[i];
+                if( 0 == desc.children.length ) 
+                    continue;
+                if( desc.isMany2One() )
+                    ret.unshift(desc);
+                else
+                    ret.push(desc);
+            }
+            return ret;
+        }
+
+        this.generateDrop = function() {
             let objName = ddl.objPrefix()  + this.parseName();
             let ret = '';
             if( this.parseType() == 'view' ) 
@@ -787,6 +834,8 @@ let tree = (function(){
                 ret = 'drop table '+objName+' cascade constraints;\n';
                 if( ddl.optionEQvalue('api','yes') )
                     ret+= 'drop package '+objName+'_api;\n';
+                if( ddl.optionEQvalue('pk','SEQ') )
+                    ret+= 'drop sequence '+objName+'_seq;\n';
             }
             return ret.toLowerCase();
         };
@@ -796,7 +845,13 @@ let tree = (function(){
                 return '';
 
             if( ddl.optionEQvalue('Duality View','yes') || this.parseType() == 'dv' ) {
-                return this.generateDualityView();
+                try {
+                    return this.generateDualityView();
+                } catch ( e ) {
+                    if( e.message == this.one2many2oneUnsupoported  )
+                        return '';
+                    throw e;
+                }
             }
             let objName = ddl.objPrefix()  + this.parseName();
             let tmp = this.trimmedContent(); //.toLowerCase();
@@ -857,7 +912,7 @@ let tree = (function(){
                     let pad = tab+' '.repeat(tbl.maxChildNameLen() - 'ROW_KEY'.length);
                     ret += tab + chunks[i]+'.'+ 'ROW_KEY' + singular(pad + chunks[i])+'_'+ 'ROW_KEY,\n';              	
                 }            	
-                if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') ) {
+                if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') || 0 < tmp.indexOf('/AUDIT COL') ) {
                     let created = ddl.getOptionValue('createdcol');
                     let pad = tab+' '.repeat(tbl.maxChildNameLen() - created.length);
                     ret += tab + chunks[i]+'.'+  created + singular(pad + chunks[i])+'_'+ created+',\n';  
@@ -879,7 +934,7 @@ let tree = (function(){
                 let pad = ' '.repeat(maxLen - chunks[i].length);
                 var tbl = chunks[i];
                 if( ddl.objPrefix() != null && ddl.objPrefix() != '' )
-                    ddl.objPrefix()+chunks[i] + pad + chunks[i];
+                    tbl = ddl.objPrefix()+chunks[i] + pad + chunks[i];
                 ret += tab + tbl + ',\n';
             }
             if( ret.lastIndexOf(',\n') == ret.length-2 )
@@ -1004,7 +1059,7 @@ let tree = (function(){
                 ret += '    end if;\n';
                 OK = true;
             }
-            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') ) {
+            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') || 0 < tmp.indexOf('/AUDIT COL') ) {
                 ret += '    if inserting then\n';
                 ret += '        :new.'+ddl.getOptionValue('createdcol')+' := SYSDATE;\n'.toLowerCase();
                 ret += '        :new.'+ddl.getOptionValue('createdbycol')+' := '+user+';\n'.toLowerCase();
@@ -1013,14 +1068,14 @@ let tree = (function(){
                 ret += '    :new.'+ddl.getOptionValue('updatedbycol')+' := '+user+';\n'.toLowerCase();
                 OK = true;
             }
-            if( ddl.optionEQvalue('genpk','yes') 
+            /*if( ddl.optionEQvalue('genpk','yes') perhaps 'no'?
                 && ddl.optionEQvalue('pk','guid')  
             )  {
                 ret += '    if :new.id is null then\n';
                 ret += '        :new.id := to_number(sys_guid(), \'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\');\n';
                 ret += '    end if;\n';
                 OK = true;
-            }
+            }*/
             var cols = ddl.additionalColumns();
             for( var col in cols ) {
                 var type = cols[col];
@@ -1060,6 +1115,8 @@ let tree = (function(){
             }
             for( let i = 0; i < this.children.length; i++ ) {
                 var child = this.children[i]; 
+                if( child.refId() != null  )
+                    continue;
                 if( child.children.length != 0 ) 
                     continue;
                 ret += ',\n';
@@ -1075,11 +1132,11 @@ let tree = (function(){
             let prelude =    tab+tab+'for c1 in (select * from '+objName+' where id = p_id) loop \n';
             if( kind == 'insert' ) {
                 prelude =    tab+tab+'insert into '+objName+' ( \n';
-                prelude += tab+tab+'id';
+                prelude += tab+tab+tab+'id';
             }
             if( kind == 'update' ) {
                 prelude =    tab+tab+'update  '+objName+' set \n';
-                prelude += tab+tab+'id = p_id';
+                prelude += tab+tab+tab+'id = p_id';
             }
             ret += prelude;
             for( let fk in this.fks ) {	
@@ -1091,48 +1148,52 @@ let tree = (function(){
                 //pad = tab+tab+' '.repeat(this.maxChildNameLen() - fk.length);
                 if( kind == 'insert' || kind == 'update' ) 
                     ret += ',\n';
-                let row = '        P_'+fk+' := c1.'+fk+';\n';	
+                let row = tab+tab+tab+'P_'+fk+' := c1.'+fk+';\n';	
                 if( kind == 'insert' ) 
-                    row = '        '+fk;
+                    row = tab+tab+tab+fk;
                 if( kind == 'update' ) 
-                    row = '        '+fk+' = P_'+fk+'\n';	
+                    row = tab+tab+tab+fk+' = P_'+fk+'\n';	
                 ret += row;
             }
             for( var i = 0; i < this.children.length; i++ ) {
                 var child = this.children[i]; 
+                if( child.refId() != null  )
+                    continue;
                 if( child.children.length != 0 ) 
                     continue;
                 if( kind == 'insert' || kind == 'update' ) 
                     ret += ',\n';
-                let row = '        P_'+child.parseName().toLowerCase()+' := c1.'+child.parseName().toLowerCase()+';\n';	
+                let row = tab+tab+tab+'P_'+child.parseName().toLowerCase()+' := c1.'+child.parseName().toLowerCase()+';\n';	
                 if( kind == 'insert' ) 
-                    row = '        '+child.parseName().toLowerCase();
+                    row = tab+tab+tab+child.parseName().toLowerCase();
                 if( kind == 'update' ) 
-                    row = '        '+child.parseName().toLowerCase()+' = P_'+child.parseName().toLowerCase()+'\n';	
+                    row = tab+tab+tab+child.parseName().toLowerCase()+' = P_'+child.parseName().toLowerCase()+'\n';	
                 ret += row;
             }
             if( kind == 'insert' ) {
-                ret +=    '        ) values ( \n';
-                ret +=    '            p_id';
+                ret +=    '\n'+tab+tab+') values ( \n';
+                ret +=    tab+tab+tab+'p_id';
                 for( let fk in this.fks ) {	
                     ret += ',\n';
-                    ret += '        p_'+fk;
+                    ret += tab+tab+tab+'p_'+fk;
                 }
                 for( let i = 0; i < this.children.length; i++ ) {
                     let child = this.children[i]; 
+                    if (child.refId() != null  )
+                        continue;
                     if( child.children.length != 0 ) 
                         continue;
                     ret += ',\n';
-                    ret += '        p_'+child.parseName();
+                    ret += tab+tab+tab+'p_'+child.parseName();
                 }
             }
             let finale = '\n        end loop;\n';
             if( kind == 'insert' )
-                finale = '        );';
+                finale = '\n'+tab+tab+');';
             if( kind == 'update' )
-                finale = '    where id = p_id;';
+                finale = tab+tab+'where id = p_id;';
             ret += finale;
-            ret += '    end '+kind+'_row;\n ';
+            ret += '\n'+tab+'end '+kind+'_row;\n ';
             ret += '\n ';
             return ret;
         };
@@ -1177,156 +1238,183 @@ let tree = (function(){
             return ret.toLowerCase();
         };
 
-        this.rows = 0;       
-        this.generateData = function (curObj, parObj ) {
-
-            let ret = '';
-
-            if( ddl.optionEQvalue('inserts',false) )
-                return ret;
-            
-            let objName = ddl.objPrefix()  + this.parseName();
+        this.cardinality = function() {
             let tmp = this.trimmedContent().toLowerCase();
             let start = tmp.indexOf('/insert ');
-            let i = 0;
             if( 0 < start ) {
                 tmp = tmp.substr(start+'/insert '.length);
                 let tmps = tmp.split(' ');
-                this.rows = parseInt(tmps[0]);
-                if( 0 < this.rows ) {
-                    if( ddl.getOptionValue('datalimit') < this.rows )
-                        this.rows = ddl.getOptionValue('datalimit');
-                    for( i = 0; i < this.rows; i++ ) {
-                        let elem = curObj;
-                        if( curObj != null && Array.isArray(curObj) )
-                            //val('elem = curObj['+i+']');
-                            elem = curObj[i];
-                        ret += 'insert into '+objName+' (\n';
-                        let idColName = this.getGenIdColName();
-                        if( idColName != null ) {
-                            ret += tab + idColName +',\n';
-                        } else {
-                            let pkNode = this.getExplicitPkNode();
-                            if( pkNode != null ) {
-                                ret += tab + pkNode.parseName() +',\n';
-                            }
+                let ret =  parseInt(tmps[0]);
+                const limit = ddl.getOptionValue('datalimit');
+                if( limit < ret )
+                    ret = limit;
+                return ret;
+            }
+            return 0;
+        }
+
+        this.generateData = function( curObj, parObj ) {
+            if( ddl.optionEQvalue('inserts',false) )
+                return '';
+            const tab2inserts = this.inserts4tbl(curObj, parObj);
+            const tables = this.orderedTableNodes();
+            let ret = '';
+            for( let i = 0; i < tables.length; i++ ) {
+                const inserts = tab2inserts[tables[i].parseName()];
+                if( inserts != null )
+                    ret += inserts;
+            }
+            return ret;
+        }
+            
+        this.inserts4tbl = function( curObj, parObj ) {
+
+            let tab2inserts = {};
+
+            if( ddl.optionEQvalue('inserts',false) )
+                return '';
+            
+            let objName = ddl.objPrefix()  + this.parseName();
+            let insert = '';
+            for( let i = 0; i < this.cardinality(); i++ ) {
+                let elem = curObj;
+                if( curObj != null && Array.isArray(curObj) )
+                    //val('elem = curObj['+i+']');
+                    elem = curObj[i];
+
+                insert += 'insert into '+objName+' (\n';
+                    
+                let idColName = this.getGenIdColName();
+                if( idColName != null ) {
+                    insert += tab + idColName +',\n';
+                } else {
+                    let pkNode = this.getExplicitPkNode();
+                    if( pkNode != null ) {
+                        insert += tab + pkNode.parseName() +',\n';
+                    }
+                }
+                for( let fk in this.fks ) {
+                    let parent = this.fks[fk];				
+                    let refNode = ddl.find(parent);
+                    let _id = '';    
+                    if( refNode == null ) {
+                        refNode = ddl.find(fk);
+                        if( refNode.isMany2One() & !fk.endsWith('_id') ) {
+                            parent = fk;
+                            fk = singular(fk);
+                            _id = '_id';  
                         }
-                        for( let fk in this.fks ) {
-                            let parent = this.fks[fk];				
-                            let refNode = ddl.find(parent);
-                            let _id = '';    
-                            if( refNode == null ) {
-                                refNode = ddl.find(fk);
-                                if( refNode.isMany2One() & !fk.endsWith('_id') ) {
-                                    parent = fk;
-                                    fk = singular(fk);
-                                    _id = '_id';  
-                                }
-                            }
-                            ret += tab+fk+_id+',\n';
+                    }
+                    insert += tab+fk+_id+',\n';
+                }
+                for( let j = 0; j < this.children.length; j++ ) {
+                    let child = this.children[j];
+                    if( idColName != null && child.parseName() == 'id' )
+                        continue;
+                    if (child.refId() == null  ) {
+                        if( child == this.getExplicitPkNode() )
+                            continue; //insert += '--';
+                        if( 0 == child.children.length ) 
+                            insert += tab+child.parseName()+',\n';
+                    }
+                }
+                if( insert.lastIndexOf(',\n') == insert.length-2 )
+                    insert = insert.substr(0,insert.length-2)+'\n';
+
+                insert += ') values (\n';
+
+                if( idColName != null ) {
+                    insert += tab + (i+1)+ ',\n'; 
+                } else {
+                    let pkNode = this.getExplicitPkNode();
+                    if( pkNode != null ) {
+                        const field = pkNode.parseName();
+                        let tmp = getValue(ddl.data, null /*no name at level 0*/, field, this.parseName());
+                        let v = -1;
+                        if( elem != null )
+                            v = elem[field];
+                        if( tmp != null && tmp[i] != null ) {
+                                v = tmp[i];
                         }
-                        for( let j = 0; j < this.children.length; j++ ) {
-                            let child = this.children[j];
-                            if( idColName != null && child.parseName() == 'id' )
+                        insert += tab + (v != -1 ? v : i+1)+ ',\n';  
+                    }
+                }
+                
+                if( this.parseName()=='donut_batters' )  
+                    console.log('');             
+                for( let fk in this.fks ) {
+                    let ref = this.fks[fk];
+                    let refNode = ddl.find(ref);
+                    let values = [];
+                    for( let k = 1; k <= refNode.cardinality() ; k++ )
+                        values.push(k);    
+                    if( parObj != null && refNode != null ) {
+                        const field = refNode.getPkName();
+                        if( field == null )
+                            continue;
+                        let v = parObj[field];
+                        if( v != null ) {
+                            values = [];
+                            values[0] = v;
+                        }                                   
+                    }   
+                    if( elem != null ) {
+                        let refData = elem[ref];
+                        if( refData != null ) {
+                            const field = refNode.getPkName();
+                            if( field == null )
                                 continue;
-                            if (child.refId() == null  ) {
-                                if( child == this.getExplicitPkNode() )
-                                    continue; //ret += '--';
-                                if( 0 == child.children.length ) 
-                                    ret += tab+child.parseName()+',\n';
-                            }
+                            let v = refData[field];
+                            if( v != null ) {
+                                values = [];
+                                values[0] = v;
+                            }                                   
                         }
-                        if( ret.lastIndexOf(',\n') == ret.length-2 )
-                            ret = ret.substr(0,ret.length-2)+'\n';
-
-                        ret += ') values (\n';
-
-                        if( idColName != null ) {
-                            ret += tab + (i+1)+ ',\n'; 
-                        } else {
-                            let pkNode = this.getExplicitPkNode();
-                            if( pkNode != null ) {
-                                const field = pkNode.parseName();
-                                let tmp = getValue(ddl.data, null /*no name at level 0*/, field, this.parseName());
-                                let v = -1;
-                                if( elem != null )
-                                    v = elem[field];
-                                if( tmp != null && tmp[i] != null ) {
-                                     v = tmp[i];
-                                }
-                                ret += tab + (v != null ? v : i+1)+ ',\n';  
-                            }
-                        }
-                       
-                        for( let fk in this.fks ) {
-                            let ref = this.fks[fk];
-                            let refNode = ddl.find(ref);
-                            let values = [];
-                            for( let k = 1; k <= refNode.rows ; k++ )
-                                values.push(k);    
-                            if( parObj != null && refNode != null ) {
-                                const field = refNode.getPkName();
-                                let v = parObj[field];
+                    }
+                    insert += tab+translate(ddl.getOptionValue('Data Language'),generateSample(objName,singular(ref)+'_id', 'INTEGER', values))+',\n';
+                }
+                for( let j = 0; j < this.children.length; j++ ) {
+                    let child = this.children[j]; 
+                    if( idColName != null && child.parseName() == 'id' )
+                        continue;
+                    if (child.refId() == null  ) {
+                        if( child == this.getExplicitPkNode() )
+                            continue; //insert += '--';
+                        if( 0 == child.children.length )  {
+                            let values = child.parseValues();
+                            let cname = child.parseName();
+                            if( elem != null ) {
+                                let v = elem[cname];
                                 if( v != null ) {
                                     values = [];
                                     values[0] = v;
                                 }                                   
-                            }   
-                            if( elem != null ) {
-                                let refData = elem[ref];
-                                if( refData != null ) {
-                                    let v = refData[refNode.getPkName()];
-                                    if( v != null ) {
-                                        values = [];
-                                        values[0] = v;
-                                    }                                   
-                                }
                             }
-                            ret += tab+translate(ddl.getOptionValue('Data Language'),sample(objName,singular(ref)+'_id', 'INTEGER', values))+',\n';
-                        }
-                        for( let j = 0; j < this.children.length; j++ ) {
-                            let child = this.children[j]; 
-                            if( idColName != null && child.parseName() == 'id' )
-                                continue;
-                            if (child.refId() == null  ) {
-                                if( child == this.getExplicitPkNode() )
-                                    continue; //ret += '--';
-                                if( 0 == child.children.length )  {
-                                    let values = child.parseValues();
-                                    let cname = child.parseName();
-                                    if( elem != null ) {
-                                        let v = elem[cname];
-                                        if( v != null ) {
-                                            values = [];
-                                            values[0] = v;
-                                        }                                   
-                                    }
-                                    let tmp = getValue(ddl.data, null /*no name at level 0*/, cname, this.parseName());
-                                    if( tmp != null && tmp[i] != null ) {
-                                        values = [];
-                                        values[0] = tmp[i];
-                                    }
-                                    let datum = sample(objName, cname, child.parseType(), values);
-                                    ret += tab + translate(ddl.getOptionValue('Data Language'), datum)+',\n';
-                                }
+                            let tmp = getValue(ddl.data, null /*no name at level 0*/, cname, this.parseName());
+                            if( tmp != null && tmp[i] != null ) {
+                                values = [];
+                                values[0] = tmp[i];
                             }
+                            let datum = generateSample(objName, cname, child.parseType(), values);
+                            insert += tab + translate(ddl.getOptionValue('Data Language'), datum)+',\n';
                         }
-                        if( ret.lastIndexOf(',\n') == ret.length-2 )
-                            ret = ret.substr(0,ret.length-2)+'\n';
-                        ret += ');\n';
                     }
-                    ret += '\n';
                 }
+                if( insert.lastIndexOf(',\n') == insert.length-2 )
+                    insert = insert.substr(0,insert.length-2)+'\n';
+                insert += ');\n';
             }
  
-            if( ret != '' )    
-                ret += 'commit;\n\n';
+            if( insert != '' )    
+                insert += '\ncommit;\n\n';
 
             let idColName = this.getGenIdColName();
-            if( idColName != null && 1 < i) {
-                ret += 'alter table '+objName+'\n'
-              + 'modify '+idColName+' generated '+'always '/*'by default on null'*/+' as identity restart start with '+(i+1)+';\n\n';
+            if( idColName != null && 1 < this.cardinality() && !ddl.optionEQvalue('pk','guid') ) {
+                insert += 'alter table '+objName+'\n'
+              + 'modify '+idColName+' generated '+'always '/*'by default on null'*/+' as identity restart start with '+(this.cardinality()+1)+';\n\n';
             }
+
+            tab2inserts[objName] = insert;
             
             for( let i = 0; i < this.children.length; i++ ) {
                 const child = this.children[i]; 
@@ -1335,11 +1423,12 @@ let tree = (function(){
                     let newCurObj = null;
                     if( curObj != null )
                         newCurObj = curObj[child.parseName()];
-                    ret += child.generateData( newCurObj, prt );
+                    const merged = {...tab2inserts , ...child.inserts4tbl( newCurObj, prt )};
+                    tab2inserts = merged;
                 }
             }
 
-            return ret;
+            return tab2inserts;
         };  
         
         this.isArray = function(  ) {
@@ -1361,8 +1450,9 @@ let tree = (function(){
             return this.children.some((c) => c.children.length > 0 &&
              c.parseName() == name && !c.isArray());
         };
-        /*this.generateSelectJsonBottomUp = function( indent) {
-            var name = this.parseName();
+        this.generateSelectJsonBottomUp = function( indent) {
+            throw new Error("generateSelectJsonBottomUp() not implemented yet");
+            /*var name = this.parseName();
             var ret = indent + '\'' + this.getGenIdColName() + '\' : ' + name +'.id,\n';
             for( var j = 0; j < this.children.length; j++ ) {
                 var child = this.children[j];
@@ -1377,7 +1467,7 @@ let tree = (function(){
                 ret += indent + '\'' + pname + '\' : (\n';
                 indent += '  ';
                 ret += indent + 'select JSON {\n';
-                ret += this.generateSelectJsonBottomUp( ptbl, indent + '  ');
+                ret += ptbl.generateSelectJsonBottomUp( indent + '  ');
                 ret += indent + '} from ' + ptbl.parseName() + ' ' + pname + ' with (UPDATE)\n';
                 ret += indent + 'where ' + name + '.' + pname + '_id = ' + pname + '.ID\n';
                 indent = indent.slice(0, -2);
@@ -1385,8 +1475,9 @@ let tree = (function(){
             } else {
                 ret = ret.slice(0, -2) + '\n';
             }
-            return ret;	
-        };*/
+            return ret;	*/
+        };
+        this.one2many2oneUnsupoported = "one to many to one is not supported";
         this.generateSelectJsonTopDown = function( indent ) {
             var name = this.parseName();
             let ret = '';
@@ -1404,6 +1495,8 @@ let tree = (function(){
                     var isArray = !child.isMany2One();
                     indent += '  ';
                     ret += indent + 'select ' + /*(isArray?'JSON_ARRAYAGG(':'') +*/ 'JSON {\n';
+                    if( this.isMany2One() )
+                        throw new Error(this.one2many2oneUnsupoported);
                     ret += child.generateSelectJsonTopDown(indent + '  ');
                     ret += indent + ' WITH NOCHECK }' +  ' from ' + cname + ' with INSERT UPDATE\n';
                     var names = /*isArray? [name, cname] :*/ [cname, name];
@@ -1435,33 +1528,13 @@ let tree = (function(){
             if( tbl != null) {
                 ret += 'create or replace json relational duality view ' + chunks[1] + ' as\n';
                 ret += 'select JSON {\n';
-                ret += // tbl.isLeaf()? tbl.generateSelectJsonBottomUp('  ') :        what if middle?
+                ret += tbl.isMany2One()? tbl.generateSelectJsonBottomUp('  ') :        
                        tbl.generateSelectJsonTopDown('  ');
                 ret += '} from ' + tbl.parseName() /*+ ' ' + chunks[2]*/ + ' with INSERT UPDATE DELETE;\n\n';
             }
             return ret;
         };
         
-        /*this.render = function( table, depth ) {
-            var row = table.insertRow(-1);
-            var cell = row.insertCell(0);
-            var nbrsp = String.fromCharCode(160);
-            var nbrspX3 = nbrsp+nbrsp+nbrsp;
-            //cell.innerHTML = this.toString(apparentDepth, nbrspX3);  //<---- no sugarcoating
-            cell.innerHTML = '<font face="Lucida Console" size=-1>'
-            +this.apparentDepth(nbrspX3)
-            + '<font color=blue face="Lucida Console" size=-1>'
-            + this.location()
-            + nbrsp
-            + '</font><font color=DarkMagenta face="Lucida Console" size=-1>'
-            + this.content.trim()
-            ;
-            for( let i = 0; i < this.children.length; i++ ) {
-                let child = this.children[i];
-                child.render(table, depth+1);
-            }
-        };*/
-
     }
 
     function recognize( parsed ) {
