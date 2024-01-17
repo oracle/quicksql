@@ -1253,10 +1253,10 @@ let tree = (function(){
             return 0;
         }
 
-        this.generateData = function( curObj, parObj ) {
+        this.generateData = function( dataObj ) {
             if( ddl.optionEQvalue('inserts',false) )
                 return '';
-            const tab2inserts = this.inserts4tbl(curObj, parObj);
+            const tab2inserts = this.inserts4tbl(dataObj);
             const tables = this.orderedTableNodes();
             let ret = '';
             for( let i = 0; i < tables.length; i++ ) {
@@ -1267,7 +1267,7 @@ let tree = (function(){
             return ret;
         }
             
-        this.inserts4tbl = function( curObj, parObj ) {
+        this.inserts4tbl = function( dataObj ) {
 
             let tab2inserts = {};
 
@@ -1277,10 +1277,14 @@ let tree = (function(){
             let objName = ddl.objPrefix()  + this.parseName();
             let insert = '';
             for( let i = 0; i < this.cardinality(); i++ ) {
-                let elem = curObj;
-                if( curObj != null && Array.isArray(curObj) )
-                    //val('elem = curObj['+i+']');
-                    elem = curObj[i];
+                let elem = null;
+                if( dataObj != null ) {
+                    const tbl = dataObj[objName];
+                    if( tbl != null && Array.isArray(tbl) ) {
+                        const record = tbl[i];
+                        elem = record;
+                    }
+                }
 
                 insert += 'insert into '+objName+' (\n';
                     
@@ -1336,42 +1340,29 @@ let tree = (function(){
                         if( tmp != null && tmp[i] != null ) {
                                 v = tmp[i];
                         }
+                        if( v.replaceAll )
+                            v = "'"+v+"'";
                         insert += tab + (v != -1 ? v : i+1)+ ',\n';  
                     }
                 }
                 
-                if( this.parseName()=='donut_batters' )  
-                    console.log('');             
                 for( let fk in this.fks ) {
                     let ref = this.fks[fk];
                     let refNode = ddl.find(ref);
                     let values = [];
+                    let type = 'INTEGER';
                     for( let k = 1; k <= refNode.cardinality() ; k++ )
-                        values.push(k);    
-                    if( parObj != null && refNode != null ) {
-                        const field = refNode.getPkName();
-                        if( field == null )
-                            continue;
-                        let v = parObj[field];
-                        if( v != null ) {
-                            values = [];
-                            values[0] = v;
-                        }                                   
-                    }   
+                        values.push(k);      
                     if( elem != null ) {
-                        let refData = elem[ref];
+                        let refData = elem[fk];
                         if( refData != null ) {
-                            const field = refNode.getPkName();
-                            if( field == null )
-                                continue;
-                            let v = refData[field];
-                            if( v != null ) {
-                                values = [];
-                                values[0] = v;
-                            }                                   
+                            if( typeof refData == 'string' )
+                                type = "STRING"; // not INTEGER
+                            values = [];
+                            values[0] = refData;                                
                         }
                     }
-                    insert += tab+translate(ddl.getOptionValue('Data Language'),generateSample(objName,singular(ref)+'_id', 'INTEGER', values))+',\n';
+                    insert += tab+translate(ddl.getOptionValue('Data Language'),generateSample(objName,singular(ref)+'_id', type, values))+',\n';
                 }
                 for( let j = 0; j < this.children.length; j++ ) {
                     let child = this.children[j]; 
@@ -1390,11 +1381,11 @@ let tree = (function(){
                                     values[0] = v;
                                 }                                   
                             }
-                            let tmp = getValue(ddl.data, null /*no name at level 0*/, cname, this.parseName());
+                            /*let tmp = getValue(ddl.data, null no name at level 0, cname, this.parseName());
                             if( tmp != null && tmp[i] != null ) {
                                 values = [];
                                 values[0] = tmp[i];
-                            }
+                            }*/
                             let datum = generateSample(objName, cname, child.parseType(), values);
                             insert += tab + translate(ddl.getOptionValue('Data Language'), datum)+',\n';
                         }
@@ -1419,11 +1410,7 @@ let tree = (function(){
             for( let i = 0; i < this.children.length; i++ ) {
                 const child = this.children[i]; 
                 if( 0 < child.children.length ) {
-                    const prt = curObj;
-                    let newCurObj = null;
-                    if( curObj != null )
-                        newCurObj = curObj[child.parseName()];
-                    const merged = {...tab2inserts , ...child.inserts4tbl( newCurObj, prt )};
+                    const merged = {...tab2inserts , ...child.inserts4tbl( dataObj )};
                     tab2inserts = merged;
                 }
             }
@@ -1623,11 +1610,32 @@ let tree = (function(){
                     line = '';
                     continue;
                 }
+                let flattened = null;
                 let document = null;
                 let settings = null;
                 for( let j in src1 ) {
                     const t1 = src1[j];
-                    if( document == null && t1.value == 'document' ) {
+                    if( flattened == null && t1.value == 'flattened' ) {
+                        flattened = '';
+                        continue;
+                    }
+                    if( flattened != null ) {
+                        flattened += t1.value;
+                        if( flattened == '=' )
+                            continue;
+                        if( flattened.charAt(flattened.length-1)!='}' )
+                            continue;
+                        let jsonStr = flattened.substring(1);
+if( jsonStr.length == 57 )
+    jsonStr.length == 57;
+                        try {
+                            ddl.data = JSON.parse(jsonStr);
+                            poundDirective = null;
+                            line = '';
+                            continue OUTER;
+                        } catch( error ) {}        
+                    }
+                    /*if( document == null && t1.value == 'document' ) {
                         document = '';
                         continue;
                     }
@@ -1642,7 +1650,7 @@ let tree = (function(){
                             line = '';
                             continue OUTER;
                         } catch( error ) {}        
-                    }
+                    }*/
                     if( settings == null && t1.value == 'settings' ) {
                         settings = '';
                         continue;
@@ -1660,6 +1668,7 @@ let tree = (function(){
                         } catch( error ) {}        
                     }
                 }
+                //poundDirective = null;
             }
             if( t.type == 'comment' ) {
                 continue;

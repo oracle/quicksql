@@ -16,6 +16,8 @@ export function generateSample( lTable, lColumn, lType, values ) {
         let value = values[Math.floor(seededRandom() * (max - min)) + min];
         if( value.toLowerCase && value.toLowerCase() == 'null' )
             optQuote = '';
+        if( value.replaceAll )
+            value = value.replaceAll('\'','\'\'');
         return optQuote+value+optQuote;    		
     }
     

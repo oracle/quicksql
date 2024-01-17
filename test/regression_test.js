@@ -92,7 +92,7 @@ function processFile( subdir, file ) {
     if( 0 < subdir.indexOf('/erd/') )
         output = JSON.stringify(new quicksql(text).getERD(),null,3);
     else if( ext == '.json' )
-        output = fromJSON(text);
+        output = fromJSON(text, file);
     else {
         const p = new quicksql(text);
         output = p.getDDL();
