@@ -1,6 +1,6 @@
 import {singular,concatNames,canonicalObjectName} from './naming.js';
 import translate from './translate.js';
-import {generateSample} from './sample.js';
+import {generateSample, resetSeed} from './sample.js';
 import lexer from './lexer.js';
 import amend_reserved_word from './reserved_words.js';
 //import { quicksql.quicksql.identityDataType, guid, quicksql.tswtz, tswltz } from './ddl.js';
@@ -255,6 +255,8 @@ let tree = (function(){
             if( 0 < this.indexOf('int', true) ) 
                 ret = 'integer';
             if( src[0].value.endsWith('_id') && vcPos < 0 && this.indexOf('date') < 0 ) 
+                ret = 'number';
+            if( src[0].value == 'quantity' ) 
                 ret = 'number';
             if( src[0].value.endsWith('id') && vcPos < 0 && this.indexOf('/')+1 == this.indexOf('pk') ) 
                 ret = 'number';
@@ -1254,6 +1256,7 @@ let tree = (function(){
         }
 
         this.generateData = function( dataObj ) {
+            resetSeed();
             if( ddl.optionEQvalue('inserts',false) )
                 return '';
             const tab2inserts = this.inserts4tbl(dataObj);

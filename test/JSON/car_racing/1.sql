@@ -41,7 +41,7 @@ from
 where
     driver.team_id(+) = team.id
 /
-*/
+
 
 CREATE or replace JSON RELATIONAL DUALITY VIEW team_dv AS
   SELECT JSON {'teamId' : team.teamid,
@@ -54,7 +54,7 @@ CREATE or replace JSON RELATIONAL DUALITY VIEW team_dv AS
                      FROM driver WITH INSERT UPDATE
                      WHERE driver.team_id = team.teamid ]}
   FROM team  WITH INSERT UPDATE DELETE;
-
+*/
 
 -- load data
 

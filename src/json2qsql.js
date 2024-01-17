@@ -52,6 +52,30 @@ var json2qsql = (function () {
         }
         return false;
     }
+
+    function suggestName( obj ) {
+        let property = null;
+        outer: for( const i in obj ) {
+            if( i == 0 )
+                for( const attr in obj[i] ) {
+                    property = attr;
+                    break outer;
+                }
+            else {
+                property = i;
+                break outer;
+            }
+        }
+        if( property.toLowerCase() == 'id' )
+            return null;
+
+        if( property.toLowerCase().endsWith('_id') )
+            return property.substring(0,property.length-'_id'.length);
+        if( property.endsWith('Id') )
+            return property.substring(0,property.length-'Id'.length);
+
+        return null;
+    }
     
     /**
      * @param {*} input JSON document
@@ -60,6 +84,12 @@ var json2qsql = (function () {
      */
     function translate( input, name ) {
         const obj = JSON.parse(input); 
+
+        const sugg = suggestName(obj);
+        if( sugg != null )
+            name = sugg;
+        if( name == null )
+            name = 'root_tbl'
 
         const tc = new TableContent();
         tc.duplicatesAndParents(name, obj);

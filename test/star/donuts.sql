@@ -68,20 +68,6 @@ insert into toppings (
     2,
     'N/A'
 );
-insert into toppings (
-    id,
-    type
-) values (
-    3,
-    'N/A'
-);
-insert into toppings (
-    id,
-    type
-) values (
-    4,
-    'N/A'
-);
 
 commit;
 
@@ -97,13 +83,6 @@ insert into batters (
     type
 ) values (
     2,
-    'N/A'
-);
-insert into batters (
-    id,
-    type
-) values (
-    3,
     'N/A'
 );
 
@@ -131,13 +110,6 @@ insert into donut_batters (
     donut_id
 ) values (
     2,
-    1
-);
-insert into donut_batters (
-    batters_id,
-    donut_id
-) values (
-    2,
     2
 );
 insert into donut_batters (
@@ -151,14 +123,7 @@ insert into donut_batters (
     batters_id,
     donut_id
 ) values (
-    3,
-    2
-);
-insert into donut_batters (
-    batters_id,
-    donut_id
-) values (
-    3,
+    2,
     2
 );
 
@@ -168,21 +133,7 @@ insert into donut_toppings (
     toppings_id,
     donut_id
 ) values (
-    3,
-    2
-);
-insert into donut_toppings (
-    toppings_id,
-    donut_id
-) values (
-    4,
-    2
-);
-insert into donut_toppings (
-    toppings_id,
-    donut_id
-) values (
-    4,
+    2,
     2
 );
 insert into donut_toppings (
@@ -190,27 +141,13 @@ insert into donut_toppings (
     donut_id
 ) values (
     1,
-    1
-);
-insert into donut_toppings (
-    toppings_id,
-    donut_id
-) values (
-    3,
     2
 );
 insert into donut_toppings (
     toppings_id,
     donut_id
 ) values (
-    2,
-    1
-);
-insert into donut_toppings (
-    toppings_id,
-    donut_id
-) values (
-    3,
+    1,
     1
 );
 

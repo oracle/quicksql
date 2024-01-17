@@ -115,7 +115,7 @@ function processFile( subdir, file ) {
     let sc= lexer( cmp, false, true, "" );
     let i = 0;
     while (i < so.length && i < sc.length ) {
-        const strict = 0 < subdir.indexOf('/DV/') || 0 <= file.indexOf('donuts');
+        const strict = 0 < subdir.indexOf('/star/') || 0 <= file.indexOf('/JSON/');
         if( !compareTokens(so[i], sc[i], strict) ) {
             //var linec = Service.charPos2LineNo(cmp, sc[i].begin);
             //var linecOffset = Service.lineNo2CharPos(cmp, linec);

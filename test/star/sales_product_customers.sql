@@ -21,7 +21,7 @@ create table sales (
     customers_id    number
                     constraint sales_customers_id_fk
                     references customers,
-    quantity        varchar2(4000 char)
+    quantity        number
 );
 
 -- table index
@@ -44,7 +44,7 @@ insert into customers (
     first_name
 ) values (
     1,
-    'Cornelia'
+    'Aaron'
 );
 
 commit;
@@ -54,12 +54,10 @@ insert into product (
     name
 ) values (
     1,
-    'Matilda Spencer'
+    'Aaron Erickson'
 );
 
 commit;
-
-
 
 insert into sales (
     id,
@@ -68,9 +66,9 @@ insert into sales (
     quantity
 ) values (
     1,
-    7,
-    52,
-    'N/A'
+    1,
+    1,
+    20
 );
 insert into sales (
     id,
@@ -79,12 +77,13 @@ insert into sales (
     quantity
 ) values (
     2,
-    10,
-    90,
-    'N/A'
+    1,
+    1,
+    84
 );
 
 commit;
+
 
 alter table sales
 modify id generated always  as identity restart start with 3;

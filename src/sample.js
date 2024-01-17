@@ -1,7 +1,8 @@
 import Chance from 'chance';
-var chance = new Chance();
+
 
 export function generateSample( lTable, lColumn, lType, values ) {
+    var chance = new Chance(seed);
     if( lType == null )
         console.log();
     let type = lType.toUpperCase();
