@@ -3,7 +3,6 @@ import translate from './translate.js';
 import {generateSample, resetSeed} from './sample.js';
 import lexer from './lexer.js';
 import amend_reserved_word from './reserved_words.js';
-//import { quicksql.quicksql.identityDataType, guid, quicksql.tswtz, tswltz } from './ddl.js';
 
 let tree = (function(){ 
     let ddl;
@@ -109,9 +108,9 @@ let tree = (function(){
          */
         this.indexOf = function( token, isPrefix ) {
             for( let i = 0; i < this.src.length; i++ ) {
-                if( isPrefix && 0 == this.src[i].value.indexOf(token) )  
+                if( isPrefix && 0 == this.src[i].value.toLowerCase().indexOf(token.toLowerCase()) )  
                     return i;
-                else if( token == this.src[i].value )
+                else if( token.toLowerCase() == this.src[i].value.toLowerCase() )
                     return i;
             }
             return -1;
@@ -135,7 +134,7 @@ let tree = (function(){
             return ret.trim();
         };
 
-        this.src = lexer( this.content./*trimmedContent().*/toLowerCase(), false, true, '' ); 
+        this.src = lexer( this.content/*.toLowerCase()*/, false, true, '' ); 
          
         this.parseName = function () {            
             
@@ -1629,8 +1628,6 @@ let tree = (function(){
                         if( flattened.charAt(flattened.length-1)!='}' )
                             continue;
                         let jsonStr = flattened.substring(1);
-if( jsonStr.length == 57 )
-    jsonStr.length == 57;
                         try {
                             ddl.data = JSON.parse(jsonStr);
                             poundDirective = null;
@@ -1638,22 +1635,6 @@ if( jsonStr.length == 57 )
                             continue OUTER;
                         } catch( error ) {}        
                     }
-                    /*if( document == null && t1.value == 'document' ) {
-                        document = '';
-                        continue;
-                    }
-                    if( document != null ) {
-                        document += t1.value;
-                        if( document == '=' )
-                            continue;
-                        let jsonStr = document.substring(1);
-                        try {
-                            ddl.data = JSON.parse(jsonStr);
-                            poundDirective = null;
-                            line = '';
-                            continue OUTER;
-                        } catch( error ) {}        
-                    }*/
                     if( settings == null && t1.value == 'settings' ) {
                         settings = '';
                         continue;

@@ -3,10 +3,10 @@ import  {quicksql,fromJSON} from "../src/ddl.js";
 import fs from "fs";
   
 try {
-    let file = '//Bug35756025/1.qsql';
+    let file = '//bugs/35923103.qsql';
     //file = '//DV/car_racing/2.qsql';
-    file = '//star/sales_product_customers.qsql';
-    //file = '//experimental/car_racing/1.json';
+    //file = '//star/sales_product_customers.qsql';
+    //file = '//experimental/car_racing/2.json';
 
     let args = process.argv.slice(2);
     if( 0 < args.length )

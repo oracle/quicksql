@@ -7615,16 +7615,16 @@ let ce = function() {
     }
     this.content = s(S), this.comment, this.indexOf = function(i, t) {
       for (let o = 0; o < this.src.length; o++) {
-        if (t && this.src[o].value.indexOf(i) == 0)
+        if (t && this.src[o].value.toLowerCase().indexOf(i.toLowerCase()) == 0)
           return o;
-        if (i == this.src[o].value)
+        if (i.toLowerCase() == this.src[o].value.toLowerCase())
           return o;
       }
       return -1;
     }, this.trimmedContent = function() {
       var i = this.content.trim(), t = i.indexOf("["), o = i.indexOf("]");
       return this.comment == null && 0 < t && (this.comment = i.substr(t + 1, o - t - 1)), 0 < t && (i = i.substr(0, t) + i.substr(o + 2)), t = i.indexOf("--"), this.comment == null && 0 < t && (this.comment = i.substr(t + 2)), 0 < t && (i = i.substr(0, t)), i.trim();
-    }, this.src = Z(this.content.toLowerCase(), !1, !0, ""), this.parseName = function() {
+    }, this.src = Z(this.content, !1, !0, ""), this.parseName = function() {
       let i = this.trimmedContent();
       i = i.replace(/\t/, f);
       const t = i.indexOf('"'), o = i.indexOf('"', t + 1);
@@ -8512,7 +8512,6 @@ modify ` + h + " generated always  as identity restart start with " + (this.card
               if (T += x.value, T == "=" || T.charAt(T.length - 1) != "}")
                 continue;
               let w = T.substring(1);
-              w.length == 57 && w.length == 57;
               try {
                 m.data = JSON.parse(w), t = null, o = "";
                 continue e;

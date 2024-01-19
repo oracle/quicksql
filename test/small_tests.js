@@ -533,8 +533,15 @@ students
     name
     `).getDDL();
                    
+     assert( "0 < output.indexOf('drop sequence students_seq')" );  
+
+    // https://github.com/oracle/quicksql/issues/42
+    output = new quicksql( `test
+    approved boolean /default N
+    `).getDDL();
+                       
     //console.log(output);
-    assert( "0 < output.indexOf('drop sequence students_seq')" );  
+    assert( "0 < output.indexOf(\"default on null 'N'\")" );   
 }    
 
  
