@@ -3,7 +3,7 @@ import  {quicksql,fromJSON} from "../src/ddl.js";
 import fs from "fs";
   
 try {
-    let file = '//bugs/35923103.qsql';
+    let file = '//bugs/Bug35669377.quicksql';
     //file = '//DV/car_racing/2.qsql';
     //file = '//star/sales_product_customers.qsql';
     //file = '//experimental/car_racing/2.json';

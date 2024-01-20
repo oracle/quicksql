@@ -29,6 +29,13 @@ let tree = (function(){
             parent.children.push(this);
         
         this.fks = null;
+
+        this.findChild = function( name ) {
+            for( var i = 0; i < this.children.length; i++ ) 
+                if( this.children[i].parseName() == name )
+                    return this.children[i];
+            return null;
+        };
                 
         this.descendants = function() {
             var ret = [];
@@ -251,14 +258,18 @@ let tree = (function(){
             var ret = 'varchar2('+len+char+')';
             if( pure == 'plsql' )
                 ret = 'varchar2';
-            if( 0 < this.indexOf('int', true) ) 
-                ret = 'integer';
+            //if( pure == 'fk' )
+                //ret = null;
             if( src[0].value.endsWith('_id') && vcPos < 0 && this.indexOf('date') < 0 ) 
+                ret = 'number';
+            if( src[1] && src[1].value == 'id' ) 
                 ret = 'number';
             if( src[0].value == 'quantity' ) 
                 ret = 'number';
             if( src[0].value.endsWith('id') && vcPos < 0 && this.indexOf('/')+1 == this.indexOf('pk') ) 
                 ret = 'number';
+            if( 0 < this.indexOf('int', true) ) 
+                ret = 'integer';
 
             const parent_child = concatNames(parent.parseName(),'_',this.parseName());
 
@@ -306,9 +317,11 @@ let tree = (function(){
                 ret = 'TIMESTAMP'.toLowerCase();
 
             if( pure ) {
-                if( 0 < this.indexOf('fk') || 0 < this.indexOf('reference') ) {
+                if( 0 < this.indexOf('fk') || 0 < this.indexOf('reference', true) ) {
                     const parent = this.refId();
                     let type = 'number';
+                    if( ret == 'integer' )
+                        type = ret;
                     let refNode = ddl.find(parent);
                     if( refNode != null && refNode.getExplicitPkNode() != null )
                         type = refNode.getExplicitPkNode().parseType(pure=>true);
@@ -533,21 +546,9 @@ let tree = (function(){
             return this.parent.depth()+1;
         };
 
-        /*this.location = function() {
-            return '['+x+','+this.y()+')';
-        };
-        this.toString = function( padding ) {
-            return this.apparentDepth(padding)
-                //+ nbrsp;
-                + this.location()
-                + padding
-                + this.content
-            ;
-        };*/
         this.isLeaf = function(  ) {
             return this.children.every((c) => c.children.length == 0);
         };
-
 
         this.getGenIdColName = function () {
             if( this.parseType() != 'table' )
@@ -641,8 +642,11 @@ let tree = (function(){
             }
  
             for( let fk in this.fks ) {	
-                let parent = this.fks[fk];				
+                let parent = this.fks[fk];	
                 let type = 'number';
+                const attr = this.findChild(fk);
+                if( attr != null )
+                    type = attr.parseType('fk');		
                 let refNode = ddl.find(parent);
                 let _id = '';    
                 if( refNode != null && refNode.getExplicitPkNode() != null )
@@ -751,8 +755,6 @@ let tree = (function(){
                 if( !this.isMany2One() ) {
                     var parent = this.fks[fk];
                     var ref = parent;
-                    //if( ref.endsWith('S') )
-                        //ref = ref.substr(0,ref.length-1);
                     var col = fk;
                     if( col == null )
                         col = singular(ref)+'_id';
