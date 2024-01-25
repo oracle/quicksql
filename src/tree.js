@@ -1280,6 +1280,10 @@ let tree = (function(){
             
             let objName = ddl.objPrefix()  + this.parseName();
             let insert = '';
+
+            let pkName = null;
+            let pkValue = null;
+
             for( let i = 0; i < this.cardinality(); i++ ) {
                 let elem = null;
                 if( dataObj != null ) {
@@ -1294,11 +1298,13 @@ let tree = (function(){
                     
                 let idColName = this.getGenIdColName();
                 if( idColName != null ) {
-                    insert += tab + idColName +',\n';
+                    pkName = idColName;
+                    insert += tab + pkName +',\n';
                 } else {
                     let pkNode = this.getExplicitPkNode();
                     if( pkNode != null ) {
-                        insert += tab + pkNode.parseName() +',\n';
+                        pkName = pkNode.parseName();
+                        insert += tab + pkName +',\n';
                     }
                 }
                 for( let fk in this.fks ) {
@@ -1332,7 +1338,8 @@ let tree = (function(){
                 insert += ') values (\n';
 
                 if( idColName != null ) {
-                    insert += tab + (i+1)+ ',\n'; 
+                    pkValue = i+1;
+                    insert += tab + pkValue + ',\n'; 
                 } else {
                     let pkNode = this.getExplicitPkNode();
                     if( pkNode != null ) {
@@ -1346,7 +1353,8 @@ let tree = (function(){
                         }
                         if( v.replaceAll )
                             v = "'"+v+"'";
-                        insert += tab + (v != -1 ? v : i+1)+ ',\n';  
+                        pkValue = v != -1 ? v : i+1;
+                        insert += tab + pkValue + ',\n';  
                     }
                 }
                 
@@ -1364,8 +1372,34 @@ let tree = (function(){
                                 type = "STRING"; // not INTEGER
                             values = [];
                             values[0] = refData;                                
+                        } else {
+                            const m2mTbl = objName+'_'+ref;
+                            const m2mData = ddl.data[m2mTbl];
+                            if( m2mData != null ) {
+                                for( const i in m2mData ) {
+                                    if( m2mData[i][objName+'_id'] == pkValue ) {
+                                        const refData = m2mData[i][fk];
+                                        if( refData != null ) {
+                                            if( typeof refData == 'string' )
+                                                type = "STRING"; // not INTEGER
+                                            values = [];
+                                            values[0] = refData;                                
+                                        }       
+                                        break;
+                                    }
+                                }   
+                            } else {
+                                let fk1 = refNode.getPkName();
+                                let refData = elem[fk1];
+                                if( refData != null ) {
+                                    if( typeof refData == 'string' )
+                                        type = "STRING"; // not INTEGER
+                                    values = [];
+                                    values[0] = refData;                                
+                                }
+                            }
                         }
-                    }
+                    } 
                     insert += tab+translate(ddl.getOptionValue('Data Language'),generateSample(objName,singular(ref)+'_id', type, values))+',\n';
                 }
                 for( let j = 0; j < this.children.length; j++ ) {

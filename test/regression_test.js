@@ -165,6 +165,7 @@ console.log("All tests are OK");
 console.log("Time = "+(Date.now()-t1));
 console.log("Compared with 364-412 ms as of 10/2/2023");
 console.log("              506 ms     as of 11/8/2023");
+console.log("              800 ms     as of 1/24/2024");
 
 
 import {quicksql} from '../dist/quick-sql.js';

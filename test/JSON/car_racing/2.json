@@ -11,8 +11,8 @@
                                       "name"   : "Saudi Arabian Grand Prix"},
                  "finalPosition"   : 1} ]}
 , { "driverId" : 102,
-"name"     : "",
-"points"   : 258,
+"name"     : "Luigi Pinole",
+"points"   : 123,
 "teamInfo" : {"teamId" : 301, "name" : "Red Bull"},
 "race"     : [ {"driverRaceMapId" : 4,
                 "raceInfo"        : {"raceId" : 201,

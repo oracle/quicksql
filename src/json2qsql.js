@@ -10,18 +10,6 @@ var json2qsql = (function () {
         return s;
     }
 
-    function isPrimitive( value ) {
-         return typeof value == 'number' || typeof value == 'string' || typeof value == 'boolean' ;
-    }
-
-    function typeOf( value ) {
-        const t = typeof value;
-        if( typeof value == 'string')
-            return 'vc255';
-        return '';
-   }
-
-
     function hasEntry( array, entry ) {
         for( const i in array ) 
             if( JSON.stringify(array[i]) == JSON.stringify(entry) ) 
@@ -32,16 +20,20 @@ var json2qsql = (function () {
     function getId( record ) {
         let suffixes = ["_id", "Id"];
         if( record['id'] != null )
-            return record['id'];
+            return {key: 'id', value: record['id']};
         let found = false;
         for( let i = 0; i < suffixes.length; i++ ) {
             const suffix = suffixes[i];
             for( let property in record ) {
                 if( property.endsWith(suffix) ) {
-                    return record[property];
+                    return {key: property, value : record[property]};
                 }       
             }
         }
+    }
+
+    function refIdName( table ) {
+        return singular(table)+'_id';
     }
 
     function hasPrimitiveAttr( value ) {
@@ -76,6 +68,23 @@ var json2qsql = (function () {
 
         return null;
     }
+
+    function isM2M( content, attr1, attr2 ) {
+        let is12M = false;
+        let isM21 = false;
+        for( const i in content )
+            for( var j = 0; j < i; j++ ) {
+                if( content[i][attr1] == content[j][attr1] 
+                 && content[i][attr2] != content[j][attr2]
+                ) is12M = true;
+                else if( content[i][attr1] != content[j][attr1] 
+                    && content[i][attr2] == content[j][attr2]
+                ) isM21 = true;
+                if( is12M && isM21 )  
+                    return true;
+            }
+        return false;
+    }
     
     /**
      * @param {*} input JSON document
@@ -94,12 +103,6 @@ var json2qsql = (function () {
         const tc = new TableContent();
         tc.duplicatesAndParents(name, obj);
         tc.flatten(name, obj);
-
-        /*for( const t in tc.tables ) {
-            console.log('***'+t+'***');
-            for( const i in tc.tables[t] )
-                console.log(JSON.stringify(tc.tables[t][i]));
-        }*/
 
         let output = tc.output(name, obj, 0);
 
@@ -137,8 +140,10 @@ var json2qsql = (function () {
                     const record = tContent[0];
                     //for( const attr in record )
                         //output += '\n'+indent(level+1)+attr+' '+typeOf(record[attr]);
-                    output += this.output(key, value, level+1, false);
-                    return output;
+                    if( isM2M(tContent,refIdName(this.parent(key)), refIdName(key)) ) {  
+                        output += this.output(key, value, level+1, false);
+                        return output;
+                    }
                 }
             }
 
@@ -220,6 +225,9 @@ var json2qsql = (function () {
                     record[property] = value[property];
                 }
             }
+
+            if( !this.notNormalized.includes(key) && parentId != null && Object.keys(record).length )
+                record[parentId.key]=parentId.value;
     
             const hasKeys = 0 < Object.keys(record).length;
             let array = this.tables[key];
@@ -237,8 +245,8 @@ var json2qsql = (function () {
                         if( array2 == null )
                             array2 = [];
                         const newObj = {};
-                        newObj[singular(parent)+"_id"] = parentId;
-                        newObj[singular(key)+"_id"] = getId(record);
+                        newObj[refIdName(parent)] = parentId.value;
+                        newObj[refIdName(key)] = getId(record).value;
                         array2.push(newObj);
                         this.tables[m2m] = array2;
                     }
