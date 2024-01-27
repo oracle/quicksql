@@ -740,7 +740,7 @@ let tree = (function(){
             }
             ret += this.genConstraint();
             if( ret.lastIndexOf(',\n') == ret.length-2 )
-                ret = ret.substr(0,ret.length-2)+'\n';
+                ret = ret.substring(0,ret.length-2)+'\n';
             ret += ')'+(ddl.optionEQvalue('compress','yes') || 0 < nodeContent.indexOf('/COMPRESS')?' compress':'')+';\n\n';
             
             const auditPos = nodeContent.indexOf('/AUDIT');

@@ -4,9 +4,7 @@ import fs from "fs";
   
 try {
     let file = '//bugs/Bug35669377.quicksql';
-    //file = '//DV/car_racing/2.qsql';
-    //file = '//star/sales_product_customers.qsql';
-    file = '//experimental/donuts.json';
+    file = '//experimental/food_product.json';
 
     let args = process.argv.slice(2);
     if( 0 < args.length )
