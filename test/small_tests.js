@@ -547,9 +547,24 @@ students
         foo_id int /nn /fk foo
     `).getDDL();
                            
-    //console.log(output);
     assert( "0 < output.indexOf(\"foo_id    integer\")" );      
+
+    // https://github.com/oracle/quicksql/issues/46
+    output = new quicksql( `test
+        test_name
+        test_description
+        test_number
+        test_date
+    `).getDDL();
+                           
+    //console.log(output);
+    assert( "0 < output.indexOf(\"test_name           varchar2(255\")" );      
+    assert( "0 < output.indexOf(\"test_description    varchar2(4000\")" );      
+    assert( "0 < output.indexOf(\"test_number         number\")" );      
+    assert( "0 < output.indexOf(\"test_date           date\")" );      
+
 }    
+
 
  
 small_tests();

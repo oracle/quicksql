@@ -230,8 +230,8 @@ let tree = (function(){
     
             var char = ddl.semantics();
             var len = 4000;	
-            if( src[0].value.startsWith('name') || src[0].value.startsWith('email') )
-                len = 255;
+            if( src[0].value.endsWith('_name') || src[0].value.startsWith('name') || src[0].value.startsWith('email') )
+                len = ddl.getOptionValue('namelen');
             var start;
             var end;
             var values;
@@ -266,10 +266,18 @@ let tree = (function(){
                 ret = 'number';
             if( src[0].value == 'quantity' ) 
                 ret = 'number';
+            if( src[0].value.endsWith('_number') ) 
+                ret = 'number';
             if( src[0].value.endsWith('id') && vcPos < 0 && this.indexOf('/')+1 == this.indexOf('pk') ) 
                 ret = 'number';
             if( 0 < this.indexOf('int', true) ) 
                 ret = 'integer';
+
+            if( 0 < vcPos ) {
+                ret = 'varchar2('+len+char+')';
+                if( pure == 'plsql' )
+                    ret = 'varchar2';
+            }
 
             const parent_child = concatNames(parent.parseName(),'_',this.parseName());
 

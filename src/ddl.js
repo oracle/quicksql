@@ -32,6 +32,7 @@ export const quicksql = (function () {
         inserts: {label: 'Generate Inserts', value:true, check:['yes','no']},
         //longvc: {label: 'Longer Varchars', value:'yes',check:['yes','no']},    // not used, if a user specified the length, presumably he knows what he is doing
         //columnNamePrefix: "?",
+        namelen: {label: 'Name Character Length', value: 255},
         overridesettings: {label: 'Ignore toDDL() second parameter', value:'no',check:['yes','no']},    
         prefix: {label: 'Object Prefix', value:'' },
         //ondelete: {label: 'On Delete', value:'Cascade',check:['restrict','cascade','set null']},

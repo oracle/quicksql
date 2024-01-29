@@ -88,6 +88,8 @@ var json2qsql = (function () {
     }*/
 
     function signature( obj ) {
+        if( obj == null )
+            return '';
         if( typeof obj != "object" )
             return '';
         let ret = '(';
@@ -196,7 +198,7 @@ var json2qsql = (function () {
             if( 'id' == key ) {
                 return '\n'+indent(level)+'id vc32 /pk';
             }
-            tofinal: if( typeof value == "object" ) {
+            tofinal: if( value != null && typeof value == "object" ) {
                 if( Array.isArray(value) ) {
                     for( const property in value ) {
                         if( 1 <= property )
