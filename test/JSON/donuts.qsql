@@ -1,16 +1,16 @@
 donuts  /insert 3
    id vc32 /pk
-   type vc
-   name vc
+   type 
+   name 
    ppu num
    donuts_batter /insert 7
       >batter  /insert 4
          id vc32 /pk
-         type vc
+         type 
    donuts_topping /insert 16
       >topping  /insert 7
          id vc32 /pk
-         type vc
+         type 
 
 #settings = { genpk: false, drop: true }
 

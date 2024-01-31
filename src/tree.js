@@ -828,12 +828,20 @@ let tree = (function(){
                 var desc = this.descendants()[i];
                 if( 0 == desc.children.length ) 
                     continue;
-                if( desc.isMany2One() )
-                    ret.unshift(desc);
-                else
+                if( desc.isMany2One() ) {
+                    if( !desc.isContainedIn(ret) )
+                        ret.unshift(desc);
+                } else if( !desc.isContainedIn(ret) )
                     ret.push(desc);
             }
             return ret;
+        }
+        
+        this.isContainedIn = function( nodes ) {
+            for( const i in nodes ) 
+                if( nodes[i].parseName() == this.parseName() )
+                    return true;
+            return false;    
         }
 
         this.generateDrop = function() {

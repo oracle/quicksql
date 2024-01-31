@@ -83,10 +83,6 @@ var json2qsql = (function () {
         return false;
     }
 
-    /*function nameWsignature( name, value ) {
-        return name+signature(value);
-    }*/
-
     function signature( obj ) {
         if( obj == null )
             return '';
@@ -115,6 +111,15 @@ var json2qsql = (function () {
         return table1+'_'+table2+'('+table1+'_id,'+table2+'_id)';
     }
     
+    /*function isArray( obj ) {
+        let cnt = 0;
+        for( let property in obj ) {
+            if( isNaN(property) )
+                return false;
+            cnt++;
+        }
+        return  0 < cnt;  
+    }*/
     
     /**
      * @param {*} input JSON document
@@ -178,15 +183,13 @@ var json2qsql = (function () {
                 }
             }
 
-            let output = this.tableName(key);
             let m2o = '';
             if( this.notNormalized.includes(key) )
                 m2o = '>'
-            if( 0 < level )
-                output = '\n'+indent(level)+m2o+this.tableName(key);
+            let output = '\n'+indent(level)+m2o+this.tableName(key);
 
             if( typeof value == 'string' ) {
-                output += ' vc';
+                //output += ' vc';
             }
             if( typeof value == 'number' ) {
                 output += ' num';
@@ -211,10 +214,16 @@ var json2qsql = (function () {
                     if( key != "" ) {
                         if( this.tableContent[key] == null )
                             console.log();
+                        //if( this.tableName(key) == 'threatened_species' )
+                            //console.log();
                         output += '  /insert '+this.tableContent[key].length;
                     }
                 }
                 let promotedField = "";
+                if( !this.tableSignatures.includes(key) ) {
+                    output = '';
+                    level--;
+                }
                 for( let property in value ) {
                     const field = value[property];
                     if( property != null  ) {
@@ -224,10 +233,8 @@ var json2qsql = (function () {
                             promotedField = property;
                         if( fld + "_id" == cmp )
                             continue;
-                    }
-                    if( !this.tableSignatures.includes(key) ) {
-                        output = '';
-                        level--;
+                        if( !isNaN(property) && !Array.isArray(value) )
+                            continue;
                     }
                     const subtree = this.output(property+signature(field), field, level + 1);
                     output += subtree;
@@ -304,10 +311,17 @@ var json2qsql = (function () {
 
             let isComposite = false;
             for( let property in value ) {
-                if( value[property] != null && typeof value[property] == "object" ) {  
-                    let k = attr;
-                    if( isNaN(property) ) 
-                        k = property+signature(value[property]);
+                //if( property == '1' && typeof value[property] == "object" )
+                    //console.log();
+                    //if( property == 'adjustments' )
+                        //console.log();
+                    if( value[property] != null && typeof value[property] == "object" ) {  
+                        let k = attr;
+                        if( isNaN(property) ) 
+                            k = property+signature(value[property]);
+                        else if( !Array.isArray(value) ) {
+                            continue;
+                    }
                     if( k != attr )
                         this.child2parent[k] = attr;
                     this.duplicatesAndParents( k, value[property] );
@@ -315,6 +329,8 @@ var json2qsql = (function () {
                 }
             }
 
+            //if( attr == 'adjustments()' )
+                //console.log();
             const hasPrimAttr = hasPrimitiveAttr(value);
             if( hasPrimAttr && !this.tableSignatures.includes(attr) )
                 this.tableSignatures.push(attr);
@@ -336,7 +352,7 @@ var json2qsql = (function () {
             const ip = tableSignature.indexOf('(');
             if( ip < 0 )
                 return tableSignature;
-            const table = tableSignature.substring(0,ip);
+            let table = tableSignature.substring(0,ip);
             let cnt = 0;
             let pos = -1;
             for( const property in this.tableSignatures ) {
@@ -347,6 +363,8 @@ var json2qsql = (function () {
                 if( cmp == tableSignature ) 
                     pos = cnt;
             }
+            //if( !isNaN(parseInt(table)) )
+                //table = 'num_'+table;
             if( cnt < 2 )
                 return table;
             return table+pos; 

@@ -24,7 +24,9 @@ try {
         const sp = file.lastIndexOf('/');
         if( 0 < sp )
             key = key.substring(sp+1);
+        let t1 = Date.now();
         output = fromJSON(input, key);
+        console.log("JSON Time = "+(Date.now()-t1));
         if( 0 <= ofile.indexOf('/experimental/') )
             fs.writeFileSync(ofile+'.qsql', output);
         else {
@@ -32,11 +34,14 @@ try {
             console.log(output);
         }
         input = output;
-    } 
+    }
+    let t1 = Date.now();
     if( 0 <= file.indexOf('/erd/') ) {
         output = JSON.stringify(new quicksql(input).toERD(), null, 4);
     } else
         output = new quicksql(input).getDDL();
+        
+    console.log("DDL Time = "+(Date.now()-t1));    
     
     if( 0 <= ofile.indexOf('/experimental/') ) 
         fs.writeFileSync(ofile+'.sql', output);

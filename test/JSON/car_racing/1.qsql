@@ -1,10 +1,10 @@
 team  /insert 1
    teamId num /pk
-   name vc
+   name 
    points num
    driver  /insert 2
       driverId num /pk
-      name vc
+      name 
       points num
 
 #settings = { genpk: false, drop: true }

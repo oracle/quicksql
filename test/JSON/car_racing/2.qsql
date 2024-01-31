@@ -1,15 +1,15 @@
 driver  /insert 2
    driverId num /pk
-   name vc
+   name 
    points num
    >teamInfo  /insert 1
       teamId num /pk
-      name vc
+      name 
    race  /insert 4
       driverRaceMapId num /pk
       >raceInfo  /insert 3
          raceId num /pk
-         name vc
+         name 
       finalPosition num
 
 #settings = { genpk: false, drop: true }
