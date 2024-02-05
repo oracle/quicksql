@@ -557,12 +557,18 @@ students
         test_date
     `).getDDL();
                            
-    //console.log(output);
     assert( "0 < output.indexOf(\"test_name           varchar2(255\")" );      
     assert( "0 < output.indexOf(\"test_description    varchar2(4000\")" );      
     assert( "0 < output.indexOf(\"test_number         number\")" );      
     assert( "0 < output.indexOf(\"test_date           date\")" );      
 
+    // https://github.com/oracle/quicksql/issues/48
+    output = new quicksql( `support
+    support_email vc100 /default support@oracle.com
+    `).getDDL();
+                           
+    //console.log(output);
+    assert( "0 < output.indexOf(\"support_email    varchar2(100 char) default on null 'support@oracle.com'\")" );      
 }    
 
 
@@ -571,7 +577,7 @@ small_tests();
 
 console.log(assertionCnt);
 
-const minimalTestCnt = 95;
+const minimalTestCnt = 100;
 if( assertionCnt < minimalTestCnt ) {
     console.error("assertionCnt < "+minimalTestCnt);
     throw new Error('Test failed');

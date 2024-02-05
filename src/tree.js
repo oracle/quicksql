@@ -347,7 +347,17 @@ let tree = (function(){
             if(  ret.startsWith('integer') || ret.startsWith('number') || ret.startsWith('date')  ) 
                 optQuote = '';
             if( 0 < this.indexOf('default') ) {
-                const value = src[this.indexOf('default')+1].value;
+                let value = '';
+                for( let i = this.indexOf('default')+1; i < src.length; i++ ) {
+                    const token = src[i].value;
+                    if( token == '/' )
+                        break;
+                    if( token == '-' )
+                        break;
+                    if( token == '[' )
+                        break;
+                    value += src[i].value;
+                }
                 ret +=' default '+'on null ' + optQuote+value+optQuote ;
             }
             if( 0 < this.indexOf('nn') || this.indexOf('not')+1== this.indexOf('null') )
