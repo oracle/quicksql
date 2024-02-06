@@ -122,6 +122,11 @@ let tree = (function(){
             }
             return -1;
         }
+
+        this.occursBeforeOption = function( token, isPrefix ) {
+            return 0 < this.indexOf(token, isPrefix) 
+               && ( this.indexOf('/') < 0 || this.indexOf(token, isPrefix) < this.indexOf('/') );
+        }
  
         this.trimmedContent = function() {
             var ret = this.content.trim();
@@ -270,7 +275,7 @@ let tree = (function(){
                 ret = 'number';
             if( src[0].value.endsWith('id') && vcPos < 0 && this.indexOf('/')+1 == this.indexOf('pk') ) 
                 ret = 'number';
-            if( 0 < this.indexOf('int', true) ) 
+            if( this.occursBeforeOption('int', true) ) 
                 ret = 'integer';
 
             if( 0 < vcPos ) {
@@ -309,19 +314,19 @@ let tree = (function(){
             )        		
                 ret = ddl.getOptionValue('Date Data Type').toLowerCase();
             if( vcPos < 0 ) {              	
-                if( 0 < this.indexOf('clob')   ) 
+                if( this.occursBeforeOption('clob')   ) 
                     ret = 'clob';
-                if( 0 < this.indexOf('blob') || 0 <  this.indexOf('file') ) 
+                if( this.occursBeforeOption('blob') || this.occursBeforeOption('file') ) 
                     ret = 'blob';
-                if( 0 < this.indexOf('json') ) 
+                if( this.occursBeforeOption('json') ) 
                     ret = 'clob check ('+this.parseName()+' is json)';
             }
 
-            if( 0 < this.indexOf('tswltz')  ) 
+            if( this.occursBeforeOption('tswltz') && this.indexOf('/')  ) 
                 ret = 'TIMESTAMP WITH LOCAL TIME ZONE'.toLowerCase();
-            else if( 0 < this.indexOf('tswtz') || 0 < this.indexOf('tstz') ) 
+            else if( this.occursBeforeOption('tswtz') || this.occursBeforeOption('tstz') ) 
                 ret = 'TIMESTAMP WITH TIME ZONE'.toLowerCase();
-            else if( 0 < this.indexOf('ts') ) 
+            else if( this.occursBeforeOption('ts') ) 
                 ret = 'TIMESTAMP'.toLowerCase();
 
             if( pure ) {

@@ -567,11 +567,17 @@ students
     support_email vc100 /default support@oracle.com
     `).getDDL();
                            
-    //console.log(output);
     assert( "0 < output.indexOf(\"support_email    varchar2(100 char) default on null 'support@oracle.com'\")" );      
+
+    // https://github.com/oracle/quicksql/issues/49
+    output = new quicksql( `change_history
+    data_type vc20 /check VARCHAR2,CLOB,TSWLTZ
+    `).getDDL();
+                           
+    //console.log(output);
+    assert( "0 < output.indexOf(\"data_type    varchar2(20 char)\")" );      
+
 }    
-
-
  
 small_tests();
 
