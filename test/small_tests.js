@@ -406,11 +406,14 @@ projects /insert 1
     important2 bool
     is_important
     `).getDDL();
-                
-    assert( " 0 < output.indexOf('important_yn    varchar2(1 char) constraint bug35814922_important_yn') " );                                     
-    assert( " 0 < output.indexOf('important1      varchar2(1 char) constraint bug35814922_important1') " );                                     
-    assert( " 0 < output.indexOf('important2      varchar2(1 char) constraint bug35814922_important2') " );    
-    assert( " 0 < output.indexOf('is_important    varchar2(1 char) constraint bug35814922_is_important') " );    
+    assert( " 0 < output.indexOf('important_yn    varchar2(1 char)') " );                                     
+    assert( " 0 < output.indexOf('constraint bug35814922_important_yn') " );                                     
+    assert( " 0 < output.indexOf('important1      varchar2(1 char)')" );                                     
+    assert( " 0 < output.indexOf('constraint bug35814922_important1') " );                                     
+    assert( " 0 < output.indexOf('important2      varchar2(1 char)') " );    
+    assert( " 0 < output.indexOf('constraint bug35814922_important2') " );    
+    assert( " 0 < output.indexOf('is_important    varchar2(1 char)') " );    
+    assert( " 0 < output.indexOf('constraint bug35814922_is_important') " );    
     
     output = new quicksql( 
 `Bug35842845 
@@ -574,10 +577,20 @@ students
     data_type vc20 /check VARCHAR2,CLOB,TSWLTZ
     `).getDDL();
                            
-    //console.log(output);
     assert( "0 < output.indexOf(\"data_type    varchar2(20 char)\")" );      
 
+    // https://github.com/oracle/quicksql/issues/51
+    output = new quicksql( `foo
+    bar /boolean /default y
+    `).getDDL();
+                        
+    //console.log(output);
+    assert( "0 < output.indexOf(\"varchar2(1 char) default on null 'y'\")" );   
+    assert( "0 < output.indexOf(\"constraint foo_bar check (bar in ('Y','N'))\")" );    
 }    
+
+
+
  
 small_tests();
 

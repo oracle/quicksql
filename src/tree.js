@@ -286,15 +286,18 @@ let tree = (function(){
 
             const parent_child = concatNames(parent.parseName(),'_',this.parseName());
 
+            const isDefault = 0 < this.indexOf('default');
+
+            let booleanCheck = '';
             if( src[0].value.endsWith('_yn') || src[0].value.startsWith('is_') ) {
-                ret = 'varchar2(1 char) constraint '+concatNames(ddl.objPrefix(),parent_child)+'\n';
-                ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'check ('+this.parseName()+" in ('Y','N'))";
+                ret = 'varchar2(1 char)';
+                booleanCheck = '\n' + tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+concatNames(ddl.objPrefix(),parent_child)+' check ('+this.parseName()+" in ('Y','N'))";
             }
             for( let i in boolTypes ) {
                 let pos = this.indexOf(boolTypes[i]);
                 if( 0 < pos ) {
-                    ret = 'varchar2(1 char) constraint '+concatNames(ddl.objPrefix(),parent_child)+'\n';
-                    ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'check ('+this.parseName()+" in ('Y','N'))";
+                    ret = 'varchar2(1 char)';
+                    booleanCheck = '\n' + tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+concatNames(ddl.objPrefix(),parent_child)+' check ('+this.parseName()+" in ('Y','N'))";
                     break;
                 }
             }
@@ -371,6 +374,7 @@ let tree = (function(){
             if( 0 < this.indexOf('hidden') || 0 < this.indexOf('invincible') ) 
                 ret += ' invisible';
             ret += this.genConstraint(optQuote);
+            ret += booleanCheck;
             if( 0 < this.indexOf('between') ) {
                 const bi = this.indexOf('between');
                 const values = src[bi+1].value + ' and ' + src[bi+3].value;
@@ -392,6 +396,7 @@ let tree = (function(){
             }
             return ret;
         };
+
 
         this.genConstraint = function ( optQuote ) {
             let ret = '';
