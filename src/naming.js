@@ -55,16 +55,20 @@ function quoteIdentifier(/*String*/ s, /*char*/ quoteChar ) {
         //s.getChars(0, chars.length, chars, 0);
         if( chars.length > 0 && '0' <= chars[0] && chars[0] <= '9' )
             quote = true;
-        else for ( let i in chars ) {
-            const c = chars[i];
-            if( legitimateChars.indexOf(c) < 0 && (
-                c < '0' || '9' < c && c < 'A' || 'Z' < c && c < 'a' || 'z' < c
-            )) {
+        else {
+            for ( let i = 0; i < chars.length; i++ ) {
+                const c = chars[i];
+                if( 'a' <= c && c <= 'z' )
+                    continue;
+                if( 'A' <= c && c <= 'Z' )
+                    continue;
+                if( '0' <= c && c <= '9' )
+                    continue;
+                if( 0 <= legitimateChars.indexOf(c) )
+                    continue;
                 quote = true;
                 break;
             }
-            // wierd case with double quote inside
-            // ...
         }
     }
     if( s.startsWith("_") || s.startsWith("$") || s.startsWith("#") )

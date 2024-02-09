@@ -12,9 +12,9 @@ function fe(d, h) {
     if (x.length > 0 && "0" <= x[0] && x[0] <= "9")
       D = !0;
     else
-      for (let b in x) {
+      for (let b = 0; b < x.length; b++) {
         const g = x[b];
-        if (I.indexOf(g) < 0 && (g < "0" || "9" < g && g < "A" || "Z" < g && g < "a" || "z" < g)) {
+        if (!("a" <= g && g <= "z") && !("A" <= g && g <= "Z") && !("0" <= g && g <= "9") && !(0 <= I.indexOf(g))) {
           D = !0;
           break;
         }
