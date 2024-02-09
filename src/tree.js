@@ -148,7 +148,10 @@ let tree = (function(){
 
         this.src = lexer( this.content/*.toLowerCase()*/, false, true, '' ); 
          
-        this.parseName = function () {            
+        this.parsedName = null;
+        this.parseName = function () {  
+            if( this.parsedName != null ) 
+                return this.parsedName;         
             
             let rEt = this.trimmedContent();
             rEt = rEt.replace(/\t/,tab);
@@ -217,7 +220,8 @@ let tree = (function(){
             if (c >= '0' && c <= '9') {
                 rEt = 'x'+rEt;
             } 
-            return amend_reserved_word(canonicalObjectName(rEt));
+            this.parsedName = amend_reserved_word(canonicalObjectName(rEt));
+            return this.parsedName;
         };
         this.parseType = function( pure ) {
             if( this.children != null && 0 < this.children.length )

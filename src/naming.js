@@ -33,6 +33,7 @@ export function singular( name ) {
  * @return
  */
 function quoteIdentifier(/*String*/ s, /*char*/ quoteChar ) {
+ 
     let quoteString = '"'; //String.valueOf(quoteChar);
     if( s == null )   // to be able to safely wrap any string value
         return null;    	
