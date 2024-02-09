@@ -143,16 +143,20 @@ export const quicksql = (function () {
                 char = ' byte';
             return char;	
         };
+        this.name2node = null;
         this.find = function( name ) {
+            if( this.name2node != null ) 
+                return this.name2node[canonicalObjectName(name)];
+
+            this.name2node = {};    
             for( var i = 0; i < this.forest.length; i++ ) {
                 var descendants = this.forest[i].descendants();
                 for( var j = 0; j < descendants.length; j++ ) {
                     var node = descendants[j];
-                    if( node.parseName() == canonicalObjectName(name) )
-                        return node;
+                    this.name2node[node.parseName()] = node;
                 }
             }
-            return null;
+            return this.name2node[canonicalObjectName(name)];
         };
 
         this.setOptions = function( line ) {

@@ -848,8 +848,9 @@ let tree = (function(){
 
         this.orderedTableNodes = function() {
             var ret = [this,];
-            for( let i = 1; i < this.descendants().length; i++ ) {
-                var desc = this.descendants()[i];
+            const descendants = this.descendants();
+            for( let i = 1; i < descendants.length; i++ ) {
+                var desc = descendants[i];
                 if( 0 == desc.children.length ) 
                     continue;
                 if( desc.isMany2One() ) {
