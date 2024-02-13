@@ -1,10 +1,13 @@
 import {quicksql, toDDL} from "../src/ddl.js";
 
+var assertionCnt = 0;
+
 function assert( condition ) {
     if( !eval(condition) ) {
         console.error("Failed: "+condition);
         throw new Error('Test failed');
-    }   
+    } 
+    assertionCnt++; 
 }
 
 var output;
@@ -403,11 +406,14 @@ projects /insert 1
     important2 bool
     is_important
     `).getDDL();
-                
-    assert( " 0 < output.indexOf('important_yn    varchar2(1 char) constraint bug35814922_important_yn') " );                                     
-    assert( " 0 < output.indexOf('important1      varchar2(1 char) constraint bug35814922_important1') " );                                     
-    assert( " 0 < output.indexOf('important2      varchar2(1 char) constraint bug35814922_important2') " );    
-    assert( " 0 < output.indexOf('is_important    varchar2(1 char) constraint bug35814922_is_important') " );    
+    assert( " 0 < output.indexOf('important_yn    varchar2(1 char)') " );                                     
+    assert( " 0 < output.indexOf('constraint bug35814922_important_yn') " );                                     
+    assert( " 0 < output.indexOf('important1      varchar2(1 char)')" );                                     
+    assert( " 0 < output.indexOf('constraint bug35814922_important1') " );                                     
+    assert( " 0 < output.indexOf('important2      varchar2(1 char)') " );    
+    assert( " 0 < output.indexOf('constraint bug35814922_important2') " );    
+    assert( " 0 < output.indexOf('is_important    varchar2(1 char)') " );    
+    assert( " 0 < output.indexOf('constraint bug35814922_is_important') " );    
     
     output = new quicksql( 
 `Bug35842845 
@@ -463,8 +469,135 @@ projects /insert 1
         id
     `).getDDL();
         
-    //console.log(output);
     assert( " output.indexOf('id    varchar2') < 0 " ); 
+
+    // https://github.com/oracle/quicksql/issues/26
+    output = new quicksql( 
+`dept
+    name
+
+view v dept
+
+# settings = {prefix: "abc"}
+    `).getDDL();
+        
+    assert( "output.indexOf('from') <  output.lastIndexOf('abc_dept') " ); 
+
+    // https://github.com/oracle/quicksql/issues/27
+    output = new quicksql( `dept
+    name
+        
+    # settings = {prefix: "prefix", schema: "schema"}
+    `).getDDL();
+                    
+    assert( "output.indexOf('schema.prefix_dept_id_pk') < 0 " ); 
+            
+    // https://github.com/oracle/quicksql/issues/28
+    output = new quicksql( `# settings = {"pk":"GUID"}
+students /insert 2 
+        name
+    `).getDDL();
+                    
+    assert( "output.indexOf('trigger') < 0 " ); 
+    assert( "output.indexOf('alter') < 0 " ); 
+
+    // https://github.com/oracle/quicksql/issues/29
+    output = new quicksql( `employees /insert 1
+       date hired
+   
+   #settings={ date:timestamp}
+    `).getDDL();
+                       
+    assert( "output.indexOf('N/A') < 0 " );  
+
+    // https://github.com/oracle/quicksql/issues/31
+    output = new quicksql( `departments /audit cols
+   name 
+   employees /audit columns
+       name 
+    `).getDDL();
+                   
+    assert( "output.indexOf('audit all') < 0 " );  
+    assert( "output.indexOf('created       date not null') <  output.lastIndexOf('created          date not null,')" );  
+
+    // https://github.com/oracle/quicksql/issues/32
+    output = new quicksql( `queues
+    created /default sysdate
+    created dt /default systimestamp
+    `).getDDL();
+                   
+    assert( "0 < output.indexOf('default on null sysdate')" );  
+    assert( "0 < output.indexOf('default on null systimestamp')" );  
+
+    // https://github.com/oracle/quicksql/issues/32
+    output = new quicksql( `# pk: SEQ
+    # drop: Y
+students 
+    name
+    `).getDDL();
+                   
+    assert( "0 < output.indexOf('drop sequence students_seq')" );  
+
+    // https://github.com/oracle/quicksql/issues/42
+    output = new quicksql( `test
+    approved boolean /default N
+    `).getDDL();
+                       
+    assert( "0 < output.indexOf(\"default on null 'N'\")" );   
+
+    // https://github.com/oracle/quicksql/issues/43
+    output = new quicksql( `test
+        foo_id int /nn /fk foo
+    `).getDDL();
+                           
+    assert( "0 < output.indexOf(\"foo_id    integer\")" );      
+
+    // https://github.com/oracle/quicksql/issues/46
+    output = new quicksql( `test
+        test_name
+        test_description
+        test_number
+        test_date
+    `).getDDL();
+                           
+    assert( "0 < output.indexOf(\"test_name           varchar2(255\")" );      
+    assert( "0 < output.indexOf(\"test_description    varchar2(4000\")" );      
+    assert( "0 < output.indexOf(\"test_number         number\")" );      
+    assert( "0 < output.indexOf(\"test_date           date\")" );      
+
+    // https://github.com/oracle/quicksql/issues/48
+    output = new quicksql( `support
+    support_email vc100 /default support@oracle.com
+    `).getDDL();
+                           
+    assert( "0 < output.indexOf(\"support_email    varchar2(100 char) default on null 'support@oracle.com'\")" );      
+
+    // https://github.com/oracle/quicksql/issues/49
+    output = new quicksql( `change_history
+    data_type vc20 /check VARCHAR2,CLOB,TSWLTZ
+    `).getDDL();
+                           
+    assert( "0 < output.indexOf(\"data_type    varchar2(20 char)\")" );      
+
+    // https://github.com/oracle/quicksql/issues/51
+    output = new quicksql( `foo
+    bar /boolean /default y
+    `).getDDL();
+                        
+    //console.log(output);
+    assert( "0 < output.indexOf(\"varchar2(1 char) default on null 'y'\")" );   
+    assert( "0 < output.indexOf(\"constraint foo_bar check (bar in ('Y','N'))\")" );    
 }    
 
+
+
+ 
 small_tests();
+
+console.log(assertionCnt);
+
+const minimalTestCnt = 100;
+if( assertionCnt < minimalTestCnt ) {
+    console.error("assertionCnt < "+minimalTestCnt);
+    throw new Error('Test failed');
+} 

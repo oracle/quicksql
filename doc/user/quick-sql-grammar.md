@@ -139,7 +139,14 @@ spaces. Delimit table names by a space or comma.
 ### View Example
 
 ```quicksql
-dept dname loc emp ename job view dept_emp emp dept
+dept 
+  dname 
+  loc 
+  emp 
+    ename 
+    job 
+    
+view dept_emp emp dept
 ```
 
 This syntax restricts views to conjunctive queries (i.e. containing equijoin

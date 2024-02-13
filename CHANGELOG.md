@@ -19,3 +19,11 @@ are encouraged to be replaced with
    let errors = qsql.getErrors();
 ```
 
+## [1.2.1] - 2024-2-8
+
+Issues up to #51
+
+Further Json to QSQL parsing progress
+
+Performance optimization: from 12 sec down to 6 sec for 1000 line QSQL schema definition 
+in test/profile.js. Faster regression test as well.
