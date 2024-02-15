@@ -165,7 +165,7 @@ function guessIndent( lines ) {
     let indent = null;
     for( let i in frequencies ) {
         if( indent == null || frequencies[indent] <= frequencies[i] )
-            indent = i; 
+            indent = parseInt(i); 
     }
     return indent;
 

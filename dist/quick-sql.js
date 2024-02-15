@@ -8914,7 +8914,7 @@ function Se(d) {
   }
   let x = null;
   for (let b in I)
-    (x == null || I[x] <= I[b]) && (x = b);
+    (x == null || I[x] <= I[b]) && (x = parseInt(b));
   return x;
 }
 function te(d) {
@@ -9219,7 +9219,7 @@ function Ee(d, h) {
   return new Y(d, h).getErrors();
 }
 function le() {
-  return "1.2.1";
+  return "1.2.2";
 }
 Y.version = le;
 Y.toDDL = Pe;

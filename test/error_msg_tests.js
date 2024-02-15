@@ -1,8 +1,10 @@
 import  {quicksql,toErrors} from "../src/ddl.js";
 import errorMsgs from '../src/errorMsgs.js'
 
+var assertionCnt = 0;
 
 function checkError(msgList, line, offset, msg) {
+    assertionCnt++;
     for( const i in msgList ) {
         if( msgList[i].from.line == line && msgList[i].from.depth == offset && msgList[i].message == msg ) {
             return;
@@ -12,17 +14,19 @@ function checkError(msgList, line, offset, msg) {
 }    
 
 export function checkNoError(msgList, msgPrefix) {
+    assertionCnt++;
     for( const i in msgList ) {
         if( msgList[i].message.indexOf(msgPrefix) == 0 ) {
-            throw new Error('Test failed for "'+msg);
+            throw new Error('Test failed: extra error "'+msgPrefix+'"');
         }
     }   
 }    
 
+var output;
 
 export default function error_msg_tests() {
 
-    let output =toErrors(`dept
+    output =toErrors(`dept
     id
     `);
     checkError(output, 1, 4, errorMsgs.messages.duplicateId);
@@ -63,7 +67,22 @@ view customer_view customer
     `).getErrors();
     checkError(output, 3, 4, errorMsgs.messages.misalignedAttribute+"3");
 
+    output = new quicksql(`dept
+   name
+   emp
+      name
+    `).getErrors();
+    checkNoError(output, errorMsgs.messages.misalignedAttribute);
+
+
 }
 
-
 error_msg_tests();
+
+console.log(assertionCnt);
+
+const minimalTestCnt = 10;
+if( assertionCnt < minimalTestCnt ) {
+    console.error("assertionCnt < "+minimalTestCnt);
+    throw new Error('Test failed');
+} 
