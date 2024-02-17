@@ -30,7 +30,7 @@ users
   push_subscription              vc4000
 
 user_sources
-  user_id                        number /nn /fk users
+  user_id                        number /NN /fk users
   source_name                    vc100
   latitude                       number
   longitude                      number
@@ -44,7 +44,7 @@ user_claims
   receipt_from_id                number /nn /fk user_sources
   receipt_date                   date  /nn
   receipt_amount                 number  /nn
-  claimant                       number  /fk users
+  claimant                       number  /FK users
   status                         vc80
   payment_txn_id                 number
   reimburse_percentage           number

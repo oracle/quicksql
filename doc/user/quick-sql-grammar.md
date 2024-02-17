@@ -78,7 +78,8 @@
 | /insert NN                              | Generate NN SQL INSERT statement(s) with random data, for example: /INSERT 20. (Maximum = 1000) |
 | /rest                                   | Generate REST enablement of the table using Oracle REST Data Services (ORDS) |
 | /select                                 | Generate SQL SELECT statement after generating data for each table |
-| /unique                                 | Generate table level unique constraint |
+| /unique, /uk                            | Generate table level unique constraint |
+| /pk                                     | Generate primary key constraint (on table level it is usually a composite key) |
 <!-- markdownlint-enable MD013 -->
 
 ### Star/Snowflake schema relationship direction indicators
@@ -110,7 +111,7 @@ and is usually omitted from QSQL schema definition.
 | Directive                      | Description                                |
 | ------------------------------ | ------------------------------------------ |
 | /idx, /index, /indexed         | Creates a non unique index                 |
-| /unique                        | Creates a unique constraint                |
+| /unique, /uk                   | Creates a unique constraint                |
 | /check                         | Creates a check constraint with comma or white space delimited values e.g. /check Yes, No |
 | /constant                      | When generating data set this column to a constant value. For example /constant NYC. |
 | /default                       | Adds default value if the column is null   |
@@ -429,6 +430,8 @@ stmt::= tree
       |  'document' '=' JSON
 
 view::= 'view' view_name table_name+
+       | view_name '=' table_name+
+
 view_name::= identifier
 table_name::= identifier
 column_name::= identifier
@@ -452,11 +455,13 @@ tableDirective::= '/'
       |'insert' integer
       |'rest'
       |'select'
-      |'unique' )
+      |'unique' | 'uk'
+      |'pk'
+      )
 
 columnDirective::= '/'
       ('idx'|'index'|'indexed'
-      |'unique'
+      |'unique'|'uk'
       |'check'
       |'constant'
       |'default'
@@ -467,7 +472,9 @@ columnDirective::= '/'
       |'between'
       |'hidden'|'invisible'
       |'references'|'reference'
-      |'fk'|'pk' )
+      |'fk'
+      |'pk' 
+      )
 
 datatype::=
        'num'|'number'

@@ -3,6 +3,7 @@ import translate from './translate.js';
 import {generateSample, resetSeed} from './sample.js';
 import lexer from './lexer.js';
 import amend_reserved_word from './reserved_words.js';
+import split_str from './split_str.js';
 
 let tree = (function(){ 
     let ddl;
@@ -127,6 +128,29 @@ let tree = (function(){
             return 0 < this.indexOf(token, isPrefix) 
                && ( this.indexOf('/') < 0 || this.indexOf(token, isPrefix) < this.indexOf('/') );
         }
+
+        this.isOption = function( token, token2 ) {
+            for( let i = 2; i < this.src.length; i++ ) {
+                if( token == this.src[i].value )
+                    if( token2 == null || i < this.src.length-1 && token2 ==this.src[i+1].value)
+                        return this.src[i-1].value == '/';
+            }
+            return false;
+        }
+
+        this.getOptionValue = function( option ) {
+            if( this.src.length < 3 )
+                return null;
+            const pos = this.indexOf(option);
+            if( pos < 2 || this.src[pos-1].value != '/' )
+                return null;
+
+            let ret = '';
+            for( let i = pos+1; i < this.src.length && this.src[i] != '/'; i++ )
+                ret += this.src[i].value;
+
+            return ret;
+        }
  
         this.trimmedContent = function() {
             var ret = this.content.trim();
@@ -165,9 +189,11 @@ let tree = (function(){
 
             const ret = rEt.toLowerCase();
 
-            if( 0 == ret.indexOf('view ') ) {
-                var chunks = rEt.split(' ');
-                return chunks[1];
+            if( this.src[0].value == 'view' ) {
+                return this.src[1].value;
+            }
+            if( 1 < this.src.length && this.src[0].value == '=' ) {
+                return this.src[0].value;
             }
             rEt = replaceTrailing(rEt,' d');
             var pos = rEt.indexOf('/');
@@ -229,10 +255,10 @@ let tree = (function(){
 
             const src = this.src;    
 
-            if( src[0].value == 'view' ) 
+            if( src[0].value == 'view' || 1 < src.length && src[1].value == '=' ) 
                 return 'view';
-            if( src[0].value == 'dv' ) 
-                return 'dv';
+            /*if( src[0].value == 'dv' ) 
+                return 'dv';*/
                         
             if( this.parent == null )
                 return 'table';
@@ -290,7 +316,7 @@ let tree = (function(){
 
             const parent_child = concatNames(parent.parseName(),'_',this.parseName());
 
-            const isDefault = 0 < this.indexOf('default');
+            const isDefault = this.isOption('default');
 
             let booleanCheck = '';
             if( src[0].value.endsWith('_yn') || src[0].value.startsWith('is_') ) {
@@ -337,28 +363,28 @@ let tree = (function(){
                 ret = 'TIMESTAMP'.toLowerCase();
 
             if( pure ) {
-                if( 0 < this.indexOf('fk') || 0 < this.indexOf('reference', true) ) {
+                if( this.isOption('fk') || 0 < this.indexOf('reference', true) ) {
                     const parent = this.refId();
                     let type = 'number';
                     if( ret == 'integer' )
                         type = ret;
                     let refNode = ddl.find(parent);
-                    if( refNode != null && refNode.getExplicitPkNode() != null )
-                        type = refNode.getExplicitPkNode().parseType(pure=>true);
+                    if( refNode != null && refNode.getExplicitPkName() != null )
+                        type = refNode.getPkType();
                     return type;
                 }     
                 return ret;
             }	
 
 
-            if( 0 < this.indexOf('unique') ) {
+            if( this.isOption('unique') || this.isOption('uk') ) {
                 ret += '\n';  
                 ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+parent_child+'_unq unique';
             } 
             var optQuote = '\'';
             if(  ret.startsWith('integer') || ret.startsWith('number') || ret.startsWith('date')  ) 
                 optQuote = '';
-            if( 0 < this.indexOf('default') ) {
+            if( this.isOption('default') ) {
                 let value = '';
                 for( let i = this.indexOf('default')+1; i < src.length; i++ ) {
                     const token = src[i].value;
@@ -372,20 +398,20 @@ let tree = (function(){
                 }
                 ret +=' default '+'on null ' + optQuote+value+optQuote ;
             }
-            if( 0 < this.indexOf('nn') || this.indexOf('not')+1== this.indexOf('null') )
+            if( this.isOption('nn') || this.indexOf('not')+1== this.indexOf('null') )
                 if( this.indexOf('pk') < 0 ) 
                     ret += ' not null';
-            if( 0 < this.indexOf('hidden') || 0 < this.indexOf('invincible') ) 
+            if( this.isOption('hidden') || this.isOption('invincible') ) 
                 ret += ' invisible';
             ret += this.genConstraint(optQuote);
             ret += booleanCheck;
-            if( 0 < this.indexOf('between') ) {
+            if( this.isOption('between') ) {
                 const bi = this.indexOf('between');
                 const values = src[bi+1].value + ' and ' + src[bi+3].value;
                 ret +=' constraint '+concatNames(parent_child,'_bet')+'\n';
                 ret +='           check ('+this.parseName()+' between '+values+')';        		
             }
-            if( 0 < this.indexOf('pk') ) {
+            if( this.isOption('pk') ) {
                 let typeModifier = ' not null';
                 if( ret.startsWith('number') && ddl.optionEQvalue('pk', 'identityDataType') )
                     typeModifier = ' GENERATED BY DEFAULT ON NULL AS IDENTITY'.toLowerCase();
@@ -404,7 +430,7 @@ let tree = (function(){
 
         this.genConstraint = function ( optQuote ) {
             let ret = '';
-            if( 0 < this.indexOf('check') ) {
+            if( this.isOption('check') ) {
                 let parentPref = '';
                 if( parent != null )
                     parentPref = parent.parseName()+'_';
@@ -444,19 +470,20 @@ let tree = (function(){
         }
 
         this.isMany2One = function() {
-            var tmp = this.trimmedContent();
-            var pos = tmp.indexOf('>');
-            if( 0 == pos )
-                return true;
-            return false;
+            return this.src[0].value == '>';
         };
         
-        this.getExplicitPkNode = function() {
+        this.getExplicitPkName = function() {
+            if( this.isOption('pk') ) {
+                if( this.parseType() == 'table' )
+                    return this.getOptionValue('pk');
+                else
+                    return this.parseName();
+            }
             for( var i = 0; i < this.children.length; i++ ) {
                 var child = this.children[i];
-                var tmp = child.trimmedContent().toLowerCase();
-                if( 0 < tmp.indexOf('/pk') )
-                    return child;
+                if( child.isOption('pk') )
+                    return child.parseName();
             }
             return null;
         };
@@ -523,7 +550,7 @@ let tree = (function(){
             var start;
             var end;
             var values;
-            if( 0 <= tmp.indexOf('/CHECK') || 0 <= tmp.indexOf('/VALUES') ) {
+            if( this.isOption('check') || this.isOption('values') ) {
                 var substr = '/CHECK';
                 start = tmp.indexOf(substr);
                 if( start < 0 ) {
@@ -540,7 +567,7 @@ let tree = (function(){
                 } else
                     return values.split(' ');
             }
-            if( 0 <= tmp.indexOf('/BETWEEN') ) {
+            if( this.isOption('between') ) {
                 start = tmp.indexOf('/BETWEEN');
                 end = tmp.lastIndexOf('/');
                 if( end == start)
@@ -585,8 +612,7 @@ let tree = (function(){
         this.getGenIdColName = function () {
             if( this.parseType() != 'table' )
                 return null;
-            let ret = this.getExplicitPkNode();
-            if( ret != null )
+            if( this.getExplicitPkName() != null )
                 return null;
             if( ddl.optionEQvalue('Auto Primary Key','yes') ) {
                 let colPrefix = '';
@@ -601,12 +627,17 @@ let tree = (function(){
         this.getPkName = function () {
             let id = this.getGenIdColName();
             if( id == null ) {
-                let pkn = this.getExplicitPkNode();
-                if( pkn == null )
-                    return null;
-                return pkn.parseName();
+                return this.getExplicitPkName();
             }
             return id;
+        }
+        this.getPkType = function () {
+            let id = this.getGenIdColName();
+            if( id == null ) {
+                const cname = this.getExplicitPkName();
+                return this.findChild(cname).parseType(pure=>true);
+            }
+            return 'number';
         }
 
         this.singleDDL = function() {
@@ -625,22 +656,17 @@ let tree = (function(){
 
             if( !this.isMany2One() ) {
                 if( this.parent != null && this.parseType() == 'table' )
-                    this.fks[singular(this.parent.parseName())+'_id']=this.parent.parseName();
-                    //this.fks[singular(this.parent.getPkName())]=this.parent.parseName();
+                    //this.fks[singular(this.parent.parseName())+'_id']=this.parent.parseName();
+                    this.fks[singular(this.parent.getPkName())]=this.parent.parseName();
                 for( let i = 0; i < this.children.length; i++ ) 
                     if( this.children[i].refId() != null ) {
                         this.fks[this.children[i].parseName()]=this.children[i].refId();
                     }
             } //...else   -- too lae to do here, performed earlier, during recognize()
             
-
-            const nodeContent = this.trimmedContent().toUpperCase();
-            var colPrefPos = nodeContent.indexOf('/COLPREFIX ');
-            if( 0 < colPrefPos ) {
-                let cut = nodeContent.substr(colPrefPos+'/COLPREFIX '.length);
-                let cuts = cut.split(' ');
-                this.colprefix= cuts[0];
-            }
+            const cp = this.getOptionValue('colprefix');
+            if( cp != null )
+                this.colprefix = cp;
 
             //var indexedColumns = [];
             var ret = '';
@@ -654,7 +680,7 @@ let tree = (function(){
             var pad = tab+' '.repeat(this.maxChildNameLen() - 'ID'.length);
 
             let idColName = this.getGenIdColName();
-            if( idColName != null ) {
+            if( idColName != null && !this.isOption('pk') ) {
                 let typeModifier = 'not null';
                 if( ddl.optionEQvalue('pk', 'identityDataType') )
                     typeModifier = 'GENERATED BY DEFAULT ON NULL AS IDENTITY'.toLowerCase();
@@ -666,23 +692,41 @@ let tree = (function(){
                 const obj_col = concatNames(ddl.objPrefix('no schema')  + this.parseName(),'_',idColName);  
                 ret += tab +  tab+' '.repeat(this.maxChildNameLen()) +'constraint '+concatNames(obj_col,'_pk')+' primary key,\n';
             } else {
-                let pkNode = this.getExplicitPkNode();
-                if( pkNode != null ) {
-                    let pad = tab + ' '.repeat(this.maxChildNameLen() - pkNode.parseName().length);
-                    ret += tab +  pkNode.parseName() + pad + pkNode.parseType() + ',\n';
+                let pkName = this.getExplicitPkName();
+                if( pkName != null && pkName.indexOf(',') < 0 ) {
+                    let pad = tab + ' '.repeat(this.maxChildNameLen() - pkName.length);
+                    let type = 'number';
+                    const child = this.findChild(pkName);
+                    if( child != null )
+                        type = child.parseType();
+                    ret += tab +  pkName + pad + type + ',\n';
                 }
             }
  
-            for( let fk in this.fks ) {	
-                let parent = this.fks[fk];	
+            for( let fk in this.fks ) {
+                let parent = this.fks[fk];
+                if( 0 < fk.indexOf(',') ) {
+                    let refNode = ddl.find(parent);
+                    var chunks = split_str(fk,', ');
+                    for( var i = 0; i < chunks.length; i++ ) {
+                        var col = chunks[i];
+                        if( col == ',' )
+                            continue;
+                        const pChild = refNode.findChild(col);
+                        pad = tab+' '.repeat(this.maxChildNameLen() - col.length);
+                        ret += tab + col   + pad + pChild.parseType(pure=>true) + ',\n';  
+                    }
+                    continue;
+                }
                 let type = 'number';
                 const attr = this.findChild(fk);
                 if( attr != null )
                     type = attr.parseType('fk');		
                 let refNode = ddl.find(parent);
-                let _id = '';    
-                if( refNode != null && refNode.getExplicitPkNode() != null )
-                    type = refNode.getExplicitPkNode().parseType(pure=>true);
+                let _id = ''; 
+                const rname = refNode.getExplicitPkName();  
+                if( refNode != null && rname != null && rname.indexOf(',') < 0 )
+                    type = refNode.getPkType();  
                 else if( refNode == null ) {
                     refNode = ddl.find(fk);
                     if( refNode.isMany2One() & !fk.endsWith('_id') ) {
@@ -695,7 +739,7 @@ let tree = (function(){
                 ret += tab + fk + _id  + pad + type + '\n';  
                 ret += tab + tab+' '.repeat(this.maxChildNameLen()) + 'constraint '+objName+'_'+fk+'_fk\n';
                 let onDelete = '';
-                if( 0 <= nodeContent.indexOf('/CASCADE')) 
+                if( this.isOption('cascade')) 
                     onDelete = ' on delete cascade';
                 let	notNull = '';
                 for( let c in this.children ) {
@@ -712,7 +756,7 @@ let tree = (function(){
                 ret += tab + tab+' '.repeat(this.maxChildNameLen()) + 'references '+ddl.objPrefix()+parent+onDelete+notNull+',\n';
             }
 
-            if( ddl.optionEQvalue('rowkey',true) || 0 < nodeContent.indexOf('/ROWKEY') ) {
+            if( ddl.optionEQvalue('rowkey',true) || this.isOption('rowkey') ) {
                 let pad = tab+' '.repeat(this.maxChildNameLen() - 'ROW_KEY'.length);
                 ret += tab +  'row_key' + pad + 'varchar2(30 char)\n';              	
                 ret += tab +  tab+' '.repeat(this.maxChildNameLen()) +'constraint '+objName+'_row_key_unq unique not null,\n';
@@ -725,9 +769,9 @@ let tree = (function(){
                 if( 0 < child.children.length ) {
                     continue;
                 }
-                if (child.refId() == null  ) {
-                    if( child == this.getExplicitPkNode() )
-                        continue; //ret += '--';
+                if( child.refId() == null ) {
+                    if( child.parseName() == this.getExplicitPkName() )
+                        continue; 
                     ret += tab + child.singleDDL() +',\n';
                     if( 0 < child.indexOf('file') ) {
                         const col = child.parseName().toUpperCase();
@@ -746,11 +790,12 @@ let tree = (function(){
                     }
                 } 
             }
-            if( ddl.optionEQvalue('rowVersion','yes') || 0 < nodeContent.indexOf('/ROWVERSION') ) {
+            if( ddl.optionEQvalue('rowVersion','yes') || this.isOption('rowversion') ) {
                 let pad = tab+' '.repeat(this.maxChildNameLen() - 'row_version'.length);
                 ret += tab +  'row_version' + pad + 'integer not null,\n';              	
             }            	
-            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < nodeContent.indexOf('/AUDITCOLS') || 0 < nodeContent.indexOf('/AUDIT COL')  ) {
+            if( ddl.optionEQvalue('Audit Columns','yes') || this.isOption('auditcols') 
+                      || this.isOption('audit','col') || this.isOption('audit','cols') || this.isOption('audit','columns') ) {
                 let created = ddl.getOptionValue('createdcol');
                 let pad = tab+' '.repeat(this.maxChildNameLen() - created.length);
                 ret += tab +  created + pad + ddl.getOptionValue('Date Data Type').toLowerCase() + ' not null,\n';  
@@ -773,15 +818,19 @@ let tree = (function(){
             ret += this.genConstraint();
             if( ret.lastIndexOf(',\n') == ret.length-2 )
                 ret = ret.substring(0,ret.length-2)+'\n';
-            ret += ')'+(ddl.optionEQvalue('compress','yes') || 0 < nodeContent.indexOf('/COMPRESS')?' compress':'')+';\n\n';
+            ret += ')'+(ddl.optionEQvalue('compress','yes') || this.isOption('compress')?' compress':'')+';\n\n';
             
-            const auditPos = nodeContent.indexOf('/AUDIT');
-            const auditcolsPos = nodeContent.indexOf('/AUDITCOLS');
-            const auditcolPos = nodeContent.indexOf('/AUDIT COL');
-            if( 0 < auditPos && auditcolsPos < 0 && auditcolPos < 0 ) {
+            if( this.isOption('audit') && !this.isOption('auditcols') && 
+                           !this.isOption('audit','col') && !this.isOption('audit','cols') && !this.isOption('audit','columns') ) {
                 ret += 'audit all on '+objName+';\n\n';
             }
      
+            for( let fk in this.fks ) {
+                if( 0 < fk.indexOf(',') ) {
+                    var parent = this.fks[fk];
+                    ret +=  'alter table '+objName+' add constraint '+parent+'_'+objName+'_fk foreign key ('+fk+') references '+parent+';\n\n';
+                }
+            }
             let num = 1;
             for( let fk in this.fks ) {
                 if( !this.isMany2One() ) {
@@ -797,19 +846,19 @@ let tree = (function(){
 
                 }
             }
-            
-            let uniquePos = nodeContent.indexOf('/UNIQUE ');
-            if( 0 < uniquePos ) {
-                let cut = nodeContent.substr(uniquePos+'/UNIQUE '.length);
-                let endPos = cut.indexOf('/');
-                if( 0 < endPos )
-                    cut = cut.substring(0,endPos).trim();
-                /*let cols = cut.split(',');
-                for( var i = 0; i < colss.length; i++ ) { 
-                    let col = cols[i].trim();
-                }*/
+ 
+            let cut = this.getOptionValue('pk');
+            if( cut /*!= null*/ ) {
+                ret += 'alter table '+objName+' add constraint '+objName+'_pk primary key ('+cut+');\n\n';
+            }
+
+            cut = this.getOptionValue('unique');
+            if( cut == null )
+                cut = this.getOptionValue('uk');
+            if( cut != null ) {
                 ret += 'alter table '+objName+' add constraint '+objName+'_uk unique ('+cut+');\n\n';
             }
+
 
             //var j = 1;
             for( let i = 0; i < this.children.length; i++ ) {
@@ -1014,9 +1063,7 @@ let tree = (function(){
         this.restEnable = function() {
             if( this.parseType() != 'table' ) 
                 return '';
-            const nodeContent = this.trimmedContent().toUpperCase();
-            let restPos = nodeContent.indexOf('/REST');
-            if( restPos < 0 ) 
+            if( !this.isOption('rest') ) 
                 return '';
             let name = this.parseName();
             const isQuoted = 0 == name.indexOf('"');
@@ -1151,8 +1198,8 @@ let tree = (function(){
                 let parent = this.fks[fk];				
                 let type = 'number';
                 let refNode = ddl.find(parent);
-                if( refNode != null && refNode.getExplicitPkNode() != null )
-                    type = refNode.getExplicitPkNode().parseType(pure=>true);
+                if( refNode != null && refNode.getExplicitPkName() != null )
+                    type = refNode.getPkType();
                 //pad = tab+tab+' '.repeat(this.maxChildNameLen() - fk.length);
                 ret += ',\n';
                 ret += tab+tab+'P_'+fk+'   '+mode+'  '+type+modifier;
@@ -1187,8 +1234,8 @@ let tree = (function(){
                 let parent = this.fks[fk];				
                 let type = 'number';
                 let refNode = ddl.find(parent);
-                if( refNode != null && refNode.getExplicitPkNode() != null )
-                    type = refNode.getExplicitPkNode().parseType(pure=>true);
+                if( refNode != null && refNode.getExplicitPkName() != null )
+                    type = refNode.getPkType();
                 //pad = tab+tab+' '.repeat(this.maxChildNameLen() - fk.length);
                 if( kind == 'insert' || kind == 'update' ) 
                     ret += ',\n';
@@ -1342,9 +1389,8 @@ let tree = (function(){
                     pkName = idColName;
                     insert += tab + pkName +',\n';
                 } else {
-                    let pkNode = this.getExplicitPkNode();
-                    if( pkNode != null ) {
-                        pkName = pkNode.parseName();
+                    let pkName = this.getExplicitPkName();
+                    if( pkName != null ) {
                         insert += tab + pkName +',\n';
                     }
                 }
@@ -1367,14 +1413,14 @@ let tree = (function(){
                     if( idColName != null && child.parseName() == 'id' )
                         continue;
                     if (child.refId() == null  ) {
-                        if( child == this.getExplicitPkNode() )
+                        if( child.isOption('pk') )
                             continue; //insert += '--';
                         if( 0 == child.children.length ) 
                             insert += tab+child.parseName()+',\n';
                     }
                 }
                 if( insert.lastIndexOf(',\n') == insert.length-2 )
-                    insert = insert.substr(0,insert.length-2)+'\n';
+                    insert = insert.substring(0,insert.length-2)+'\n';
 
                 insert += ') values (\n';
 
@@ -1382,9 +1428,9 @@ let tree = (function(){
                     pkValue = i+1;
                     insert += tab + pkValue + ',\n'; 
                 } else {
-                    let pkNode = this.getExplicitPkNode();
-                    if( pkNode != null ) {
-                        const field = pkNode.parseName();
+                    let pkName = this.getExplicitPkName();
+                    if( pkName != null ) {
+                        const field = pkName;
                         let tmp = getValue(ddl.data, null /*no name at level 0*/, field, this.parseName());
                         let v = -1;
                         if( elem != null )
@@ -1448,7 +1494,7 @@ let tree = (function(){
                     if( idColName != null && child.parseName() == 'id' )
                         continue;
                     if (child.refId() == null  ) {
-                        if( child == this.getExplicitPkNode() )
+                        if( child.parseName() == this.getExplicitPkName() )
                             continue; //insert += '--';
                         if( 0 == child.children.length )  {
                             let values = child.parseValues();
@@ -1516,89 +1562,9 @@ let tree = (function(){
             return this.children.some((c) => c.children.length > 0 &&
              c.parseName() == name && !c.isArray());
         };
-        this.generateSelectJsonBottomUp = function( indent) {
-            throw new Error("generateSelectJsonBottomUp() not implemented yet");
-            /*var name = this.parseName();
-            var ret = indent + '\'' + this.getGenIdColName() + '\' : ' + name +'.id,\n';
-            for( var j = 0; j < this.children.length; j++ ) {
-                var child = this.children[j];
-                var cname = child.parseName();
-                if( 0 == child.children.length ) {
-                    ret += indent + '\'' + cname + '\' : ' + name + '.' + cname + ',\n';
-                }
-            }
-            var ptbl = this.parent;
-            if( ptbl != null ) { 
-                var pname = ptbl.parseName();
-                ret += indent + '\'' + pname + '\' : (\n';
-                indent += '  ';
-                ret += indent + 'select JSON {\n';
-                ret += ptbl.generateSelectJsonBottomUp( indent + '  ');
-                ret += indent + '} from ' + ptbl.parseName() + ' ' + pname + ' with (UPDATE)\n';
-                ret += indent + 'where ' + name + '.' + pname + '_id = ' + pname + '.ID\n';
-                indent = indent.slice(0, -2);
-                ret += indent + ')\n';
-            } else {
-                ret = ret.slice(0, -2) + '\n';
-            }
-            return ret;	*/
-        };
-        this.one2many2oneUnsupoported = "one to many to one is not supported";
-        this.generateSelectJsonTopDown = function( indent ) {
-            var name = this.parseName();
-            let ret = '';
-            if( this.getExplicitPkNode == null )
-                ret += indent + '\'' + this.getGenIdColName() + '\' : ' + name + '.'+this.getGenIdColName()+',\n';
-            for( var j = 0; j < this.children.length; j++ ) {
-                var child = this.children[j];
-                var cname = child.parseName();
-                if( 0 == child.children.length ) {
-                    if (this.hasNonArrayChildId(cname))
-                        continue;
-                    ret += indent + '\'' + cname + '\' : ' + name + '.' + cname;
-                } else {
-                    ret += indent + '\'' + cname + '\' : [\n';
-                    var isArray = !child.isMany2One();
-                    indent += '  ';
-                    ret += indent + 'select ' + /*(isArray?'JSON_ARRAYAGG(':'') +*/ 'JSON {\n';
-                    if( this.isMany2One() )
-                        throw new Error(this.one2many2oneUnsupoported);
-                    ret += child.generateSelectJsonTopDown(indent + '  ');
-                    ret += indent + ' WITH NOCHECK }' +  ' from ' + cname + ' with INSERT UPDATE\n';
-                    var names = /*isArray? [name, cname] :*/ [cname, name];
-                    let cfk = null;
-                    for( var k in child.fks ) {
-                        var parent = child.fks[k];
-                        if( parent == name ) {
-                            cfk = k;
-                            break;
-                        }
-                    }
-                    const thisRef = name + '.' + this.getPkName(); 
-                    const childRef = cname + '.' + cfk; 
-                    ret += indent + 'where ' + childRef  + ' = ' + thisRef +'\n';
-                    indent = indent.slice(0, -2);
-                    ret += indent + ']';
-                }
-                ret += (j < this.children.length - 1)? ',\n' : '\n';
-            }
-            return (ret[ret.length-2] == ',')? ret.slice(0, -2) + '\n' : ret;
-        };
+
         this.generateDualityView = function() {
-            var tmp = this.trimmedContent();
-            var chunks = tmp.split(' ');
-            if( 3 < chunks.length )
-                throw 'max 1 table is allowed in DV';  
-            var ret = '';
-            var tbl = ddl.find(chunks[2]);
-            if( tbl != null) {
-                ret += 'create or replace json relational duality view ' + chunks[1] + ' as\n';
-                ret += 'select JSON {\n';
-                ret += tbl.isMany2One()? tbl.generateSelectJsonBottomUp('  ') :        
-                       tbl.generateSelectJsonTopDown('  ');
-                ret += '} from ' + tbl.parseName() /*+ ' ' + chunks[2]*/ + ' with INSERT UPDATE DELETE;\n\n';
-            }
-            return ret;
+            return '/* not supported yet*/';  
         };
         
     }

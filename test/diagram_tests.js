@@ -8,7 +8,6 @@ function assert( condition ) {
         console.error("Failed: "+condition);
         throw new Error('Test failed');
     }   
-    console.log('.\r');  
 }
 
 var output;
