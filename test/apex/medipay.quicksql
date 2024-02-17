@@ -44,7 +44,7 @@ user_claims
   receipt_from_id                number /nn /fk user_sources
   receipt_date                   date  /nn
   receipt_amount                 number  /nn
-  claimant                       number  /FK users
+  claimant                       number  /fk users
   status                         vc80
   payment_txn_id                 number
   reimburse_percentage           number

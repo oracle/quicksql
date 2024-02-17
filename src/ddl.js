@@ -325,8 +325,8 @@ export const quicksql = (function () {
                     if( pkNode == null )
                         continue;
                     let pk = 'id';
-                    if( pkNode.getExplicitPkNode() != null )
-                        pk = pkNode.getExplicitPkNode().parseName();				
+                    if( pkNode.getExplicitPkName() != null )
+                        pk = pkNode.getExplicitPkName();				
  
                     output.links.push({source: this.objPrefix() +parent, source_id: pk,
                                        target: this.objPrefix() + descendants[i].parseName(''), target_id: fk

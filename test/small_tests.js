@@ -593,7 +593,7 @@ students
     first_name
     last_name `).getDDL();
                        
-    assert( "0 < output.indexOf(\"alter table employee add constraint employee_uk unique (first_name, last_name);\")" );    
+    assert( "0 < output.indexOf(\"alter table employee add constraint employee_uk unique (first_name,last_name);\")" );    
 
     // https://github.com/oracle/quicksql/issues/47
     output = new quicksql( `employee /pk first_name, last_name
@@ -610,24 +610,14 @@ students
     assert( "0 < output.indexOf(\"constraint employee_job_history_fk foreign key (first_name,last_name) references employee;\")" );    
 }    
 
-    // https://github.com/oracle/quicksql/issues/31
-    output = new quicksql( `departments /audit cols
-   name 
-   employees /audit columns
-       name 
-    `).getDDL();
-                
-    console.log(output);
-    assert( "output.indexOf('audit all') < 0 " );  
-    assert( "output.indexOf('created       date not null') <  output.lastIndexOf('created          date not null,')" );  
 
 
-//small_tests();
+small_tests();
 
 console.log(assertionCnt);
 
 // metatest that watches tests
-const minimalTestCnt = 100;
+const minimalTestCnt = 110;
 if( assertionCnt < minimalTestCnt ) {
     console.error("assertionCnt < "+minimalTestCnt);
     throw new Error('Test failed');

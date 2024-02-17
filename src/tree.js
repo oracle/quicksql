@@ -131,8 +131,8 @@ let tree = (function(){
 
         this.isOption = function( token, token2 ) {
             for( let i = 2; i < this.src.length; i++ ) {
-                if( token == this.src[i].value )
-                    if( token2 == null || i < this.src.length-1 && token2 ==this.src[i+1].value)
+                if( token == this.src[i].value.toLowerCase() )
+                    if( token2 == null || i < this.src.length-1 && token2 ==this.src[i+1].value.toLowerCase() )
                         return this.src[i-1].value == '/';
             }
             return false;
@@ -146,7 +146,7 @@ let tree = (function(){
                 return null;
 
             let ret = '';
-            for( let i = pos+1; i < this.src.length && this.src[i] != '/'; i++ )
+            for( let i = pos+1; i < this.src.length && this.src[i].value != '/'; i++ )
                 ret += this.src[i].value;
 
             return ret;
@@ -192,7 +192,7 @@ let tree = (function(){
             if( this.src[0].value == 'view' ) {
                 return this.src[1].value;
             }
-            if( 1 < this.src.length && this.src[0].value == '=' ) {
+            if( 1 < this.src.length && this.src[1].value == '=' ) {
                 return this.src[0].value;
             }
             rEt = replaceTrailing(rEt,' d');
@@ -655,9 +655,13 @@ let tree = (function(){
 
 
             if( !this.isMany2One() ) {
-                if( this.parent != null && this.parseType() == 'table' )
-                    //this.fks[singular(this.parent.parseName())+'_id']=this.parent.parseName();
-                    this.fks[singular(this.parent.getPkName())]=this.parent.parseName();
+                if( this.parent != null && this.parseType() == 'table' ) {
+                    const pkn = this.parent.getPkName();
+                    if( pkn.indexOf(',') < 0 )
+                        this.fks[singular(this.parent.parseName())+'_id']=this.parent.parseName();
+                    else
+                        this.fks[singular(this.parent.getPkName())]=this.parent.parseName();
+                }
                 for( let i = 0; i < this.children.length; i++ ) 
                     if( this.children[i].refId() != null ) {
                         this.fks[this.children[i].parseName()]=this.children[i].refId();
@@ -724,10 +728,11 @@ let tree = (function(){
                     type = attr.parseType('fk');		
                 let refNode = ddl.find(parent);
                 let _id = ''; 
-                const rname = refNode.getExplicitPkName();  
-                if( refNode != null && rname != null && rname.indexOf(',') < 0 )
-                    type = refNode.getPkType();  
-                else if( refNode == null ) {
+                if( refNode != null ) {
+                    const rname = refNode.getExplicitPkName();  
+                    if( rname != null && rname.indexOf(',') < 0 )
+                        type = refNode.getPkType();  
+                } else {
                     refNode = ddl.find(fk);
                     if( refNode.isMany2One() & !fk.endsWith('_id') ) {
                         parent = fk;
