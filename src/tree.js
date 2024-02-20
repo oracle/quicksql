@@ -746,15 +746,18 @@ let tree = (function(){
                 let onDelete = '';
                 if( this.isOption('cascade')) 
                     onDelete = ' on delete cascade';
+                else if( this.isOption('setnull')) 
+                    onDelete = ' on delete set null';
                 let	notNull = '';
                 for( let c in this.children ) {
                     let child = this.children[c];
                     if( fk == child.parseName() )  {
-                        let tmp = child.trimmedContent().toUpperCase();
-                        if( 0 <= tmp.indexOf('/NN') || 0 <= tmp.indexOf('/NOTNULL')  ) 
+                        if( child.isOption('nn') || child.isOption('notnull')  ) 
                             notNull = ' NOT NULL'.toLowerCase();        
-                        if( 0 <= tmp.indexOf('/CASCADE')  ) 
-                            onDelete = ' on delete cascade';       
+                        if( child.isOption('cascade')  ) 
+                            onDelete = ' on delete cascade';  
+                        else if( this.isOption('setnull')) 
+                            onDelete = ' on delete set null';
                         break;
                     }
                 }

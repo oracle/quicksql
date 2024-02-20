@@ -604,12 +604,24 @@ students
         end_date
     `).getDDL();
                         
-    //console.log(output);
-    assert( "output.indexOf(\"employee_id\") < 0" );   // neither in employees and job_history tables
+     assert( "output.indexOf(\"employee_id\") < 0" );   // neither in employees and job_history tables
     assert( "0 < output.indexOf(\"alter table employee add constraint employee_pk primary key (first_name,last_name);\")" );    
-    assert( "0 < output.indexOf(\"constraint employee_job_history_fk foreign key (first_name,last_name) references employee;\")" );    
+    assert( "0 < output.indexOf(\"constraint employee_job_history_fk foreign key (first_name,last_name) references employee;\")" );  
+    
+    // https://github.com/oracle/quicksql/issues/52
+    output = new quicksql(`dept
+    dname
+    emp /setnull
+        dept_id
+        ename
+    `).getDDL();
+    
+    //console.log(output);
+    assert( "0 < output.indexOf('dept_id    number')" );
+    assert( "0 < output.indexOf('constraint emp_dept_id_fk')" );
+    assert( "0 < output.indexOf('references dept on delete set null')" );
+        
 }    
-
 
 
 small_tests();
@@ -617,7 +629,7 @@ small_tests();
 console.log(assertionCnt);
 
 // metatest that watches tests
-const minimalTestCnt = 110;
+const minimalTestCnt = 115;
 if( assertionCnt < minimalTestCnt ) {
     console.error("assertionCnt < "+minimalTestCnt);
     throw new Error('Test failed');

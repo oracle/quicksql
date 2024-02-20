@@ -317,9 +317,9 @@ var re = { exports: {} };
         return S.indexOf(H) !== -1;
       };
       n && (c = n.comparator || c);
-      for (var m = [], C = 0, E, f = a * 50, A = P.call(arguments, 2); m.length < a; ) {
-        var v = JSON.parse(JSON.stringify(A));
-        if (E = e.apply(this, v), c(m, E) || (m.push(E), C = 0), ++C > f)
+      for (var m = [], C = 0, E, f = a * 50, v = P.call(arguments, 2); m.length < a; ) {
+        var A = JSON.parse(JSON.stringify(v));
+        if (E = e.apply(this, A), c(m, E) || (m.push(E), C = 0), ++C > f)
           throw new RangeError("Chance: num is likely too large for sample set");
       }
       return m;
@@ -370,19 +370,19 @@ var re = { exports: {} };
       }
       if (c === 0)
         throw new RangeError("Chance: No valid entries in array weights");
-      var E = this.random() * c, f = 0, A = -1, v;
+      var E = this.random() * c, f = 0, v = -1, A;
       for (C = 0; C < a.length; ++C) {
         if (m = a[C], f += m, m > 0) {
           if (E <= f) {
-            v = C;
+            A = C;
             break;
           }
-          A = C;
+          v = C;
         }
-        C === a.length - 1 && (v = A);
+        C === a.length - 1 && (A = v);
       }
-      var S = e[v];
-      return n = typeof n > "u" ? !1 : n, n && (e.splice(v, 1), a.splice(v, 1)), S;
+      var S = e[A];
+      return n = typeof n > "u" ? !1 : n, n && (e.splice(A, 1), a.splice(A, 1)), S;
     }, i.prototype.paragraph = function(e) {
       e = o(e);
       var a = e.sentences || this.natural({ min: 3, max: 7 }), n = this.n(this.sentence, a), c = e.linebreak === !0 ? `
@@ -446,10 +446,10 @@ var re = { exports: {} };
         });
       } else if (e && (e.minAge !== void 0 || e.maxAge !== void 0)) {
         t(e.minAge < 0, "Chance: MinAge cannot be less than zero."), t(e.minAge > e.maxAge, "Chance: MinAge cannot be greater than MaxAge.");
-        var E = e.minAge !== void 0 ? e.minAge : 0, f = e.maxAge !== void 0 ? e.maxAge : 100, A = new Date(c - f - 1, n.getMonth(), n.getDate()), v = new Date(c - E, n.getMonth(), n.getDate());
-        A.setDate(A.getDate() + 1), v.setDate(v.getDate() + 1), v.setMilliseconds(v.getMilliseconds() - 1), e = o(e, {
-          min: A,
-          max: v
+        var E = e.minAge !== void 0 ? e.minAge : 0, f = e.maxAge !== void 0 ? e.maxAge : 100, v = new Date(c - f - 1, n.getMonth(), n.getDate()), A = new Date(c - E, n.getMonth(), n.getDate());
+        v.setDate(v.getDate() + 1), A.setDate(A.getDate() + 1), A.setMilliseconds(A.getMilliseconds() - 1), e = o(e, {
+          min: v,
+          max: A
         });
       } else
         e = o(e, {
@@ -501,9 +501,9 @@ var re = { exports: {} };
     }, i.prototype.mrz = function(e) {
       var a = function(m) {
         var C = "<ABCDEFGHIJKLMNOPQRSTUVWXYXZ".split(""), E = [7, 3, 1], f = 0;
-        return typeof m != "string" && (m = m.toString()), m.split("").forEach(function(A, v) {
-          var S = C.indexOf(A);
-          S !== -1 ? A = S === 0 ? 0 : S + 9 : A = parseInt(A, 10), A *= E[v % E.length], f += A;
+        return typeof m != "string" && (m = m.toString()), m.split("").forEach(function(v, A) {
+          var S = C.indexOf(v);
+          S !== -1 ? v = S === 0 ? 0 : S + 9 : v = parseInt(v, 10), v *= E[A % E.length], f += v;
         }), f % 10;
       }, n = function(m) {
         var C = function(f) {
@@ -670,12 +670,12 @@ var re = { exports: {} };
         return [U, U, U].join($ || "");
       }
       function n(U) {
-        var $ = U ? "rgba" : "rgb", ee = U ? "," + this.floating({ min: z, max: J }) : "", ae = m ? a(this.natural({ min: C, max: E }), ",") : this.natural({ min: v, max: S }) + "," + this.natural({ min: H, max: F }) + "," + this.natural({ max: 255 });
+        var $ = U ? "rgba" : "rgb", ee = U ? "," + this.floating({ min: z, max: J }) : "", ae = m ? a(this.natural({ min: C, max: E }), ",") : this.natural({ min: A, max: S }) + "," + this.natural({ min: H, max: F }) + "," + this.natural({ max: 255 });
         return $ + "(" + ae + ee + ")";
       }
       function c(U, $, ee) {
         var ae = ee ? "#" : "", q = "";
-        return m ? (q = a(this.pad(this.hex({ min: C, max: E }), 2)), e.format === "shorthex" && (q = a(this.hex({ min: 0, max: 15 })))) : e.format === "shorthex" ? q = this.pad(this.hex({ min: Math.floor(f / 16), max: Math.floor(A / 16) }), 1) + this.pad(this.hex({ min: Math.floor(v / 16), max: Math.floor(S / 16) }), 1) + this.pad(this.hex({ min: Math.floor(H / 16), max: Math.floor(F / 16) }), 1) : f !== void 0 || A !== void 0 || v !== void 0 || S !== void 0 || H !== void 0 || F !== void 0 ? q = this.pad(this.hex({ min: f, max: A }), 2) + this.pad(this.hex({ min: v, max: S }), 2) + this.pad(this.hex({ min: H, max: F }), 2) : q = this.pad(this.hex({ min: C, max: E }), 2) + this.pad(this.hex({ min: C, max: E }), 2) + this.pad(this.hex({ min: C, max: E }), 2), ae + q;
+        return m ? (q = a(this.pad(this.hex({ min: C, max: E }), 2)), e.format === "shorthex" && (q = a(this.hex({ min: 0, max: 15 })))) : e.format === "shorthex" ? q = this.pad(this.hex({ min: Math.floor(f / 16), max: Math.floor(v / 16) }), 1) + this.pad(this.hex({ min: Math.floor(A / 16), max: Math.floor(S / 16) }), 1) + this.pad(this.hex({ min: Math.floor(H / 16), max: Math.floor(F / 16) }), 1) : f !== void 0 || v !== void 0 || A !== void 0 || S !== void 0 || H !== void 0 || F !== void 0 ? q = this.pad(this.hex({ min: f, max: v }), 2) + this.pad(this.hex({ min: A, max: S }), 2) + this.pad(this.hex({ min: H, max: F }), 2) : q = this.pad(this.hex({ min: C, max: E }), 2) + this.pad(this.hex({ min: C, max: E }), 2) + this.pad(this.hex({ min: C, max: E }), 2), ae + q;
       }
       e = o(e, {
         format: this.pick(["hex", "shorthex", "rgb", "rgba", "0x", "name"]),
@@ -692,8 +692,8 @@ var re = { exports: {} };
         min_alpha: 0,
         max_alpha: 1
       });
-      var m = e.grayscale, C = e.min, E = e.max, f = e.min_red, A = e.max_red, v = e.min_green, S = e.max_green, H = e.min_blue, F = e.max_blue, z = e.min_alpha, J = e.max_alpha;
-      e.min_red === void 0 && (f = C), e.max_red === void 0 && (A = E), e.min_green === void 0 && (v = C), e.max_green === void 0 && (S = E), e.min_blue === void 0 && (H = C), e.max_blue === void 0 && (F = E), e.min_alpha === void 0 && (z = 0), e.max_alpha === void 0 && (J = 1), m && C === 0 && E === 255 && f !== void 0 && A !== void 0 && (C = (f + v + H) / 3, E = (A + S + F) / 3);
+      var m = e.grayscale, C = e.min, E = e.max, f = e.min_red, v = e.max_red, A = e.min_green, S = e.max_green, H = e.min_blue, F = e.max_blue, z = e.min_alpha, J = e.max_alpha;
+      e.min_red === void 0 && (f = C), e.max_red === void 0 && (v = E), e.min_green === void 0 && (A = C), e.max_green === void 0 && (S = E), e.min_blue === void 0 && (H = C), e.max_blue === void 0 && (F = E), e.min_alpha === void 0 && (z = 0), e.max_alpha === void 0 && (J = 1), m && C === 0 && E === 255 && f !== void 0 && v !== void 0 && (C = (f + A + H) / 3, E = (v + S + F) / 3);
       var V;
       if (e.format === "hex")
         V = c.call(this, 2, 6, !0);
@@ -889,10 +889,10 @@ var re = { exports: {} };
           m = e.formatted ? C + " " + E + "-" + f : C + E + f;
           break;
         case "br":
-          var A = this.pick(["11", "12", "13", "14", "15", "16", "17", "18", "19", "21", "22", "24", "27", "28", "31", "32", "33", "34", "35", "37", "38", "41", "42", "43", "44", "45", "46", "47", "48", "49", "51", "53", "54", "55", "61", "62", "63", "64", "65", "66", "67", "68", "69", "71", "73", "74", "75", "77", "79", "81", "82", "83", "84", "85", "86", "87", "88", "89", "91", "92", "93", "94", "95", "96", "97", "98", "99"]), v;
-          e.mobile ? v = "9" + a.string({ pool: "0123456789", length: 4 }) : v = this.natural({ min: 2e3, max: 5999 }).toString();
+          var v = this.pick(["11", "12", "13", "14", "15", "16", "17", "18", "19", "21", "22", "24", "27", "28", "31", "32", "33", "34", "35", "37", "38", "41", "42", "43", "44", "45", "46", "47", "48", "49", "51", "53", "54", "55", "61", "62", "63", "64", "65", "66", "67", "68", "69", "71", "73", "74", "75", "77", "79", "81", "82", "83", "84", "85", "86", "87", "88", "89", "91", "92", "93", "94", "95", "96", "97", "98", "99"]), A;
+          e.mobile ? A = "9" + a.string({ pool: "0123456789", length: 4 }) : A = this.natural({ min: 2e3, max: 5999 }).toString();
           var S = a.string({ pool: "0123456789", length: 4 });
-          m = e.formatted ? "(" + A + ") " + v + "-" + S : A + v + S;
+          m = e.formatted ? "(" + v + ") " + A + "-" + S : v + A + S;
           break;
       }
       return m;
@@ -1083,15 +1083,15 @@ var re = { exports: {} };
         }).join(""), F.length > 3 && (H ? F = F.substr(0, 3) : F = F[0] + F.substr(2, 2)), F.length < 3 && (z = F, F = S.toUpperCase().split("").map(function(J) {
           return "AEIOU".indexOf(J) !== -1 ? J : void 0;
         }).join("").substr(0, 3 - z.length)), z = z + F), z;
-      }, A = function(S, H, F) {
+      }, v = function(S, H, F) {
         var z = ["A", "B", "C", "D", "E", "H", "L", "M", "P", "R", "S", "T"];
         return S.getFullYear().toString().substr(2) + z[S.getMonth()] + F.pad(S.getDate() + (H.toLowerCase() === "female" ? 40 : 0), 2);
-      }, v = function(S) {
+      }, A = function(S) {
         for (var H = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ", F = "ABCDEFGHIJABCDEFGHIJKLMNOPQRSTUVWXYZ", z = "ABCDEFGHIJKLMNOPQRSTUVWXYZ", J = "BAKPLCQDREVOSFTGUHMINJWZYX", V = 0, U = 0; U < 15; U++)
           U % 2 !== 0 ? V += z.indexOf(F[H.indexOf(S[U])]) : V += J.indexOf(F[H.indexOf(S[U])]);
         return z[V % 26];
       };
-      return E = E.concat(f(c, !0), f(n), A(m, a, this), C.toUpperCase().split("")).join(""), E += v(E.toUpperCase()), E.toUpperCase();
+      return E = E.concat(f(c, !0), f(n), v(m, a, this), C.toUpperCase().split("")).join(""), E += A(E.toUpperCase()), E.toUpperCase();
     }, i.prototype.pl_pesel = function() {
       for (var e = this.natural({ min: 1, max: 9999999999 }), a = this.pad(e, 10).split(""), n = 0; n < a.length; n++)
         a[n] = parseInt(a[n]);
@@ -1200,9 +1200,9 @@ var re = { exports: {} };
         throw new Error("Chance: Extensions must be an Array or Object");
       }
       if (a.fileType) {
-        var A = a.fileType;
-        if (c.indexOf(A) !== -1)
-          return C = this.pickone(this.get(n)[A]), m + "." + C;
+        var v = a.fileType;
+        if (c.indexOf(v) !== -1)
+          return C = this.pickone(this.get(n)[v]), m + "." + C;
         throw new RangeError("Chance: Expect file type value to be 'raster', 'vector', '3d' or 'document'");
       }
       return C = this.pickone(this.get(n)[this.pickone(c)]), m + "." + C;
@@ -7165,10 +7165,10 @@ var re = { exports: {} };
       return this.md5_cmn(n ^ (a | ~c), e, a, m, C, E);
     }, T.prototype.binl_md5 = function(e, a) {
       e[a >> 5] |= 128 << a % 32, e[(a + 64 >>> 9 << 4) + 14] = a;
-      var n, c, m, C, E, f = 1732584193, A = -271733879, v = -1732584194, S = 271733878;
+      var n, c, m, C, E, f = 1732584193, v = -271733879, A = -1732584194, S = 271733878;
       for (n = 0; n < e.length; n += 16)
-        c = f, m = A, C = v, E = S, f = this.md5_ff(f, A, v, S, e[n], 7, -680876936), S = this.md5_ff(S, f, A, v, e[n + 1], 12, -389564586), v = this.md5_ff(v, S, f, A, e[n + 2], 17, 606105819), A = this.md5_ff(A, v, S, f, e[n + 3], 22, -1044525330), f = this.md5_ff(f, A, v, S, e[n + 4], 7, -176418897), S = this.md5_ff(S, f, A, v, e[n + 5], 12, 1200080426), v = this.md5_ff(v, S, f, A, e[n + 6], 17, -1473231341), A = this.md5_ff(A, v, S, f, e[n + 7], 22, -45705983), f = this.md5_ff(f, A, v, S, e[n + 8], 7, 1770035416), S = this.md5_ff(S, f, A, v, e[n + 9], 12, -1958414417), v = this.md5_ff(v, S, f, A, e[n + 10], 17, -42063), A = this.md5_ff(A, v, S, f, e[n + 11], 22, -1990404162), f = this.md5_ff(f, A, v, S, e[n + 12], 7, 1804603682), S = this.md5_ff(S, f, A, v, e[n + 13], 12, -40341101), v = this.md5_ff(v, S, f, A, e[n + 14], 17, -1502002290), A = this.md5_ff(A, v, S, f, e[n + 15], 22, 1236535329), f = this.md5_gg(f, A, v, S, e[n + 1], 5, -165796510), S = this.md5_gg(S, f, A, v, e[n + 6], 9, -1069501632), v = this.md5_gg(v, S, f, A, e[n + 11], 14, 643717713), A = this.md5_gg(A, v, S, f, e[n], 20, -373897302), f = this.md5_gg(f, A, v, S, e[n + 5], 5, -701558691), S = this.md5_gg(S, f, A, v, e[n + 10], 9, 38016083), v = this.md5_gg(v, S, f, A, e[n + 15], 14, -660478335), A = this.md5_gg(A, v, S, f, e[n + 4], 20, -405537848), f = this.md5_gg(f, A, v, S, e[n + 9], 5, 568446438), S = this.md5_gg(S, f, A, v, e[n + 14], 9, -1019803690), v = this.md5_gg(v, S, f, A, e[n + 3], 14, -187363961), A = this.md5_gg(A, v, S, f, e[n + 8], 20, 1163531501), f = this.md5_gg(f, A, v, S, e[n + 13], 5, -1444681467), S = this.md5_gg(S, f, A, v, e[n + 2], 9, -51403784), v = this.md5_gg(v, S, f, A, e[n + 7], 14, 1735328473), A = this.md5_gg(A, v, S, f, e[n + 12], 20, -1926607734), f = this.md5_hh(f, A, v, S, e[n + 5], 4, -378558), S = this.md5_hh(S, f, A, v, e[n + 8], 11, -2022574463), v = this.md5_hh(v, S, f, A, e[n + 11], 16, 1839030562), A = this.md5_hh(A, v, S, f, e[n + 14], 23, -35309556), f = this.md5_hh(f, A, v, S, e[n + 1], 4, -1530992060), S = this.md5_hh(S, f, A, v, e[n + 4], 11, 1272893353), v = this.md5_hh(v, S, f, A, e[n + 7], 16, -155497632), A = this.md5_hh(A, v, S, f, e[n + 10], 23, -1094730640), f = this.md5_hh(f, A, v, S, e[n + 13], 4, 681279174), S = this.md5_hh(S, f, A, v, e[n], 11, -358537222), v = this.md5_hh(v, S, f, A, e[n + 3], 16, -722521979), A = this.md5_hh(A, v, S, f, e[n + 6], 23, 76029189), f = this.md5_hh(f, A, v, S, e[n + 9], 4, -640364487), S = this.md5_hh(S, f, A, v, e[n + 12], 11, -421815835), v = this.md5_hh(v, S, f, A, e[n + 15], 16, 530742520), A = this.md5_hh(A, v, S, f, e[n + 2], 23, -995338651), f = this.md5_ii(f, A, v, S, e[n], 6, -198630844), S = this.md5_ii(S, f, A, v, e[n + 7], 10, 1126891415), v = this.md5_ii(v, S, f, A, e[n + 14], 15, -1416354905), A = this.md5_ii(A, v, S, f, e[n + 5], 21, -57434055), f = this.md5_ii(f, A, v, S, e[n + 12], 6, 1700485571), S = this.md5_ii(S, f, A, v, e[n + 3], 10, -1894986606), v = this.md5_ii(v, S, f, A, e[n + 10], 15, -1051523), A = this.md5_ii(A, v, S, f, e[n + 1], 21, -2054922799), f = this.md5_ii(f, A, v, S, e[n + 8], 6, 1873313359), S = this.md5_ii(S, f, A, v, e[n + 15], 10, -30611744), v = this.md5_ii(v, S, f, A, e[n + 6], 15, -1560198380), A = this.md5_ii(A, v, S, f, e[n + 13], 21, 1309151649), f = this.md5_ii(f, A, v, S, e[n + 4], 6, -145523070), S = this.md5_ii(S, f, A, v, e[n + 11], 10, -1120210379), v = this.md5_ii(v, S, f, A, e[n + 2], 15, 718787259), A = this.md5_ii(A, v, S, f, e[n + 9], 21, -343485551), f = this.safe_add(f, c), A = this.safe_add(A, m), v = this.safe_add(v, C), S = this.safe_add(S, E);
-      return [f, A, v, S];
+        c = f, m = v, C = A, E = S, f = this.md5_ff(f, v, A, S, e[n], 7, -680876936), S = this.md5_ff(S, f, v, A, e[n + 1], 12, -389564586), A = this.md5_ff(A, S, f, v, e[n + 2], 17, 606105819), v = this.md5_ff(v, A, S, f, e[n + 3], 22, -1044525330), f = this.md5_ff(f, v, A, S, e[n + 4], 7, -176418897), S = this.md5_ff(S, f, v, A, e[n + 5], 12, 1200080426), A = this.md5_ff(A, S, f, v, e[n + 6], 17, -1473231341), v = this.md5_ff(v, A, S, f, e[n + 7], 22, -45705983), f = this.md5_ff(f, v, A, S, e[n + 8], 7, 1770035416), S = this.md5_ff(S, f, v, A, e[n + 9], 12, -1958414417), A = this.md5_ff(A, S, f, v, e[n + 10], 17, -42063), v = this.md5_ff(v, A, S, f, e[n + 11], 22, -1990404162), f = this.md5_ff(f, v, A, S, e[n + 12], 7, 1804603682), S = this.md5_ff(S, f, v, A, e[n + 13], 12, -40341101), A = this.md5_ff(A, S, f, v, e[n + 14], 17, -1502002290), v = this.md5_ff(v, A, S, f, e[n + 15], 22, 1236535329), f = this.md5_gg(f, v, A, S, e[n + 1], 5, -165796510), S = this.md5_gg(S, f, v, A, e[n + 6], 9, -1069501632), A = this.md5_gg(A, S, f, v, e[n + 11], 14, 643717713), v = this.md5_gg(v, A, S, f, e[n], 20, -373897302), f = this.md5_gg(f, v, A, S, e[n + 5], 5, -701558691), S = this.md5_gg(S, f, v, A, e[n + 10], 9, 38016083), A = this.md5_gg(A, S, f, v, e[n + 15], 14, -660478335), v = this.md5_gg(v, A, S, f, e[n + 4], 20, -405537848), f = this.md5_gg(f, v, A, S, e[n + 9], 5, 568446438), S = this.md5_gg(S, f, v, A, e[n + 14], 9, -1019803690), A = this.md5_gg(A, S, f, v, e[n + 3], 14, -187363961), v = this.md5_gg(v, A, S, f, e[n + 8], 20, 1163531501), f = this.md5_gg(f, v, A, S, e[n + 13], 5, -1444681467), S = this.md5_gg(S, f, v, A, e[n + 2], 9, -51403784), A = this.md5_gg(A, S, f, v, e[n + 7], 14, 1735328473), v = this.md5_gg(v, A, S, f, e[n + 12], 20, -1926607734), f = this.md5_hh(f, v, A, S, e[n + 5], 4, -378558), S = this.md5_hh(S, f, v, A, e[n + 8], 11, -2022574463), A = this.md5_hh(A, S, f, v, e[n + 11], 16, 1839030562), v = this.md5_hh(v, A, S, f, e[n + 14], 23, -35309556), f = this.md5_hh(f, v, A, S, e[n + 1], 4, -1530992060), S = this.md5_hh(S, f, v, A, e[n + 4], 11, 1272893353), A = this.md5_hh(A, S, f, v, e[n + 7], 16, -155497632), v = this.md5_hh(v, A, S, f, e[n + 10], 23, -1094730640), f = this.md5_hh(f, v, A, S, e[n + 13], 4, 681279174), S = this.md5_hh(S, f, v, A, e[n], 11, -358537222), A = this.md5_hh(A, S, f, v, e[n + 3], 16, -722521979), v = this.md5_hh(v, A, S, f, e[n + 6], 23, 76029189), f = this.md5_hh(f, v, A, S, e[n + 9], 4, -640364487), S = this.md5_hh(S, f, v, A, e[n + 12], 11, -421815835), A = this.md5_hh(A, S, f, v, e[n + 15], 16, 530742520), v = this.md5_hh(v, A, S, f, e[n + 2], 23, -995338651), f = this.md5_ii(f, v, A, S, e[n], 6, -198630844), S = this.md5_ii(S, f, v, A, e[n + 7], 10, 1126891415), A = this.md5_ii(A, S, f, v, e[n + 14], 15, -1416354905), v = this.md5_ii(v, A, S, f, e[n + 5], 21, -57434055), f = this.md5_ii(f, v, A, S, e[n + 12], 6, 1700485571), S = this.md5_ii(S, f, v, A, e[n + 3], 10, -1894986606), A = this.md5_ii(A, S, f, v, e[n + 10], 15, -1051523), v = this.md5_ii(v, A, S, f, e[n + 1], 21, -2054922799), f = this.md5_ii(f, v, A, S, e[n + 8], 6, 1873313359), S = this.md5_ii(S, f, v, A, e[n + 15], 10, -30611744), A = this.md5_ii(A, S, f, v, e[n + 6], 15, -1560198380), v = this.md5_ii(v, A, S, f, e[n + 13], 21, 1309151649), f = this.md5_ii(f, v, A, S, e[n + 4], 6, -145523070), S = this.md5_ii(S, f, v, A, e[n + 11], 10, -1120210379), A = this.md5_ii(A, S, f, v, e[n + 2], 15, 718787259), v = this.md5_ii(v, A, S, f, e[n + 9], 21, -343485551), f = this.safe_add(f, c), v = this.safe_add(v, m), A = this.safe_add(A, C), S = this.safe_add(S, E);
+      return [f, v, A, S];
     }, T.prototype.binl2rstr = function(e) {
       var a, n = "";
       for (a = 0; a < e.length * 32; a += 8)
@@ -7878,8 +7878,8 @@ let ue = function() {
             var y = g[I];
             if (y == ",")
               continue;
-            const A = f.findChild(y);
-            l = h + " ".repeat(this.maxChildNameLen() - y.length), t += h + y + l + A.parseType((v) => !0) + `,
+            const v = f.findChild(y);
+            l = h + " ".repeat(this.maxChildNameLen() - y.length), t += h + y + l + v.parseType((A) => !0) + `,
 `;
           }
           continue;
@@ -7897,13 +7897,12 @@ let ue = function() {
 `, t += h + h + " ".repeat(this.maxChildNameLen()) + "constraint " + s + "_" + T + `_fk
 `;
         let C = "";
-        this.isOption("cascade") && (C = " on delete cascade");
+        this.isOption("cascade") ? C = " on delete cascade" : this.isOption("setnull") && (C = " on delete set null");
         let E = "";
         for (let f in this.children) {
-          let A = this.children[f];
-          if (T == A.parseName()) {
-            let v = A.trimmedContent().toUpperCase();
-            (0 <= v.indexOf("/NN") || 0 <= v.indexOf("/NOTNULL")) && (E = " NOT NULL".toLowerCase()), 0 <= v.indexOf("/CASCADE") && (C = " on delete cascade");
+          let v = this.children[f];
+          if (T == v.parseName()) {
+            (v.isOption("nn") || v.isOption("notnull")) && (E = " NOT NULL".toLowerCase()), v.isOption("cascade") ? C = " on delete cascade" : this.isOption("setnull") && (C = " on delete set null");
             break;
           }
         }
@@ -8074,38 +8073,38 @@ let ue = function() {
         let E = " ".repeat(u - (s[m] + ".id").length);
         l += h + s[m] + ".id" + h + E + W(s[m]) + `_id,
 `;
-        for (let A = 0; A < C.children.length; A++) {
-          let v = C.children[A];
-          if (v.children.length == 0) {
-            E = " ".repeat(u - (s[m] + "." + v.parseName()).length);
+        for (let v = 0; v < C.children.length; v++) {
+          let A = C.children[v];
+          if (A.children.length == 0) {
+            E = " ".repeat(u - (s[m] + "." + A.parseName()).length);
             var O = "";
-            1 < G[v.parseName()] && (O = W(s[m]) + "_"), l += h + s[m] + "." + v.parseName() + h + E + O + v.parseName() + `,
+            1 < G[A.parseName()] && (O = W(s[m]) + "_"), l += h + s[m] + "." + A.parseName() + h + E + O + A.parseName() + `,
 `;
           }
         }
         let f = C.trimmedContent().toUpperCase();
         if (d.optionEQvalue("rowVersion", "yes") || 0 < f.indexOf("/ROWVERSION")) {
-          let A = h + " ".repeat(C.maxChildNameLen() - 11);
-          l += h + s[m] + ".row_version" + W(A + s[m]) + `_row_version,
+          let v = h + " ".repeat(C.maxChildNameLen() - 11);
+          l += h + s[m] + ".row_version" + W(v + s[m]) + `_row_version,
 `;
         }
         if (d.optionEQvalue("rowkey", "yes") || 0 < f.indexOf("/ROWKEY")) {
-          let A = h + " ".repeat(C.maxChildNameLen() - 7);
-          l += h + s[m] + ".ROW_KEY" + W(A + s[m]) + `_ROW_KEY,
+          let v = h + " ".repeat(C.maxChildNameLen() - 7);
+          l += h + s[m] + ".ROW_KEY" + W(v + s[m]) + `_ROW_KEY,
 `;
         }
         if (d.optionEQvalue("Audit Columns", "yes") || 0 < f.indexOf("/AUDITCOLS") || 0 < f.indexOf("/AUDIT COL")) {
-          let A = d.getOptionValue("createdcol"), v = h + " ".repeat(C.maxChildNameLen() - A.length);
-          l += h + s[m] + "." + A + W(v + s[m]) + "_" + A + `,
+          let v = d.getOptionValue("createdcol"), A = h + " ".repeat(C.maxChildNameLen() - v.length);
+          l += h + s[m] + "." + v + W(A + s[m]) + "_" + v + `,
 `;
           let S = d.getOptionValue("createdbycol");
-          v = h + " ".repeat(C.maxChildNameLen() - S.length), l += h + s[m] + "." + S + W(v + s[m]) + "_" + S + `,
+          A = h + " ".repeat(C.maxChildNameLen() - S.length), l += h + s[m] + "." + S + W(A + s[m]) + "_" + S + `,
 `;
           let H = d.getOptionValue("updatedcol");
-          v = h + " ".repeat(C.maxChildNameLen() - H.length), l += h + s[m] + "." + H + W(v + s[m]) + "_" + H + `,
+          A = h + " ".repeat(C.maxChildNameLen() - H.length), l += h + s[m] + "." + H + W(A + s[m]) + "_" + H + `,
 `;
           let F = d.getOptionValue("updatedbycol");
-          v = h + " ".repeat(C.maxChildNameLen() - F.length), l += h + s[m] + "." + F + W(v + s[m]) + "_" + F + `,
+          A = h + " ".repeat(C.maxChildNameLen() - F.length), l += h + s[m] + "." + F + W(A + s[m]) + "_" + F + `,
 `;
         }
       }
