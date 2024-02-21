@@ -73,6 +73,7 @@
 | /api                                    | Generate PL/SQL package API to query, insert, update, and delete data within a table. Adds Oracle auditing, by default AUDIT ALL ON &lt;TABLE NAME&gt;. |
 | /audit                                  | Adds Oracle auditing, by default AUDIT ALL ON &lt;TABLE NAME&gt;. |
 | /auditcols, /audit cols, /audit columns | Automatically adds an UPDATED, UPDATED_BY, INSERTED, and INSERTED_BY columns and the trigger logic to set column values. |
+| /check                                  | table level constraint            |
 | /colprefix                              | Prefix all columns of a given table with this value. Automatically adds an underscore if not provided. |
 | /compress, /compressed                  | Table will be created compressed. |
 | /insert NN                              | Generate NN SQL INSERT statement(s) with random data, for example: /INSERT 20. (Maximum = 1000) |
@@ -121,6 +122,9 @@ and is usually omitted from QSQL schema definition.
 | /nn, /not null                 | Adds a not null constraint on the column   |
 | /between                       | Adds a between check constraint on the column, for example /between 1 and 100 |
 | /hidden, /invisible            | Hidden columns are not displayed using select * from table. |
+| /references, /reference, /fk   | Foreign key references e.g. /references table_name. Note you can reference tables that are not part of your model. |
+| /cascade                       | on delete cascade                          |
+| /setnull                       | on delete set null                         |
 | /references, /reference, /fk   | Foreign key references e.g. /references table_name. Note you can reference tables that are not part of your model. |
 | /pk                            | Identifies column as the primary key of the table. It is recommended not manually specify primary keys and let this app create primary key columns automatically. |
 | --, [comments]                 |  Enclose comments using square brackets or using dash dash syntax |
