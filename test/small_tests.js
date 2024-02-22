@@ -517,6 +517,7 @@ students /insert 2
        name 
     `).getDDL();
                    
+    assert( "0 < output.indexOf(\"department_id\")" );
     assert( "output.indexOf('audit all') < 0 " );  
     assert( "output.indexOf('created       date not null') <  output.lastIndexOf('created          date not null,')" );  
 
@@ -584,19 +585,51 @@ students
     bar /boolean /default y
     `).getDDL();
                         
-    //console.log(output);
     assert( "0 < output.indexOf(\"varchar2(1 char) default on null 'y'\")" );   
-    assert( "0 < output.indexOf(\"constraint foo_bar check (bar in ('Y','N'))\")" );    
+    assert( "0 < output.indexOf(\"constraint foo_bar check (bar in ('Y','N'))\")" );   
+    
+    // https://github.com/oracle/quicksql/issues/47
+    output = new quicksql( `employee /UK first_name, last_name
+    first_name
+    last_name `).getDDL();
+                       
+    assert( "0 < output.indexOf(\"alter table employee add constraint employee_uk unique (first_name,last_name);\")" );    
+
+    // https://github.com/oracle/quicksql/issues/47
+    output = new quicksql( `employee /pk first_name, last_name
+    first_name
+    last name
+    job history
+        start_date
+        end_date
+    `).getDDL();
+                        
+     assert( "output.indexOf(\"employee_id\") < 0" );   // neither in employees and job_history tables
+    assert( "0 < output.indexOf(\"alter table employee add constraint employee_pk primary key (first_name,last_name);\")" );    
+    assert( "0 < output.indexOf(\"constraint employee_job_history_fk foreign key (first_name,last_name) references employee;\")" );  
+    
+    // https://github.com/oracle/quicksql/issues/52
+    output = new quicksql(`dept
+    dname
+    emp /setnull
+        dept_id
+        ename
+    `).getDDL();
+    
+    //console.log(output);
+    assert( "0 < output.indexOf('dept_id    number')" );
+    assert( "0 < output.indexOf('constraint emp_dept_id_fk')" );
+    assert( "0 < output.indexOf('references dept on delete set null')" );
+        
 }    
 
 
-
- 
 small_tests();
 
 console.log(assertionCnt);
 
-const minimalTestCnt = 100;
+// metatest that watches tests
+const minimalTestCnt = 115;
 if( assertionCnt < minimalTestCnt ) {
     console.error("assertionCnt < "+minimalTestCnt);
     throw new Error('Test failed');

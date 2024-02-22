@@ -30,7 +30,7 @@ users
   push_subscription              vc4000
 
 user_sources
-  user_id                        number /nn /fk users
+  user_id                        number /NN /fk users
   source_name                    vc100
   latitude                       number
   longitude                      number

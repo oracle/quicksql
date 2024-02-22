@@ -25,5 +25,13 @@ Issues up to #51
 
 Further Json to QSQL parsing progress
 
-Performance optimization: from 12 sec down to 6 sec for 1000 line QSQL schema definition 
-in test/profile.js. Faster regression test as well.
+Performance optimization: from 12 sec down to 4.5 sec for 1000 line QSQL schema definition 
+in test/profile.js (test for pk-fk chain of 333 tables, 3 column each; 268 ms for chain of
+50 tables, 20 columns each).
+
+## [1.2.2] - 2024-2-15
+
+Issue #47
+
+Fixed invalid 'Misaligned Table ...' error, exhibited in vscode QSQL extension (yet to be published).
+
