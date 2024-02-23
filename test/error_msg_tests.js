@@ -84,7 +84,25 @@ x = dept
     `).getErrors();
     checkNoError(output);
 
+    output = new quicksql(`# apex:Y
+team_statuses
+    name /fk undefined
+    `).getErrors();
+checkError(output, 2, 4+4+1+3+1, errorMsgs.messages.undefinedObject+'undefined');
+
+
+    output = new quicksql(`team_statuses
+    name  
+    
+teams
+    name  
+    status /fk team_statuses  [Status ]
+    `).getErrors();
+    checkNoError(output);
+
 }
+
+
 
 error_msg_tests();
 

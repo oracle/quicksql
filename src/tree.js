@@ -1650,6 +1650,7 @@ let tree = (function(){
 
             if( poundDirective == null && t.value == '#' ) {
                 poundDirective = '';
+                lineNo++;
                 continue;
             }
             if( poundDirective != null ) {
