@@ -1,6 +1,6 @@
 {
   "name": "@oracle/quicksql",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Quick SQL to DDL and ERD translator",
   "main": "./dist/quick-sql.umd.cjs",
   "module": "./dist/quick-sql.js",
@@ -17,6 +17,9 @@
   },
   "engines": {
     "node": ">=16"
+  },
+  "bin": {
+    "quicksql": "bin/index.js"
   },
   "config": {
     "ddlLibraryName": "quickSQL",
