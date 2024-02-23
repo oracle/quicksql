@@ -61,21 +61,13 @@ const findErrors = (function () {
         
         var line = node.content.toLowerCase();
         if( node.parseType() == 'view' ) {
-            var chunks = split_str(line,' '); //line.split(' ');
-            let pos = 0;
-            for( var j = 0; j < chunks.length; j++ ) { 
-                pos += chunks[j].length;
-                if( chunks[j] == ' ' ) 
-                    continue;
-                if( chunks[j] == 'view' ) 
-                    continue;
-                if( j == 1 ) 
-                    continue;
-               var tbl = ddl.find(chunks[j]);
+            var chunks = node.src;
+            for( var j = 2; j < chunks.length; j++ ) { 
+                var tbl = ddl.find(chunks[j].value);
                 if( tbl == null ) {
                     ret.push( new SyntaxError(
-                        messages.undefinedObject+chunks[j],
-                        new Offset(node.line, pos-chunks[j].length)
+                        messages.undefinedObject+chunks[j].value,
+                        new Offset(node.line, chunks[j].begin)
                     ));
                 }
             }
