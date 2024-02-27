@@ -226,7 +226,7 @@ export const quicksql = (function () {
             if( this.getOptionValue('prefix') != null )
                 value = this.getOptionValue('prefix');
             ret = ret + value;
-            if( value != '' )
+            if( value != '' && !value.endsWith('_') )
                 ret = ret + '_';
             return ret.toLowerCase();
         };

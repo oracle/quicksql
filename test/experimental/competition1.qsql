@@ -1,0 +1,84 @@
+/*
+  Identify tables with maximumb number of foregn keys:
+  submision,
+  cahllenges,
+  scores.
+  Notice the referential integrity chain: scores > submissions > challenges.
+  Choose the scores as the root node of snowflake schema.
+
+scores
+  challenge_id /fk competitions -- ?
+  submission_id /fk submissions 
+  arbiter_id /fk arbiters 
+  score num 
+  comments
+*/  
+
+
+/*
+  Inline the /fk references  
+*/
+
+scores
+  ---!!---challenge_id /fk competitions 
+  --submission_id /fk submissions 
+  --arbiter_id /fk arbiters 
+  score num 
+  comments
+  > arbiters
+    --arbiter_id /fk persons 
+    expertise 
+    persons
+      first_name 
+      last_name  
+      contactinfo 
+  > submissions
+    team_id /fk teams 
+    --challenge_id /fk challenges
+    content 
+    --status /fk submission_statuses  
+    MaxScore num
+    --submission_type /fk submission_types
+    > teams
+      name  
+      contactinfo 
+      status /fk team_statuses  
+      description 
+      team_members      -- not many2one!
+         person_id /fk persons 
+    > submission_types
+      name  
+      description
+    > submission_statuses
+      name  
+      description   
+    > challenges
+      title 
+      description 
+      image blob 
+      status /fk challenge_statuses 
+      --competition_id /fk competitions 
+      --challenge_type /fk challenge_types 
+      > challenge_types
+        name  
+        description
+      > challenge_statuses
+        name  
+        description
+      > competitions
+        name 
+        description 
+        start_datetime 
+        end_datetime 
+        --status /fk competition_statuses 
+        location  vc255 
+        --oraganizer_id /fk organizers 
+        competition_statuses
+          name  
+          description  
+        > organizers
+          name 
+          contactinfo 
+          description 
+
+

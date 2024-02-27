@@ -616,10 +616,18 @@ students
         ename
     `).getDDL();
     
-    //console.log(output);
     assert( "0 < output.indexOf('dept_id    number')" );
     assert( "0 < output.indexOf('constraint emp_dept_id_fk')" );
     assert( "0 < output.indexOf('references dept on delete set null')" );
+
+    output = new quicksql(`dept
+    dname
+    # settings = {"prefix": "abc_"} 
+    `).getDDL();
+    
+    //console.log(output);
+    assert( "0 < output.indexOf('abc_dept')" );
+    assert( "output.indexOf('abc__dept') < 0 " );  
         
 }    
 

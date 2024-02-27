@@ -9035,7 +9035,7 @@ const j = {
       var p = this.getOptionValue("schema");
       p == null && (p = ""), p != "" && b == null ? p = p + "." : p = "";
       var M = "";
-      return this.getOptionValue("prefix") != null && (M = this.getOptionValue("prefix")), p = p + M, M != "" && (p = p + "_"), p.toLowerCase();
+      return this.getOptionValue("prefix") != null && (M = this.getOptionValue("prefix")), p = p + M, M != "" && !M.endsWith("_") && (p = p + "_"), p.toLowerCase();
     };
     let D = "";
     0 < w.toLowerCase().indexOf("overridesettings") && ue(this), B != null && this.optionEQvalue("overrideSettings", !1) && (D = "# settings = " + B + `
@@ -9193,7 +9193,7 @@ function Ee(d, h) {
   return new Y(d, h).getErrors();
 }
 function le() {
-  return "1.2.5";
+  return "1.2.6";
 }
 Y.version = le;
 Y.toDDL = Pe;
