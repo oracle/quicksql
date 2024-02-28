@@ -74,4 +74,4 @@ lead_meetings
   notes                          vc4000
   confirmed                      vc1 /default N
 
-# settings = { prefix: "MED", semantics: "CHAR", auditCols: true, rowVersion: true,  language: "EN", APEX: true }
+# settings = { prefix: "MED", semantics: "CHAR", auditCols: true, rowVersion: true,  language: "EN", APEX: true, pk: identityDataType    }

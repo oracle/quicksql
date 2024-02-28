@@ -5,3 +5,5 @@ dept  /unique name, email /insert 0
     emp /unique name, email
         name
         email 
+
+#pk: identityDataType           

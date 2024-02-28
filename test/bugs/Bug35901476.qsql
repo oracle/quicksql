@@ -3,3 +3,5 @@ dept
     emp
         name
         other_table_id
+
+#pk: identityDataType           

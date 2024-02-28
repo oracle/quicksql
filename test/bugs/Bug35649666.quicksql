@@ -10,3 +10,4 @@ departments /insert 2
       job vc255
 
 # settings = { semantics: "CHAR", language: "EN", prefixPKwithTname: true } 
+#pk: identityDataType   

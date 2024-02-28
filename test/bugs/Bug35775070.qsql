@@ -9,3 +9,5 @@ session_speakers
   speaker_id                     num  /fk speakers /nn /lower
   speaker_role_id                num  /fk speaker_role /nn
   sort_sequence                  num 
+
+#pk: identityDataType   

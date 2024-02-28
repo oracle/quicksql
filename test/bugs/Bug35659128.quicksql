@@ -9,3 +9,4 @@ departments
       hiredate
 
 # settings = { semantics: "CHAR", auditCols: true, language: "EN", APEX: true, DB:"12c" }
+#pk: identityDataType   

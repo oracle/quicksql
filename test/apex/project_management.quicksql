@@ -1,4 +1,5 @@
 #apex: true, auditcols: true 
+#pk: identityDataType   
 projects /insert 5 
     name /nn 
     owner 

@@ -19,4 +19,4 @@ employees /insert 50 /api
 
 view employee_timecards employees timecards
 
-# settings = { semantics: "CHAR", API: true, rowVersion: true, drop: true, language: "EN", APEX: true, dv: false }
+# settings = { semantics: "CHAR", API: true, rowVersion: true, drop: true, language: "EN", APEX: true, dv: false, pk: identityDataType    }

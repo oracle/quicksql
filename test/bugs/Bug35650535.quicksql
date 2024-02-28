@@ -11,3 +11,4 @@ departments /insert 2
 view emp_v departments employees
 
 # settings = { semantics: "CHAR", DB: "23c", editionable: true, language: "EN", APEX: true }
+#pk: identityDataType   

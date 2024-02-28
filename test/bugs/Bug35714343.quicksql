@@ -3,3 +3,5 @@ departments
     emp  /cascade
         department_id /fk departments 
         ename
+
+#pk: identityDataType           

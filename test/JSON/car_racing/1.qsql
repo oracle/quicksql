@@ -7,7 +7,7 @@ team  /insert 1
       name 
       points num
 
-#settings = { genpk: false, drop: true }
+#settings = { genpk: false, drop: true, pk: identityDataType  }
 
 #flattened = 
 {

@@ -5,5 +5,5 @@ sales    /insert 2
     > customers  /insert 1
          first name 
 
-       
+#pk: identityDataType          
 

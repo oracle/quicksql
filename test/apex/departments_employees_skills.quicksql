@@ -12,5 +12,6 @@ departments /insert 2
           proficiency num /check 1, 2, 3, 4, 5 [with 1 being a novice and 5 being a guru]
           
 # "schema": null
-# "semantics": "char"     
+# "semantics": "char"    
+# pk: identityDataType    
 --# DV : no     

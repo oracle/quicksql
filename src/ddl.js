@@ -36,7 +36,7 @@ export const quicksql = (function () {
         overridesettings: {label: 'Ignore toDDL() second parameter', value:'no',check:['yes','no']},    
         prefix: {label: 'Object Prefix', value:'' },
         //ondelete: {label: 'On Delete', value:'Cascade',check:['restrict','cascade','set null']},
-        pk: { label: 'Primary Key Maintenance', value: identityDataType, check: [identityDataType, guid,'SEQ', 'NONE']},
+        pk: { label: 'Primary Key Maintenance', value: guid, check: [identityDataType, guid,'SEQ', 'NONE']},
         prefixpkwithtname: {label:'Prefix primary keys with table name', value:'no',check:['yes','no']}, 
         rowkey: {label: 'Alphanumeric Row Identifier', value:'no',check:['yes','no']},
         rowversion: {label: 'Row Version Number', value:'no',check:['yes','no']},
@@ -74,6 +74,7 @@ export const quicksql = (function () {
         this.errors = null;
         this.options = JSON.parse(JSON.stringify(defaultOptions));
         this.input = fullInput;
+        this.postponedAlters = []; 
 
         this.getOptionValue = function( kEy ) {
             const key = kEy.toLowerCase(); 
@@ -367,6 +368,10 @@ export const quicksql = (function () {
 
             for( let i = 0; i < this.forest.length; i++ ) {
                 output += this.forest[i].toDDL()+'\n';
+            }
+
+            for ( let i = 0; i < this.postponedAlters.length; i++ ) {
+                output += this.postponedAlters[i]+'\n';
             }
 
             let j = 0;
