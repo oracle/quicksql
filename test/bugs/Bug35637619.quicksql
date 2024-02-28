@@ -9,3 +9,5 @@ departments /insert 2
       cost center num
       date hired
       job vc255
+
+#pk: identityDataType   

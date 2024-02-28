@@ -48,6 +48,14 @@ The Quick SQL Syntax and Grammar are documented [here](./doc/user/quick-sql-gram
 
 See below for examples of how to use this library.
 
+### Command Line Usage
+
+NPXJS regitry already contains package with conflicting name. To disambiguate, please use command like this:
+
+```
+npx @oracle/quicksql test/apex/department_employees.qsql > output.sql
+```
+
 ### DDL NodeJS ECMA Script Module (ESM) Example
 
 ```js

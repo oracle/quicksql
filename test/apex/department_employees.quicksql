@@ -11,4 +11,4 @@ departments /insert 2
 
 emp_v = departments employees
 
-# settings = { "prefix": null, "semantics": "CHAR", "DV": false }
+# settings = { "prefix": null, "semantics": "CHAR", "DV": false, pk: identityDataType    }

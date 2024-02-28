@@ -2,3 +2,5 @@ dept
    name 
 
 emp   
+
+#pk: identityDataType   

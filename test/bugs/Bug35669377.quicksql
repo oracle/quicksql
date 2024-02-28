@@ -11,3 +11,5 @@ sales
    customer_id
    promotion id
    channel id
+
+#pk: identityDataType      

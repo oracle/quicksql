@@ -19,3 +19,5 @@ order_lines
 line_fulfillments
     warehouse_id /fk warehouses
     line_id /cascade /fk order_lines
+
+#pk: identityDataType       

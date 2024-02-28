@@ -59,23 +59,14 @@ const findErrors = (function () {
     function ref_error_in_view( ddl, node ) {
         var ret  = [];
         
-        var line = node.content.toLowerCase();
         if( node.parseType() == 'view' ) {
-            var chunks = split_str(line,' '); //line.split(' ');
-            let pos = 0;
-            for( var j = 0; j < chunks.length; j++ ) { 
-                pos += chunks[j].length;
-                if( chunks[j] == ' ' ) 
-                    continue;
-                if( chunks[j] == 'view' ) 
-                    continue;
-                if( j == 1 ) 
-                    continue;
-               var tbl = ddl.find(chunks[j]);
+            var chunks = node.src;
+            for( var j = 2; j < chunks.length; j++ ) { 
+                var tbl = ddl.find(chunks[j].value);
                 if( tbl == null ) {
                     ret.push( new SyntaxError(
-                        messages.undefinedObject+chunks[j],
-                        new Offset(node.line, pos-chunks[j].length)
+                        messages.undefinedObject+chunks[j].value,
+                        new Offset(node.line, chunks[j].begin)
                     ));
                 }
             }
@@ -85,32 +76,23 @@ const findErrors = (function () {
     
     function fk_ref_error( ddl, node ) {
         var ret  = [];
-        var line = node.content.toLowerCase();
-        if( 0 < line.indexOf("/fk") || 0 < line.indexOf("/reference") ) {
-            let chunks = split_str(line,' '); //line.split(' ');
-            let pos = 0;
-            let refIsNext = false;
-            for( var j = 0; j < chunks.length; j++ ) { 
-                pos += chunks[j].length;
-                if( chunks[j] == ' ' )
-                    continue;
-                if( chunks[j] == "/fk" || 0 == chunks[j].indexOf("/reference") ) {
-                    refIsNext = true;
-                    continue;
-                }
-                if( !refIsNext )
-                    continue;
-                var tbl = ddl.find(chunks[j]);
-                if(  tbl == null ) {
-                    ret.push( new SyntaxError(
-                        messages.undefinedObject+chunks[j],
-                        new Offset(node.line, pos-chunks[j].length)
-                    ));                   
-                    break;
-                }
+        if( node.isOption("fk") || 0 < node.indexOf('reference', true) ) {
+            let fk = null;
+            let pos = node.indexOf('fk');
+            if( pos < 0 )
+                pos = node.indexOf('reference');
+            pos++;
+            if( node.src.length-1 < pos )
+                return ret;
+            var tbl = ddl.find(node.src[pos].value);
+            if(  tbl == null ) {
+                ret.push( new SyntaxError(
+                    messages.undefinedObject+node.src[pos].value,
+                    new Offset(node.line, node.src[pos].begin)
+                ));                   
             }
         }
-    return ret;
+        return ret;
     }
     
     function line_mismatch( lines ) {

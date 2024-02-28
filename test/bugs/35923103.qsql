@@ -2,3 +2,5 @@ BOOKS
     NAME
     AUTHOR
     AVAILABLE /NN /default Y
+
+#pk: identityDataType       

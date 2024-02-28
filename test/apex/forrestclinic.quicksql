@@ -38,4 +38,4 @@ doctor_procedures
     medical_procedure vc30
   
 # settings = { "prefix": "FRC", "ondelete": "RESTRICT", "semantics": "CHAR", 
-  "auditcols": true, "language": "EN", "APEX": true }
+  "auditcols": true, "language": "EN", "APEX": true, pk: identityDataType    }

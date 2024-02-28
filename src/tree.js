@@ -741,27 +741,34 @@ let tree = (function(){
                     }
                 }
                 pad = tab+' '.repeat(this.maxChildNameLen() - fk.length);
-                ret += tab + fk + _id  + pad + type + '\n';  
-                ret += tab + tab+' '.repeat(this.maxChildNameLen()) + 'constraint '+objName+'_'+fk+'_fk\n';
-                let onDelete = '';
-                if( this.isOption('cascade')) 
-                    onDelete = ' on delete cascade';
-                else if( this.isOption('setnull')) 
-                    onDelete = ' on delete set null';
-                let	notNull = '';
-                for( let c in this.children ) {
-                    let child = this.children[c];
-                    if( fk == child.parseName() )  {
-                        if( child.isOption('nn') || child.isOption('notnull')  ) 
-                            notNull = ' NOT NULL'.toLowerCase();        
-                        if( child.isOption('cascade')  ) 
-                            onDelete = ' on delete cascade';  
-                        else if( this.isOption('setnull')) 
-                            onDelete = ' on delete set null';
-                        break;
+                ret += tab + fk + _id  + pad + type;  
+                if( refNode.line < this.line || refNode.isMany2One() ) {
+                    ret += tab + tab+' '.repeat(this.maxChildNameLen()) + 'constraint '+objName+'_'+fk+'_fk\n';
+                    let onDelete = '';
+                    if( this.isOption('cascade')) 
+                        onDelete = ' on delete cascade';
+                    else if( this.isOption('setnull')) 
+                        onDelete = ' on delete set null';
+                    let	notNull = '';
+                    for( let c in this.children ) {
+                        let child = this.children[c];
+                        if( fk == child.parseName() )  {
+                            if( child.isOption('nn') || child.isOption('notnull')  ) 
+                                notNull = ' NOT NULL'.toLowerCase();        
+                            if( child.isOption('cascade')  ) 
+                                onDelete = ' on delete cascade';  
+                            else if( this.isOption('setnull')) 
+                                onDelete = ' on delete set null';
+                            break;
+                        }
                     }
+                    ret += tab + tab+' '.repeat(this.maxChildNameLen()) + 'references '+ddl.objPrefix()+parent+onDelete+notNull+',\n';
+                } else {
+                    ret += ',\n';
+                    const alter = 'alter table '+objName+' add constraint '+objName+'_'+fk+'_fk foreign key ('+fk+') references '+ddl.objPrefix()+parent+';\n'
+                    if( !ddl.postponedAlters.includes(alter) )
+                        ddl.postponedAlters.push(alter);
                 }
-                ret += tab + tab+' '.repeat(this.maxChildNameLen()) + 'references '+ddl.objPrefix()+parent+onDelete+notNull+',\n';
             }
 
             if( ddl.optionEQvalue('rowkey',true) || this.isOption('rowkey') ) {
@@ -1650,6 +1657,7 @@ let tree = (function(){
 
             if( poundDirective == null && t.value == '#' ) {
                 poundDirective = '';
+                lineNo++;
                 continue;
             }
             if( poundDirective != null ) {

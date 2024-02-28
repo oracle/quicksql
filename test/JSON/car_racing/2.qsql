@@ -12,7 +12,7 @@ driver  /insert 2
          name 
       finalPosition num
 
-#settings = { genpk: false, drop: true }
+#settings = { genpk: false, drop: true, pk: identityDataType    }
 
 #flattened = 
 {

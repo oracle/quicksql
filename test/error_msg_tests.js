@@ -16,8 +16,11 @@ function checkError(msgList, line, offset, msg) {
 export function checkNoError(msgList, msgPrefix) {
     assertionCnt++;
     for( const i in msgList ) {
-        if( msgList[i].message.indexOf(msgPrefix) == 0 ) {
-            throw new Error('Test failed: extra error "'+msgPrefix+'"');
+        var isPrefix = msgList[i].message.indexOf(msgPrefix) == 0;
+        if( msgPrefix == null )
+            isPrefix = true;
+        if( isPrefix ) {
+            throw new Error('Test failed: extra error "'+msgList[i].message+'"');
         }
     }   
 }    
@@ -74,8 +77,32 @@ view customer_view customer
     `).getErrors();
     checkNoError(output, errorMsgs.messages.misalignedAttribute);
 
+    output = new quicksql(`dept
+   name
+   
+x = dept   
+    `).getErrors();
+    checkNoError(output);
+
+    output = new quicksql(`# apex:Y
+team_statuses
+    name /fk undefined
+    `).getErrors();
+checkError(output, 2, 4+4+1+3+1, errorMsgs.messages.undefinedObject+'undefined');
+
+
+    output = new quicksql(`team_statuses
+    name  
+    
+teams
+    name  
+    status /fk team_statuses  [Status ]
+    `).getErrors();
+    checkNoError(output);
 
 }
+
+
 
 error_msg_tests();
 

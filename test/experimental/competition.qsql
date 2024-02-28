@@ -1,0 +1,90 @@
+submission_statuses
+  name  
+  description  
+
+challenge_statuses
+  name  
+  description  
+
+competition_statuses
+  name  
+  description  
+
+team_statuses
+  name  
+  description  
+
+organizers
+   name 
+   contactinfo 
+   description 
+   
+persons
+  first_name 
+  last_name  
+  contactinfo 
+
+teams
+  name  
+  contactinfo 
+  status /fk team_statuses  
+  description 
+
+team_members
+  team_id /fk teams  
+  person_id /fk persons 
+
+arbiters
+  arbiter_id /fk persons 
+  expertise 
+
+competitions
+  name 
+  description 
+  start_datetime 
+  end_datetime 
+  status /fk competition_statuses 
+  location  vc255 
+  oraganizer_id /fk organizers 
+
+challenge_types
+  name  
+  description  
+
+submission_types
+  name  
+  description 
+
+challenges
+  title 
+  description 
+  status /fk challenge_statuses 
+  competition_id /fk competitions 
+  challenge_type /fk challenge_types  
+  image blob 
+
+submissions
+   team_id /fk teams 
+   challenge_id /fk challenges
+   content 
+   status /fk submission_statuses  
+   submission_type /fk submission_types
+   MaxScore num 
+
+competition_participants
+  compentition /fk competitions 
+  team_id /fk teams  
+
+scores
+  challenge_id /fk challenges 
+  submission_id /fk submissions 
+  arbiter_id /fk arbiters 
+  score num 
+  comments 
+
+results
+  competition_id /fk competitions  
+  team_id /fk teams  
+  total_points num 
+  rank num 
+  

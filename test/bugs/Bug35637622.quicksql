@@ -7,3 +7,5 @@ departments /rest
       email
       job vc255
       hiredate
+
+#pk: identityDataType         

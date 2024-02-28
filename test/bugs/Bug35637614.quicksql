@@ -3,3 +3,5 @@ customers /colprefix cust
   email
   phone1
   phone2
+
+#pk: identityDataType     

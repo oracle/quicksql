@@ -31,7 +31,13 @@ in test/profile.js (test for pk-fk chain of 333 tables, 3 column each; 268 ms fo
 
 ## [1.2.2] - 2024-2-15
 
-Issue #47
+Issue #52
 
 Fixed invalid 'Misaligned Table ...' error, exhibited in vscode QSQL extension (yet to be published).
 
+
+## [1.2.4] - 2024-2-22
+
+NPX command
+
+Error diagnostic fixes

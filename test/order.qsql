@@ -1,0 +1,9 @@
+emp
+  ename
+  deptno /fk dept
+
+dept 
+  dname
+
+#pk: identityDataType
+#prefix: abc
