@@ -1595,8 +1595,7 @@ let tree = (function(){
         ddl.data = null;
         let poundDirective = null;
         let line = '';
-        let lineNo = 0;
-        OUTER: for( let i in src ) {
+        OUTER: for( let i = 0; i < src.length; i++ ) {
             const t = src[i];
 
             if( t.value == '\n' ) {
@@ -1607,17 +1606,16 @@ let tree = (function(){
                     //     continue;
                     if( '' == nc ) {
                         line = '';
-                        lineNo++;
                         continue;
                     }
-                    let node = new ddlnode(lineNo,line,null);  // node not attached to anything
+                    let node = new ddlnode(t.line-1,line,null);  // node not attached to anything
                     let matched = false;
                     for( let j = 0; j < path.length; j++ ) {
                         let cmp = path[j];
                         if( node.apparentDepth() <= cmp.apparentDepth() ) {
                             if( 0 < j ) {
                                 let parent = path[j-1];
-                                node = new ddlnode(lineNo,line,parent);  // attach node to parent
+                                node = new ddlnode(t.line-1,line,parent);  // attach node to parent
                                 path[j] = node;
                                 path = path.slice(0, j+1);
                                 matched = true;
@@ -1633,7 +1631,7 @@ let tree = (function(){
                     if( !matched ) {
                         if( 0 < path.length ) {
                             let parent = path[path.length-1];
-                            node = new ddlnode(lineNo,line,parent);
+                            node = new ddlnode(t.line-1,line,parent);
                         }
                         path.push(node);
                         if( node.apparentDepth() == 0 )
@@ -1649,7 +1647,6 @@ let tree = (function(){
                         parent.fks[node.parseName()+'_id'] = refId;
                     }
 
-                    lineNo++;
                     line = '';
                     continue;
                 }
@@ -1657,7 +1654,6 @@ let tree = (function(){
 
             if( poundDirective == null && t.value == '#' ) {
                 poundDirective = '';
-                lineNo++;
                 continue;
             }
             if( poundDirective != null ) {
@@ -1719,8 +1715,6 @@ let tree = (function(){
             if( t.type == 'line-comment' ) {  
                 if( 0 < line.trim().length ) {
                     line += t.value;
-                    //lineNo++;
-                    //line = '';                                          
                 }
                 continue;
             }
