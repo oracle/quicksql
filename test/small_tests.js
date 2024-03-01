@@ -632,10 +632,28 @@ students
      dname
     `).getDDL();
 
-    //console.log(output);
     assert( "0 < output.indexOf('number default on null to_number(sys_guid()')" );
 
-        
+    // https://github.com/oracle/quicksql/issues/51
+    output = new quicksql(`boolvalues
+    is_legal
+    finished_yn
+    ok   bool
+    yes  boolean
+    #boolean:native`).getDDL();
+
+    assert( "0 < output.indexOf('is_legal       boolean,')" );
+    assert( "0 < output.indexOf('finished_yn    boolean,')" );
+    assert( "0 < output.indexOf('ok             boolean,')" );
+    assert( "0 < output.indexOf('yes            boolean')" );
+
+    // https://github.com/oracle/quicksql/issues/51
+    output = new quicksql(`boolvalues
+        ok   bool
+        #db:"23c"`).getDDL();
+    //console.log(output);
+    assert( "0 < output.indexOf('ok    boolean')" );
+    
 }    
 
 small_tests();
@@ -643,7 +661,7 @@ small_tests();
 console.log(assertionCnt);
 
 // metatest that watches tests
-const minimalTestCnt = 120;
+const minimalTestCnt = 125;
 if( assertionCnt < minimalTestCnt ) {
     console.error("assertionCnt < "+minimalTestCnt);
     throw new Error('Test failed');

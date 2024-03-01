@@ -6,7 +6,7 @@ try {
     let file = '//bugs/Bug35669377.quicksql';
     //file = '//experimental/food_product.json';
     //file = '//JSON/car_racing/2.qsql';
-    file = '//order.qsql';
+    file = '//bugs/Bug35650535.quicksql';
 
     let args = process.argv.slice(2);
     if( 0 < args.length )

@@ -51,6 +51,7 @@
 <!-- markdownlint-disable MD013 -->
 | Type                                        | DB Type                       |
 | ------------------------------------------- | ----------------------------- |
+| boolean, bool                               | BOOLEAN                       |
 | num, number                                 | NUMBER                        |
 | int, integer                                | INTEGER                       |
 | d, date                                     | DATE                          |
@@ -228,6 +229,15 @@ Generate PL/SQL APIs on all tables for create, insert, update, delete and query.
 Adds an additional created, created_by, updated and updated_by columns to every
 table created.
 
+### boolean
+
+**Possible Values**: `yn`, `native`  
+**Default Value**: `false`
+
+Adds an additional created, created_by, updated and updated_by columns to every
+table created.
+
+
 ### compress
 
 **Possible Values**: `true`, `false`  
@@ -260,12 +270,12 @@ name.
 By default all DATE columns created using the Oracle DATE datatype. Use this
 setting to override this default.
 
-### db
+<!--### db
 
 **Possible Values**: `11g`, `12c`, `19c`, `21c`
 **Default Value**: `21c`
 
-Specifies the database version the syntax should be compatible with.
+Specifies the database version the syntax should be compatible with.-->
 
 ### drop
 

@@ -330,7 +330,15 @@ let tree = (function(){
                     booleanCheck = '\n' + tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+concatNames(ddl.objPrefix(),parent_child)+' check ('+this.parseName()+" in ('Y','N'))";
                     break;
                 }
+            } 
+            const dbVer = ddl.getOptionValue('db');
+            if( booleanCheck != '' && ( ddl.getOptionValue('boolean')=='native' 
+                                      || 1 < dbVer.length && dbVer.charAt(0) == '2' && dbVer.charAt(1) == '3' )
+            ) {
+                booleanCheck = '';
+                ret = 'boolean';
             }
+
 
             if( this.indexOf('phone_number') == 0 )
                 ret = 'number';

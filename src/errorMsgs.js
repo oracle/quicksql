@@ -33,13 +33,13 @@ const findErrors = (function () {
             const node = descendants[i];
             if( ddl.optionEQvalue('genpk', true) && descendants[i].parseName() == 'id' ) {
                 const depth = node.content.toLowerCase().indexOf('id');
-                ret.push(new SyntaxError( messages.duplicateId, new Offset(node.line, depth) ));
+                ret.push(new SyntaxError( messages.duplicateId, new Offset(node.line, depth), new Offset(node.line, depth+2) ));
                 continue;
             }
             const src2 = node.src[2];
             if( 2 < node.src.length && src2.value == '-' ) {
                 const depth = src2.begin;
-                ret.push(new SyntaxError(  messages.invalidDatatype, new Offset(node.line,depth) ));
+                ret.push(new SyntaxError(  messages.invalidDatatype, new Offset(node.line,depth), new Offset(node.line, depth+2) ));
                 continue;
             }
             const src1 = node.src[1];
@@ -66,7 +66,8 @@ const findErrors = (function () {
                 if( tbl == null ) {
                     ret.push( new SyntaxError(
                         messages.undefinedObject+chunks[j].value,
-                        new Offset(node.line, chunks[j].begin)
+                        new Offset(node.line, chunks[j].begin),
+                        new Offset(node.line, chunks[j].begin+chunks[j].value.length)
                     ));
                 }
             }
@@ -88,7 +89,8 @@ const findErrors = (function () {
             if(  tbl == null ) {
                 ret.push( new SyntaxError(
                     messages.undefinedObject+node.src[pos].value,
-                    new Offset(node.line, node.src[pos].begin)
+                    new Offset(node.line, node.src[pos].begin),
+                    new Offset(node.line, node.src[pos].begin+node.src[pos].value.length)
                 ));                   
             }
         }
