@@ -11,14 +11,20 @@ export function generateSample( lTable, lColumn, lType, values ) {
     if( values != null && 0 < values.length ) {
         let min = 0;
         let max = values.length;
+        let value = values[Math.floor(seededRandom() * (max - min)) + min];
         var optQuote = '\'';
         if(  type.startsWith('INTEGER') || type.startsWith('NUMBER') || type.startsWith('DATE')  ) 
             optQuote = '';
-        let value = values[Math.floor(seededRandom() * (max - min)) + min];
-        if( value.toLowerCase && value.toLowerCase() == 'null' )
-            optQuote = '';
-        if( value.replaceAll )
-            value = value.replaceAll('\'','\'\'');
+        else {
+            if( value.toLowerCase && value.toLowerCase() == 'null' )
+                optQuote = '';
+            if( value.charAt && value.charAt(0) == '\'' )
+                optQuote = '';
+            if( value.charAt && value.charAt(0) == 'q' && value.charAt(1) == '\'' )
+                optQuote = '';
+        }
+        if( value.replaceAll && 0 < value.indexOf('\'') && value.indexOf('\'') < value.length-1 )  
+            value = value.replaceAll('\'','\'\'');  
         return optQuote+value+optQuote;    		
     }
     

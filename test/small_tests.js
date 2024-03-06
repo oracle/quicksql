@@ -306,7 +306,6 @@ bug35748389_2
     # settings = {"apex":"false"}
     `, '{"apex":"true"}').getDDL();
                
-    //console.log(output);
     assert( "0 < output.indexOf(':new.created_by := user;')" );
     assert( "output.indexOf('APEX$SESSION') < 0" );
 
@@ -422,7 +421,6 @@ projects /insert 1
     locatilon;drop user sys;
     country;shutdown abort;a  
     `).getDDL();
-                    
     assert( " 0 < output.indexOf('\"ファーストネーム\"') " );                                     
     assert( " 0 < output.indexOf('\"Das Gedöns\"') " );                                     
     assert( " 0 < output.indexOf('\"locatilon;drop user sys;\"') " );                                     
@@ -651,10 +649,20 @@ students
     output = new quicksql(`boolvalues
         ok   bool
         #db:"23c"`).getDDL();
-    //console.log(output);
     assert( "0 < output.indexOf('ok    boolean')" );
+
+    // https://github.com/oracle/quicksql/issues/55
+    output = new quicksql(`escape /insert 1
+    financial_year /check '23/24', \`'24/25'\`
+    surname vc60 /check 'O''Hara', q'{O'Tool}'  
+    start_date /check  \`to_date('01-APR-2025','DD-MON-YYYY')\``).getDDL();
+    //console.log(output);
+    assert( "0 < output.indexOf(\"check (financial_year in ('23/24','24/25')),\")" );
+    assert( "0 < output.indexOf(\"check (surname in ('O''Hara',q'{O'Tool}')),\")" );
+    assert( "0 < output.indexOf(\"check (start_date in (to_date('01-APR-2025','DD-MON-YYYY')))\")" );
     
-}    
+} 
+
 
 small_tests();
 

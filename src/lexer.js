@@ -11,6 +11,15 @@ var lexer = (function(){
         this.toString = function() {
             return '{type:'+type+',value:'+value+'}';
         };
+        this.getValue = function() {
+            if( this.value == null || this.value.length < 2 )
+                return this.value;
+            if( this.value.charAt(0) == '`' ) {
+                let ret = this.value.substring(1,this.value.length-1);
+                ret = "q'[" + ret + "]'";
+            }
+            return this.value;
+        };
         this.isStandardLiteral = function () {
             // fast fail
             if( this.value.length < 2 )
