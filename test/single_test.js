@@ -5,7 +5,7 @@ import fs from "fs";
 try {
     let file = '//bugs/Bug35637614.quicksql';
     //file = '//experimental/food_product.json';
-    //file = '//JSON/car_racing/2.qsql';
+    file = '//constraints.qsql';
     //file = '//apex/timecard.quicksql';
 
     let args = process.argv.slice(2);

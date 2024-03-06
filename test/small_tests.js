@@ -660,16 +660,18 @@ students
     assert( "0 < output.indexOf(\"check (financial_year in ('23/24','24/25')),\")" );
     assert( "0 < output.indexOf(\"check (surname in ('O''Hara',q'{O'Tool}')),\")" );
     assert( "0 < output.indexOf(\"check (start_date in (to_date('01-APR-2025','DD-MON-YYYY')))\")" );
+    assert( "output.indexOf(\"''24/25''\") < 0" );
+    assert( "output.indexOf(\"q''{O''Tool}''\") < 0" );
+    assert( "output.indexOf(\"to_date(''01-APR-2025'',''DD-MON-YYYY'')\") < 0" );
     
 } 
-
 
 small_tests();
 
 console.log(assertionCnt);
 
 // metatest that watches tests
-const minimalTestCnt = 125;
+const minimalTestCnt = 130;
 if( assertionCnt < minimalTestCnt ) {
     console.error("assertionCnt < "+minimalTestCnt);
     throw new Error('Test failed');

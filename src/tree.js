@@ -447,19 +447,23 @@ let tree = (function(){
                     parentPref = parent.parseName()+'_';
                 const parent_child = concatNames(parentPref,this.parseName());
 
-                let values = this.getValues('check');
-                values = '(' + values + ')';
                 let offset = tab;
                 if( parent != null )
                     offset = ' '.repeat(parent.maxChildNameLen());
-                if( this.children != null && 0 < this.children.length  ) {  // table level
-                    ret += tab + 'constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck');
-                    ret += '  check '+values+',\n';    
-                } else {
-                    ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
-                    ret += tab +  tab+offset +'check ('+this.parseName()+' in '+values+')';    
+                let constr = this.getGeneralConstraint();
+                if( constr != null ) {
+                    if( this.children != null && 0 < this.children.length ) {  // (general) table level constraint
+                        ret += tab + 'constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck');
+                        ret += '  check '+ constr +',\n';    
+                    } else {                     // general column level constraint
+                        ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
+                        ret += tab +  tab+offset +'check '+ constr +'';    
+                    } 
+                    return ret;
                 }
-    		
+                const values = this.getValues('check');
+                ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
+                ret += tab +  tab+offset +'check ('+this.parseName()+' in ('+values+'))';                    
             }
             return ret;
         }
@@ -564,9 +568,27 @@ let tree = (function(){
             return null;
         };
 
+        this.getGeneralConstraint = function() { // parenthesized constraint to return verbatim, e.g. c1 /check (c1 in ('A','B','C'))
+            let from = this.indexOf('check');
+            if(   0 < from && this.src[from-1].value == '/' &&
+                ( this.src[from+1].value == '(' || this.src[from+1].value.toLowerCase() == 'not' ) 
+            ) {    
+                let i = from+2
+                for( ; i < this.src.length && this.src[i].value != '/' && this.src[i].value != '[' ; ) 
+                    i++;
+                let ret = this.content.substring(this.src[from+1].begin, this.src[i-1].end);
+                if( ret.charAt(0) != '(' )
+                    ret = '('+ret+')';
+                return ret;
+            }
+
+            return null;
+        }
+
         this.listValues = function( check_or_values ) {
             let ret = [];
             let from = this.indexOf(check_or_values);
+ 
             let separator = ' ';   // e.g. status /check open completed closed /values open, open, open, open, closed, completed 
             for( let i = from+1; i < this.src.length && this.src[i].value != '/' && this.src[i].value != '[' ; i++ ) 
                 if( this.src[i].value == ',' ) { 

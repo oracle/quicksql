@@ -1,4 +1,5 @@
 import Chance from 'chance';
+//import lexer from './lexer.js';
 
 
 export function generateSample( lTable, lColumn, lType, values ) {
@@ -12,20 +13,16 @@ export function generateSample( lTable, lColumn, lType, values ) {
         let min = 0;
         let max = values.length;
         let value = values[Math.floor(seededRandom() * (max - min)) + min];
-        var optQuote = '\'';
-        if(  type.startsWith('INTEGER') || type.startsWith('NUMBER') || type.startsWith('DATE')  ) 
-            optQuote = '';
-        else {
-            if( value.toLowerCase && value.toLowerCase() == 'null' )
-                optQuote = '';
-            if( value.charAt && value.charAt(0) == '\'' )
-                optQuote = '';
-            if( value.charAt && value.charAt(0) == 'q' && value.charAt(1) == '\'' )
-                optQuote = '';
+        if(  !type.startsWith('INTEGER') && !type.startsWith('NUMBER') && !type.startsWith('DATE') 
+          && (!value.toLowerCase || value.toLowerCase() != 'null') 
+          && ( !value.charAt || (value.charAt(0) != 'q' && value.charAt(1) != '\'') )
+        ) { 
+            if( value.charAt && value.charAt(0) == '\'' ) 
+                value = value.substring(1,value.length-1);
+            value = value.replaceAll('\'','\'\''); 
+            value = "'"+value+"'"; 
         }
-        if( value.replaceAll && 0 < value.indexOf('\'') && value.indexOf('\'') < value.length-1 )  
-            value = value.replaceAll('\'','\'\'');  
-        return optQuote+value+optQuote;    		
+        return value;    		
     }
     
     if( column == 'NAME' && 0 <= table.indexOf('DEPARTMENT') ) {
