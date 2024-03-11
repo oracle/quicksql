@@ -656,15 +656,21 @@ students
     financial_year /check '23/24', \`'24/25'\`
     surname vc60 /check 'O''Hara', q'{O'Tool}'  
     start_date /check  \`to_date('01-APR-2025','DD-MON-YYYY')\``).getDDL();
-    //console.log(output);
     assert( "0 < output.indexOf(\"check (financial_year in ('23/24','24/25')),\")" );
     assert( "0 < output.indexOf(\"check (surname in ('O''Hara',q'{O'Tool}')),\")" );
     assert( "0 < output.indexOf(\"check (start_date in (to_date('01-APR-2025','DD-MON-YYYY')))\")" );
     assert( "output.indexOf(\"''24/25''\") < 0" );
     assert( "output.indexOf(\"q''{O''Tool}''\") < 0" );
     assert( "output.indexOf(\"to_date(''01-APR-2025'',''DD-MON-YYYY'')\") < 0" );
-    
+  
+    output = new quicksql(`departments /insert 1
+    name /nn
+    # settings = {"prefix":"test"}`).getDDL();
+    //console.log(output);
+    assert( "0 < output.indexOf(\"insert into test_departments (\")" );
+
 } 
+
 
 small_tests();
 

@@ -8410,15 +8410,16 @@ is
       const n = this.inserts4tbl(t), l = this.orderedTableNodes();
       let c = "";
       for (let u = 0; u < l.length; u++) {
-        const b = n[l[u].parseName()];
-        b != null && (c += b);
+        const b = h.objPrefix() + l[u].parseName(), A = n[b];
+        A != null && (c += A);
       }
       return c;
     }, this.inserts4tbl = function(t) {
       let n = {};
       if (h.optionEQvalue("inserts", !1))
         return "";
-      let l = h.objPrefix() + this.parseName(), c = "", u = null, b = null;
+      const l = h.objPrefix() + this.parseName();
+      let c = "", u = null, b = null;
       for (let M = 0; M < this.cardinality(); M++) {
         let k = null;
         if (t != null) {
@@ -8509,7 +8510,7 @@ is
           }
         }
         c.lastIndexOf(`,
-`) == c.length - 2 && (c = c.substr(0, c.length - 2) + `
+`) == c.length - 2 && (c = c.substring(0, c.length - 2) + `
 `), c += `);
 `;
       }

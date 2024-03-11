@@ -1459,7 +1459,8 @@ let tree = (function(){
             const tables = this.orderedTableNodes();
             let ret = '';
             for( let i = 0; i < tables.length; i++ ) {
-                const inserts = tab2inserts[tables[i].parseName()];
+                const objName = ddl.objPrefix()  + tables[i].parseName();
+                const inserts = tab2inserts[objName];
                 if( inserts != null )
                     ret += inserts;
             }
@@ -1473,7 +1474,7 @@ let tree = (function(){
             if( ddl.optionEQvalue('inserts',false) )
                 return '';
             
-            let objName = ddl.objPrefix()  + this.parseName();
+            const objName = ddl.objPrefix()  + this.parseName();
             let insert = '';
 
             let pkName = null;
@@ -1624,7 +1625,7 @@ let tree = (function(){
                     }
                 }
                 if( insert.lastIndexOf(',\n') == insert.length-2 )
-                    insert = insert.substr(0,insert.length-2)+'\n';
+                    insert = insert.substring(0,insert.length-2)+'\n';
                 insert += ');\n';
             }
  
