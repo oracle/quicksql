@@ -638,7 +638,7 @@ students
     finished_yn
     ok   bool
     yes  boolean
-    #boolean:native`).getDDL();
+    #db:"23c"`).getDDL();
 
     assert( "0 < output.indexOf('is_legal       boolean,')" );
     assert( "0 < output.indexOf('finished_yn    boolean,')" );
@@ -648,7 +648,7 @@ students
     // https://github.com/oracle/quicksql/issues/51
     output = new quicksql(`boolvalues
         ok   bool
-        #db:"23c"`).getDDL();
+        #boolean:native`).getDDL();
     assert( "0 < output.indexOf('ok    boolean')" );
 
     // https://github.com/oracle/quicksql/issues/55
