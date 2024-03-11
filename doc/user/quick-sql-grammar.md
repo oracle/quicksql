@@ -229,14 +229,6 @@ Generate PL/SQL APIs on all tables for create, insert, update, delete and query.
 Adds an additional created, created_by, updated and updated_by columns to every
 table created.
 
-### boolean
-
-**Possible Values**: `yn`, `native`  
-**Default Value**: `false`
-
-Adds an additional created, created_by, updated and updated_by columns to every
-table created.
-
 
 ### compress
 
