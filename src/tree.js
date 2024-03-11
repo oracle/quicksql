@@ -336,7 +336,7 @@ let tree = (function(){
             } 
             const dbVer = ddl.getOptionValue('db');
             if( booleanCheck != '' && ( ddl.getOptionValue('boolean')=='native' 
-                                      || 1 < dbVer.length && dbVer.charAt(0) == '2' && dbVer.charAt(1) == '3' )
+                                      || ddl.getOptionValue('boolean') != 'yn' && 0 < dbVer.length && dbVer.charAt(0) == '2' && dbVer.charAt(1) == '3' )
             ) {
                 booleanCheck = '';
                 ret = 'boolean';

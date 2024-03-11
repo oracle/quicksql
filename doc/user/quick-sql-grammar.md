@@ -232,11 +232,10 @@ table created.
 ### boolean
 
 **Possible Values**: `yn`, `native`  
-**Default Value**: `yn`
+**Default Value**: inferred from #db
 
-Adds an additional created, created_by, updated and updated_by columns to every
-table created.
-
+Set boolean to legacy char(1) or new 23c native boolean value. This setting has priority
+over db:23c, so that the user can override db seting (which influences other functionality)
 
 ### compress
 

@@ -20,7 +20,7 @@ export const quicksql = (function () {
             createdbycol: {label: 'Created By Column Name', value: 'created_by'},
             updatedcol: {label: 'Updated Column Name', value: 'updated'},
             updatedbycol: {label: 'Updated By Column Name', value: 'updated_by'},
-        boolean: {label: 'Boolean Datatype', value:'yn',check:['yn','native']},
+        boolean: {label: 'Boolean Datatype', value:'not set',check:['yn','native']},
         genpk: {label:'Auto Primary Key', value:'yes',check:['yes','no']},
         semantics: {label: 'Character Strings',value:'CHAR',check:['BYTE','CHAR','Default']},
         language: {label: 'Data Language', value:'EN',check:['EN','JP','KO']},

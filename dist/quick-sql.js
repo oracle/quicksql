@@ -7722,7 +7722,7 @@ let me = function() {
           break;
         }
       const k = h.getOptionValue("db");
-      M != "" && (h.getOptionValue("boolean") == "native" || 1 < k.length && k.charAt(0) == "2" && k.charAt(1) == "3") && (M = "", b = "boolean"), this.indexOf("phone_number") == 0 && (b = "number");
+      M != "" && (h.getOptionValue("boolean") == "native" || h.getOptionValue("boolean") != "yn" && 0 < k.length && k.charAt(0) == "2" && k.charAt(1) == "3") && (M = "", b = "boolean"), this.indexOf("phone_number") == 0 && (b = "number");
       let O = this.indexOf("num", !0);
       0 < O && (b = "number");
       let N = this.indexOf(")");
@@ -8984,7 +8984,7 @@ const j = {
     createdbycol: { label: "Created By Column Name", value: "created_by" },
     updatedcol: { label: "Updated Column Name", value: "updated" },
     updatedbycol: { label: "Updated By Column Name", value: "updated_by" },
-    boolean: { label: "Boolean Datatype", value: "yn", check: ["yn", "native"] },
+    boolean: { label: "Boolean Datatype", value: "not set", check: ["yn", "native"] },
     genpk: { label: "Auto Primary Key", value: "yes", check: ["yes", "no"] },
     semantics: { label: "Character Strings", value: "CHAR", check: ["BYTE", "CHAR", "Default"] },
     language: { label: "Data Language", value: "EN", check: ["EN", "JP", "KO"] },

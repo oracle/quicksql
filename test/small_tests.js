@@ -649,7 +649,15 @@ students
     output = new quicksql(`boolvalues
         ok   bool
         #boolean:native`).getDDL();
+    console.log(output);
     assert( "0 < output.indexOf('ok    boolean')" );
+
+    output = new quicksql(`boolvalues
+    ok   bool
+    #boolean:yn
+    #db:"23c"`).getDDL();
+    console.log(output);
+    assert( "output.indexOf('ok    boolean') < 0" );
 
     // https://github.com/oracle/quicksql/issues/55
     output = new quicksql(`escape /insert 1
