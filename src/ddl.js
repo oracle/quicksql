@@ -26,7 +26,7 @@ export const quicksql = (function () {
         language: {label: 'Data Language', value:'EN',check:['EN','JP','KO']},
         datalimit: {label: 'Data Limit Rows', value: 10000},
         date: {label: 'Date Data Type', value:'DATE',check:['DATE','TIMESTAMP',tswtz,tswltz]},
-        db: {label: 'Database Version', value:'not set',check:['not used']},  
+        db: {label: 'Database Version', value:'not set',check:['19c']},  
         dv: {label: 'Duality View', value:'no',check:['yes','no']},  // switched default to 'no' until thorough development&testig
         drop: {label: 'Include Drops', value:'no',check:['yes','no']},
         editionable: {label: 'Editinable', value:'no',check:['yes','no']},

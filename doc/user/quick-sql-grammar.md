@@ -270,12 +270,12 @@ name.
 By default all DATE columns created using the Oracle DATE datatype. Use this
 setting to override this default.
 
-<!--### db
+### db
 
-**Possible Values**: `11g`, `12c`, `19c`, `21c`
-**Default Value**: `21c`
+**Possible Values**: `11g`, `12c`, `19c`, `21c`, `23c`
+**Default Value**: `19c`
 
-Specifies the database version the syntax should be compatible with.-->
+Specifies the database version the syntax should be compatible with.
 
 ### drop
 
