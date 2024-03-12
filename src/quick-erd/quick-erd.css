@@ -17,6 +17,11 @@
     cursor: pointer;
 }
 
+.joint-link .connection-wrap,
+.joint-link .connection {
+   fill: none;
+}
+
 .selection-wrapper { display: none !important; }
 
 .link-tools .tool-remove { display: none !important; }

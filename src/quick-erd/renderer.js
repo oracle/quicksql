@@ -7,11 +7,11 @@ import cs from './constants.js';
 joint.shapes.quicksql = {};
 
 joint.shapes.quicksql.Table = joint.shapes.standard.HeaderedRecord.define('quicksql.Table', {
-    z: 3,
+    z: 0,
     columns: [],
     padding: { top: 25, bottom: 5, left: 0, right: 0 },
-    size: { width: 160 },
-    itemMinLabelWidth: 105,
+    size: { width: 60 },
+    itemMinLabelWidth: 60,
     itemHeight: 16,
     itemOverflow: true,
     attrs: {
@@ -19,7 +19,7 @@ joint.shapes.quicksql.Table = joint.shapes.standard.HeaderedRecord.define('quick
             magnet: false
         },
         body: {
-            cursor: 'default',
+            // cursor: 'default',
             rx: cs.TABLE_BORDER_RADIUS,
             ry: cs.TABLE_BORDER_RADIUS,
             fill: cs.colors.TABLE_BACKGROUND,
@@ -29,7 +29,7 @@ joint.shapes.quicksql.Table = joint.shapes.standard.HeaderedRecord.define('quick
             refHeight: '100%'
         },
         headerLabel: {
-            cursor: 'default',
+            // cursor: 'default',
             y: -4,
             fontFamily: cs.FONT_FAMILY,
             fill: cs.colors.TABLE_NAME_TEXT,
@@ -41,7 +41,7 @@ joint.shapes.quicksql.Table = joint.shapes.standard.HeaderedRecord.define('quick
             }
         },
         separator: {
-            cursor: 'default',
+            // cursor: 'default',
             stroke: cs.colors.TABLE_BORDER,
             strokeWidth: 1,
         },
