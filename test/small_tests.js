@@ -649,7 +649,7 @@ students
     output = new quicksql(`boolvalues
         ok   bool
         #boolean:native`).getDDL();
-    console.log(output);
+    //console.log(output);
     assert( "0 < output.indexOf('ok    boolean')" );
 
     output = new quicksql(`boolvalues
