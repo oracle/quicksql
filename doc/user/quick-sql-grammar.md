@@ -51,6 +51,7 @@
 <!-- markdownlint-disable MD013 -->
 | Type                                        | DB Type                       |
 | ------------------------------------------- | ----------------------------- |
+| boolean, bool                               | BOOLEAN                       |
 | num, number                                 | NUMBER                        |
 | int, integer                                | INTEGER                       |
 | d, date                                     | DATE                          |
@@ -228,6 +229,14 @@ Generate PL/SQL APIs on all tables for create, insert, update, delete and query.
 Adds an additional created, created_by, updated and updated_by columns to every
 table created.
 
+### boolean
+
+**Possible Values**: `yn`, `native`  
+**Default Value**: inferred from #db
+
+Set boolean to legacy char(1) or new 23c native boolean value. This setting has priority
+over db:23c, so that the user can override db seting (which influences other functionality)
+
 ### compress
 
 **Possible Values**: `true`, `false`  
@@ -262,8 +271,8 @@ setting to override this default.
 
 ### db
 
-**Possible Values**: `11g`, `12c`, `19c`, `21c`
-**Default Value**: `21c`
+**Possible Values**: `11g`, `12c`, `19c`, `21c`, `23c`
+**Default Value**: `19c`
 
 Specifies the database version the syntax should be compatible with.
 

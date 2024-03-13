@@ -8,8 +8,25 @@ import split_str from './split_str.js';
 let tree = (function(){ 
     let ddl;
     let tab= '    ';
-    let stringTypes = ['string', 'varchar2', 'varchar', 'vc' , 'char'];
-    var boolTypes = ['yn', 'boolean', 'bool', ];
+    const stringTypes = ['string', 'varchar2', 'varchar', 'vc' , 'char'];
+    const boolTypes = ['yn', 'boolean', 'bool', ];
+    let datatypes = [
+        'integer',
+        'number', 'num',
+        'int',
+        'num',    
+        'blob', 'clob',
+        'json',
+        'file',
+        'date', 'd',
+        'tstz',
+        'tswtz',
+        'tswltz',
+        'ts',
+    ];           
+    datatypes = datatypes.concat(stringTypes);
+    datatypes = datatypes.concat(boolTypes);
+
     /**
      * Node in QSQL tree defining a Table, a Column, a View, or an Option
      * @param lineNo  -- line number
@@ -18,12 +35,6 @@ let tree = (function(){
      */
     function ddlnode( lineNo, inputLine, parent ) {
         this.line = lineNo;
-        /*this.y = function() {
-            if( this.children.length == 0 )
-                return this.x+1;
-            else
-                return this.children[this.children.length-1].y();
-        };*/
         this.parent = parent;
         this.children = [];
         if( parent != null )
@@ -48,12 +59,12 @@ let tree = (function(){
         
         this.maxChildNameLen = function() {
             var maxLen = 2;
-            var tmp = this.trimmedContent().toUpperCase();
-            if( ddl.optionEQvalue('rowkey',true) || 0 < tmp.indexOf('/ROWKEY') )
+            if( ddl.optionEQvalue('rowkey',true) || this.isOption('rowkey') )
                 maxLen = 'row_key'.length;
-            if( ddl.optionEQvalue('Row Version Number','yes') || 0 < tmp.indexOf('/ROWVERSION') )
+            if( ddl.optionEQvalue('Row Version Number','yes') || this.isOption('rowversion') )
                 maxLen = 'row_version'.length;
-            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') || 0 < tmp.indexOf('/AUDIT COL') ) {
+            if( ddl.optionEQvalue('Audit Columns','yes') || this.isOption('auditcols') 
+            || this.isOption('audit','col') || this.isOption('audit','cols') || this.isOption('audit','columns') ) {
                 let len = ddl.getOptionValue('createdcol').length;
                 if( maxLen < len )
                     maxLen = len;
@@ -146,48 +157,62 @@ let tree = (function(){
                 return null;
 
             let ret = '';
-            for( let i = pos+1; i < this.src.length && this.src[i].value != '/'; i++ )
+            for( let i = pos+1; i < this.src.length && this.src[i].value != '/' && this.src[i].value != '['; i++ )
                 ret += this.src[i].value;
 
             return ret;
         }
- 
-        this.trimmedContent = function() {
-            var ret = this.content.trim();
-            var start = ret.indexOf('[');
-            var end = ret.indexOf(']');
-            if( this.comment == null && 0 < start ) 
-                this.comment = ret.substr(start+1, end-start-1);
-            if( 0 < start ) {
-                ret = ret.substr(0,start) + ret.substr(end+2);
-            }
-            start = ret.indexOf('--');
-            if( this.comment == null && 0 < start ) 
-                this.comment = ret.substr(start+2);
-            if( 0 < start ) {
-                ret = ret.substr(0,start);
-            }
-            return ret.trim();
-        };
 
-        this.src = lexer( this.content/*.toLowerCase()*/, false, true, '' ); 
+        this.sugarcoatName = function( from, to ) {
+            let prefix = '';
+            if( 0 == this.children.length ) {   // switched to this comparison style because accidental typo this.children.length = 0 is disastrous!
+                if( this.parent != undefined && this.parent.colprefix != undefined )
+                    prefix = this.parent.colprefix+'_';        		
+            } 
+
+            let ret = '';
+            let spacer = '_';
+            for( let i = from; i < to; i++ ) {
+                const value = this.src[i].value;
+                const qVal  = '"'+value+'"';
+                if( this.src[i].type != 'constant.numeric' && value != canonicalObjectName(qVal) ) {
+                    ret = this.content.substring(this.src[from].begin,this.src[to-1].end);
+                    this.parsedName = prefix+amend_reserved_word(canonicalObjectName(ret));
+                    return this.parsedName;
+                }
+            }
+
+            for( let i = from; i < to; i++ ) {
+                if( from < i )
+                    ret += spacer;
+                ret += this.src[i].value;
+            }
+
+            var c = ret.charAt(0);
+            if( c >= '0' && c <= '9' ) 
+                ret = 'x'+ret;
+        
+            this.parsedName = prefix+amend_reserved_word(canonicalObjectName(ret));
+            return this.parsedName;
+        }
+ 
+        this.src = lexer( this.content/*.toLowerCase()*/, false, true, '`' ); 
          
         this.parsedName = null;
         this.parseName = function () {  
             if( this.parsedName != null ) 
                 return this.parsedName;         
             
-            let rEt = this.trimmedContent();
-            rEt = rEt.replace(/\t/,tab);
-            const  qtBegin = rEt.indexOf('"');
-            const  qtEnd = rEt.indexOf('"', qtBegin+1);
+            let nameFrom = 0;        
+            let ret = this.src[0].value;
+            if( ret == '>' || ret == '<' ) {
+                ret = this.src[1].value;  
+                nameFrom = 1;
+            } 
+            const  qtBegin = ret.indexOf('"');
+            const  qtEnd = ret.indexOf('"', qtBegin+1);
             if( 0 <= qtBegin && qtBegin < qtEnd )
-                return rEt.substring(qtBegin, qtEnd+1);
-
-            if( 0 == rEt.indexOf('>') || 0 == rEt.indexOf('<') ) 
-                rEt = rEt.substring(1).trim();   
-
-            const ret = rEt.toLowerCase();
+                return ret.substring(qtBegin, qtEnd+1);
 
             if( this.src[0].value == 'view' ) {
                 return this.src[1].value;
@@ -195,59 +220,37 @@ let tree = (function(){
             if( 1 < this.src.length && this.src[1].value == '=' ) {
                 return this.src[0].value;
             }
-            rEt = replaceTrailing(rEt,' d');
-            var pos = rEt.indexOf('/');
-            if( 0 < pos )
-                rEt = rEt.substring(0,pos);
-            rEt = rEt.trim();
-            rEt = replaceTrailing(rEt,' integer');
-            rEt = replaceTrailing(rEt,' number');
-            rEt = replaceTrailing(rEt,' int');
-            rEt = replaceTrailing(rEt,' num');
-            rEt = replaceTrailing(rEt,' clob');
-            rEt = replaceTrailing(rEt,' blob');
-            rEt = replaceTrailing(rEt,' json');
-            rEt = replaceTrailing(rEt,' file');
-            rEt = replaceTrailing(rEt,' date');
-            rEt = replaceTrailing(rEt,' tstz');
-            rEt = replaceTrailing(rEt,' tswtz');
-            rEt = replaceTrailing(rEt,' tswltz');
-            rEt = replaceTrailing(rEt,' ts');
-            rEt = rEt.replace(/ vc\d+k/g,'');
-            rEt = rEt.replace(/ vc\(\d+\)/g,'');
-            rEt = rEt.replace(/ vc\d+/g,'');
-            //rEt = rEt.replace(/ VC/g,'');
-            for( let i in stringTypes ) {
-                let pos = ret.indexOf(' '+stringTypes[i]);
-                if( 0 < pos ) {
-                    rEt = rEt.substring(0,pos) + rEt.substring(pos+stringTypes[i].length+1);
-                    break;
+
+            let nameTo = this.src.length;
+
+            let tmp = this.indexOf('/');
+            if( 0 < tmp )
+                nameTo = tmp;
+
+            tmp = this.indexOf('[');
+            if( 0 < tmp )
+                nameTo = tmp;
+        
+            
+            for( let i = 0; i < datatypes.length; i++ ) {
+                const pos = this.indexOf(datatypes[i]);
+                if( 0 < pos && pos < nameTo ) {
+                    nameTo = pos;
+                    return this.sugarcoatName(nameFrom, nameTo); 
                 }
             }
-            for( let i in boolTypes ) {
-                let pos = ret.indexOf(' '+boolTypes[i]);
-                if( 0 < pos ) {
-                    rEt = rEt.substring(0,pos) + rEt.substring(pos+boolTypes[i].length+1);
-                    break;
+
+            for( let i = nameFrom; i < nameTo; i++ ) {
+                const tmp = this.src[i].value.toLowerCase();
+                if( tmp.charAt(0) == 'v' && tmp.charAt(1) == 'c' ) {
+                    if( tmp.charAt(2) == '(' )
+                        return this.sugarcoatName(nameFrom, i); 
+                    if( 0 <= tmp.charAt(2) && tmp.charAt(2) <= '9' )
+                        return this.sugarcoatName(nameFrom, i); 
                 }
             }
-            rEt = rEt.replace(/ num(ber)?\(\d+\)/g,'');
-            rEt = rEt.replace(/ num(ber)?\(\d+,\d+\)/g,'');
-            rEt = rEt.replace(/ num(ber)?\d+/g,'');
-            rEt = rEt.trim();
-            //if( prefix == undefined )
-                if( 0 == this.children.length ) {   // switched to this comparison style because accidental typo this.children.length = 0 is disastrous!
-                    if( this.parent != undefined && this.parent.colprefix != undefined )
-                        rEt = this.parent.colprefix+'_' + rEt;        		
-                } else {
-                    //rEt = ddl.objPrefix() + rEt;
-                }
-            var c = rEt.substr(0,1);
-            if (c >= '0' && c <= '9') {
-                rEt = 'x'+rEt;
-            } 
-            this.parsedName = amend_reserved_word(canonicalObjectName(rEt));
-            return this.parsedName;
+
+            return this.sugarcoatName(nameFrom, nameTo);
         };
         this.parseType = function( pure ) {
             if( this.children != null && 0 < this.children.length )
@@ -330,7 +333,15 @@ let tree = (function(){
                     booleanCheck = '\n' + tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+concatNames(ddl.objPrefix(),parent_child)+' check ('+this.parseName()+" in ('Y','N'))";
                     break;
                 }
+            } 
+            const dbVer = ddl.getOptionValue('db');
+            if( booleanCheck != '' && ( ddl.getOptionValue('boolean')=='native' 
+                                      || ddl.getOptionValue('boolean') != 'yn' && 0 < dbVer.length && dbVer.charAt(0) == '2' && dbVer.charAt(1) == '3' )
+            ) {
+                booleanCheck = '';
+                ret = 'boolean';
             }
+
 
             if( this.indexOf('phone_number') == 0 )
                 ret = 'number';
@@ -387,14 +398,14 @@ let tree = (function(){
             if( this.isOption('default') ) {
                 let value = '';
                 for( let i = this.indexOf('default')+1; i < src.length; i++ ) {
-                    const token = src[i].value;
+                    const token = src[i].getValue();
                     if( token == '/' )
                         break;
                     if( token == '-' )
                         break;
                     if( token == '[' )
                         break;
-                    value += src[i].value;
+                    value += src[i].getValue();
                 }
                 ret +=' default '+'on null ' + optQuote+value+optQuote ;
             }
@@ -407,7 +418,7 @@ let tree = (function(){
             ret += booleanCheck;
             if( this.isOption('between') ) {
                 const bi = this.indexOf('between');
-                const values = src[bi+1].value + ' and ' + src[bi+3].value;
+                const values = src[bi+1].getValue() + ' and ' + src[bi+3].getValue();
                 ret +=' constraint '+concatNames(parent_child,'_bet')+'\n';
                 ret +='           check ('+this.parseName()+' between '+values+')';        		
             }
@@ -435,36 +446,24 @@ let tree = (function(){
                 if( parent != null )
                     parentPref = parent.parseName()+'_';
                 const parent_child = concatNames(parentPref,this.parseName());
-                const tmp = this.trimmedContent().toLowerCase();
-                const start = tmp.indexOf('/check');
-                let end = tmp.lastIndexOf('/');
-                if( end == start)
-                    end = tmp.length;
-                let values = this.trimmedContent().substr(start+'/check'.length, end-start-'/check'.length).trim();
-                const srcConstr = lexer( values, false, true, '' ); 
+
                 let offset = tab;
                 if( parent != null )
                     offset = ' '.repeat(parent.maxChildNameLen());
-                if( this.children != null && 0 < this.children.length  ) {  // table level
-                    if( srcConstr[0].value != '(' )
-                        values = '( ' + values + ')';
-                    ret += tab + 'constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck');
-                    ret += '  check '+values+',\n';    
-                } else  if( srcConstr[0].value == '(' && srcConstr[srcConstr.length-1].value == ')'  ) {  
-                    ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
-                    ret += tab +  tab+offset +'check '+values;    
-                } else {
-                    if( 0 < values.indexOf(', ') )
-                        values = values.replace(/, /g,optQuote+','+optQuote);
-                    else if( 0 < values.indexOf(',') )
-                        values = values.replace(/,/g,optQuote+','+optQuote);
-                    else	
-                        values = values.replace(/ /g,optQuote+','+optQuote);
-                    ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
-                    ret += tab +  tab+offset +'check ('+this.parseName()+' in ('+optQuote+values+optQuote+'))';    
-                    ret = ret.replace(/''/gm,"'");    
+                let constr = this.getGeneralConstraint();
+                if( constr != null ) {
+                    if( this.children != null && 0 < this.children.length ) {  // (general) table level constraint
+                        ret += tab + 'constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck');
+                        ret += '  check '+ constr +',\n';    
+                    } else {                     // general column level constraint
+                        ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
+                        ret += tab +  tab+offset +'check '+ constr +'';    
+                    } 
+                    return ret;
                 }
-    		
+                const values = this.getValues('check');
+                ret +=' constraint '+concatNames(ddl.objPrefix(),parent_child,'_ck')+'\n';
+                ret += tab +  tab+offset +'check ('+this.parseName()+' in ('+values+'))';                    
             }
             return ret;
         }
@@ -486,6 +485,24 @@ let tree = (function(){
                     return child.parseName();
             }
             return null;
+        };
+
+        this.trimmedContent = function() {
+            var ret = this.content.trim();
+            var start = ret.indexOf('[');
+            var end = ret.indexOf(']');
+            if( this.comment == null && 0 < start ) 
+                this.comment = ret.substr(start+1, end-start-1);
+            if( 0 < start ) {
+                ret = ret.substr(0,start) + ret.substr(end+2);
+            }
+            start = ret.indexOf('--');
+            if( this.comment == null && 0 < start ) 
+                this.comment = ret.substr(start+2);
+            if( 0 < start ) {
+                ret = ret.substr(0,start);
+            }
+            return ret.trim();
         };
         
         this.refId = function() {
@@ -530,6 +547,9 @@ let tree = (function(){
                 pos = tmp.indexOf('/');
                 if( 0 < pos )
                     tmp = tmp.substring(0,pos).trim();
+                pos = tmp.indexOf('[');
+                if( 0 < pos )
+                    tmp = tmp.substring(0,pos).trim();
                 return tmp.replace(' ','_');
             }
             pos = tmp.indexOf('/reference');
@@ -540,42 +560,117 @@ let tree = (function(){
                 pos = tmp.indexOf('/');
                 if( 0 < pos )
                     tmp = tmp.substring(0,pos).trim();
+                pos = tmp.indexOf('[');
+                if( 0 < pos )
+                    tmp = tmp.substring(0,pos).trim();
                 return tmp.replace(' ','_');
             }
             return null;
         };
 
-        this.parseValues = function() {
-            var tmp = this.trimmedContent().toUpperCase();
-            var start;
-            var end;
-            var values;
-            if( this.isOption('check') || this.isOption('values') ) {
-                var substr = '/CHECK';
-                start = tmp.indexOf(substr);
-                if( start < 0 ) {
-                    substr = '/VALUES';
-                    start = tmp.indexOf(substr);  
+        this.getGeneralConstraint = function() { // parenthesized constraint to return verbatim, e.g. c1 /check (c1 in ('A','B','C'))
+            let from = this.indexOf('check');
+            if(   0 < from && this.src[from-1].value == '/' &&
+                ( this.src[from+1].value == '(' || this.src[from+1].value.toLowerCase() == 'not' ) 
+            ) {    
+                let i = from+2
+                for( ; i < this.src.length && this.src[i].value != '/' && this.src[i].value != '[' ; ) 
+                    i++;
+                let ret = this.content.substring(this.src[from+1].begin, this.src[i-1].end);
+                if( ret.charAt(0) != '(' )
+                    ret = '('+ret+')';
+                return ret;
+            }
+
+            return null;
+        }
+
+        this.listValues = function( check_or_values ) {
+            let ret = [];
+            let from = this.indexOf(check_or_values);
+ 
+            let separator = ' ';   // e.g. status /check open completed closed /values open, open, open, open, closed, completed 
+            for( let i = from+1; i < this.src.length && this.src[i].value != '/' && this.src[i].value != '[' ; i++ ) 
+                if( this.src[i].value == ',' ) { 
+                    separator = ',';
+                    break;
+                } else if( this.src[i].value.toLowerCase && this.src[i].value.toLowerCase() == 'and' ) { 
+                    separator = this.src[i].value;
+                    break;
+                }   
+
+            if( separator == ' ' )  {
+                for( let i = from+1; i < this.src.length && this.src[i].value != '/' && this.src[i].value != '[' ; i++ ) {
+                    let value = this.src[i].value;
+                    if( this.src[i].type == 'identifier' && value != 'null' )
+                        value = "'"+ value + "'";
+                    if( value.charAt(0) == '`' )
+                        value = value.substring(1,value.length-1);
+                    ret.push(value);
+                }  
+                return ret;
+            }
+
+            let aggrVal = null;
+            let type = null;
+            for( let i = from+1; i < this.src.length && this.src[i].value != '/' && this.src[i].value != '[' ; i++ ) {
+                let value = this.src[i].value;
+                let spacer = this.content.substring(this.src[i-1].end, this.src[i].begin);
+                if( value == separator ) {
+                    if( type == 'identifier' && aggrVal != 'null' )
+                        aggrVal = "'" + aggrVal + "'";
+                    ret.push(aggrVal); 
+                    aggrVal = null;
+                    type = null;
+                    continue;
                 }
-                end = tmp.lastIndexOf('/');
-                if( end == start)
-                    end = tmp.length;
-                values = tmp.substr(start+substr.length, end-start-substr.length).trim();
-                if( 0 < values.indexOf(',') ) {
-                    values = values.replace(/ /g,'');
-                    return values.split(',');
-                } else
-                    return values.split(' ');
+                if( value == '(' )
+                    continue;
+                if( value == ')' )
+                    continue;
+                if( value.charAt(0) == '`' )
+                    value = value.substring(1,value.length-1);
+                //if( value.charAt(0) == '\'' )
+                    //value = value.substring(1,value.length-1);
+                else if( this.src[i].type == 'identifier' )
+                    type = 'identifier';
+                if( aggrVal == null ) 
+                    aggrVal = value;
+                else   
+                    aggrVal += spacer+value;
+                
+            }
+            if( type == 'identifier' )
+                aggrVal = "'"+ aggrVal + "'";
+            ret.push(aggrVal); 
+            return ret;
+        }
+      
+
+        this.getValues = function( check_or_values ) {
+            let ret = '';
+
+            const values = this.listValues(check_or_values);
+            for( let i = 0; i < values.length; i++ ) {
+                if( 0 < i )
+                    ret += ',';
+                ret += values[i];
+            }
+            return ret;
+        }
+
+        this.parseValues = function() {
+            var values;
+            if( this.isOption('check') ) {
+                return this.listValues('check');
+            }
+            if( this.isOption('values') ) {
+                return this.listValues('values');
             }
             if( this.isOption('between') ) {
-                start = tmp.indexOf('/BETWEEN');
-                end = tmp.lastIndexOf('/');
-                if( end == start)
-                    end = tmp.length;
-                values = tmp.substr(start+'/BETWEEN'.length, end-start-'/BETWEEN'.length).trim();
-                values = values.replace(' AND ',' ');
+                var values = this.listValues('between');
                 var ret = [];
-                for( var i = parseInt(values.split(' ')[0]); i <= parseInt(values.split(' ')[1]) ; i++ )
+                for( var i = parseInt(values[0]); i <= parseInt(values[1]) ; i++ )
                     ret.push(i);
                 return ret;
             }
@@ -874,12 +969,10 @@ let tree = (function(){
                 ret += 'alter table '+objName+' add constraint '+objName+'_uk unique ('+cut+');\n\n';
             }
 
-
             //var j = 1;
             for( let i = 0; i < this.children.length; i++ ) {
                 var child = this.children[i];
-                let tmp = child.trimmedContent().toUpperCase();
-                if( 0 <= tmp.indexOf('/IDX') || 0 <= tmp.indexOf('/INDEX')  ) {
+                if( child.isOption('idx') || child.isOption('index')  ) {
                     if( num == 1 )    
                         ret += '-- table index\n';
                     ret += 'create index '+objName+'_i'+(num++)+' on '+objName+' ('+child.parseName()+');\n'; 
@@ -962,28 +1055,27 @@ let tree = (function(){
                 }
             }
             let objName = ddl.objPrefix()  + this.parseName();
-            let tmp = this.trimmedContent(); //.toLowerCase();
-            var chunks = tmp.split(' ');
+            var chunks = this.src;
             var ret = 'create or replace view ' +objName+ ' as\n';
             ret += 'select\n';
             var maxLen = 0;
             for( var i = 2; i < chunks.length; i++ ) { 
-                let tbl = ddl.find(chunks[i]);
+                let tbl = ddl.find(chunks[i].value);
                 if( tbl == null )
                     return '';
-                var len = (chunks[i]+'.id').length;
+                var len = (chunks[i].value+'.id').length;
                 if( maxLen < len )
                     maxLen = len;
                 for( var j = 0; j < tbl.children.length; j++ ) {
                     var child = tbl.children[j];
-                    len = (chunks[i]+'.'+child.parseName()).length;
+                    len = (chunks[i].value+'.'+child.parseName()).length;
                     if( maxLen < len )
                         maxLen = len;
                 }
             }
             var colCnts = {};
             for( let i = 2; i < chunks.length; i++ ) { 
-                let tbl = ddl.find(chunks[i]);
+                let tbl = ddl.find(chunks[i].value);
                 if( tbl == null )
                     continue;
                 for( let j = 0; j < tbl.children.length; j++ ) {
@@ -996,43 +1088,43 @@ let tree = (function(){
                 }
             }
             for( let i = 2; i < chunks.length; i++ ) { 
-                let tbl = ddl.find(chunks[i]);
+                let tbl = ddl.find(chunks[i].value);
                 if( tbl == null )
                     continue;
-                let pad = ' '.repeat(maxLen - (chunks[i]+'.id').length);
-                ret += tab + chunks[i]+'.id'+tab+pad+singular(chunks[i])+'_id,\n';
+                let pad = ' '.repeat(maxLen - (chunks[i].value+'.id').length);
+                ret += tab + chunks[i].value+'.id'+tab+pad+singular(chunks[i].value)+'_id,\n';
                 for( let j = 0; j < tbl.children.length; j++ ) {
                     let child = tbl.children[j];
                     if( 0 == child.children.length ) {
-                        pad = ' '.repeat(maxLen - (chunks[i]+'.'+child.parseName()).length);
+                        pad = ' '.repeat(maxLen - (chunks[i].value+'.'+child.parseName()).length);
                         var disambiguator = '';
                         if( 1< colCnts[child.parseName()] )
-                            disambiguator = singular(chunks[i])+'_';
-                        ret += tab + chunks[i]+'.'+child.parseName()+tab+pad+disambiguator+child.parseName()+',\n';
+                            disambiguator = singular(chunks[i].value)+'_';
+                        ret += tab + chunks[i].value+'.'+child.parseName()+tab+pad+disambiguator+child.parseName()+',\n';
                     }
                 }
-                let tmp = tbl.trimmedContent().toUpperCase();
-                if( ddl.optionEQvalue('rowVersion','yes') || 0 < tmp.indexOf('/ROWVERSION') ) {
+                if( ddl.optionEQvalue('rowVersion','yes') || tbl.isOption('rowversion') ) {
                     let pad = tab+' '.repeat(tbl.maxChildNameLen() - 'row_version'.length);
-                    ret += tab + chunks[i]+'.'+ 'row_version' + singular(pad + chunks[i])+'_'+ 'row_version,\n';              	
+                    ret += tab + chunks[i].value+'.'+ 'row_version' + singular(pad + chunks[i].value)+'_'+ 'row_version,\n';              	
                 }            	
-                if( ddl.optionEQvalue('rowkey','yes') || 0 < tmp.indexOf('/ROWKEY') ) {
+                if( ddl.optionEQvalue('rowkey','yes') || tbl.isOption('rowkey') ) {
                     let pad = tab+' '.repeat(tbl.maxChildNameLen() - 'ROW_KEY'.length);
-                    ret += tab + chunks[i]+'.'+ 'ROW_KEY' + singular(pad + chunks[i])+'_'+ 'ROW_KEY,\n';              	
+                    ret += tab + chunks[i].value+'.'+ 'ROW_KEY' + singular(pad + chunks[i].value)+'_'+ 'ROW_KEY,\n';              	
                 }            	
-                if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') || 0 < tmp.indexOf('/AUDIT COL') ) {
+                if( ddl.optionEQvalue('Audit Columns','yes') || tbl.isOption('auditcols') 
+                   || tbl.isOption('audit','col') || tbl.isOption('audit','cols') || tbl.isOption('audit','columns') ) {
                     let created = ddl.getOptionValue('createdcol');
                     let pad = tab+' '.repeat(tbl.maxChildNameLen() - created.length);
-                    ret += tab + chunks[i]+'.'+  created + singular(pad + chunks[i])+'_'+ created+',\n';  
+                    ret += tab + chunks[i].value+'.'+  created + singular(pad + chunks[i].value)+'_'+ created+',\n';  
                     let createdby = ddl.getOptionValue('createdbycol');
                     pad = tab+' '.repeat(tbl.maxChildNameLen() - createdby.length);
-                    ret += tab + chunks[i]+'.'+  createdby + singular(pad + chunks[i])+'_'+  createdby+',\n';  
+                    ret += tab + chunks[i].value+'.'+  createdby + singular(pad + chunks[i].value)+'_'+  createdby+',\n';  
                     let updated = ddl.getOptionValue('updatedcol');
                     pad = tab+' '.repeat(tbl.maxChildNameLen() - updated.length);
-                    ret += tab + chunks[i]+'.'+  updated + singular(pad + chunks[i])+'_'+  updated+',\n';  
+                    ret += tab + chunks[i].value+'.'+  updated + singular(pad + chunks[i].value)+'_'+  updated+',\n';  
                     let updatedby = ddl.getOptionValue('updatedbycol');
                     pad = tab+' '.repeat(tbl.maxChildNameLen() - updatedby.length);
-                    ret += tab + chunks[i]+'.'+  updatedby + singular(pad + chunks[i])+'_'+ updatedby + ',\n';  
+                    ret += tab + chunks[i].value+'.'+  updatedby + singular(pad + chunks[i].value)+'_'+ updatedby + ',\n';  
                 }            	
             }
             if( ret.lastIndexOf(',\n') == ret.length-2 )
@@ -1040,9 +1132,9 @@ let tree = (function(){
             ret += 'from\n'; 
             for( let i = 2; i < chunks.length; i++ ) {
                 let pad = ' '.repeat(maxLen - chunks[i].length);
-                var tbl = chunks[i];
+                var tbl = chunks[i].value;
                 if( ddl.objPrefix() != null && ddl.objPrefix() != '' )
-                    tbl = ddl.objPrefix()+chunks[i] + pad + chunks[i];
+                    tbl = ddl.objPrefix()+chunks[i].value + pad + chunks[i].value;
                 ret += tab + tbl + ',\n';
             }
             if( ret.lastIndexOf(',\n') == ret.length-2 )
@@ -1052,8 +1144,8 @@ let tree = (function(){
                 for( let j = 2; j < chunks.length; j++ ) {
                     if( j == i )
                         continue;
-                    var nameA = chunks[i];
-                    var nameB = chunks[j];
+                    var nameA = chunks[i].value;
+                    var nameB = chunks[j].value;
                     var nodeA = ddl.find(nameA);
                     if( nodeA == null )
                         continue;
@@ -1066,11 +1158,14 @@ let tree = (function(){
                             ret += tab + nameA+'.'+singular(parent)+'_id(+) = ' +nameB+'.id and\n';
                         }
                     }
-                } 
-            ret = replaceTrailing(ret, 'where\n');    
-            //^ trimmed
-            if( ret.lastIndexOf(' and') == ret.length-' and'.length )
-                ret = ret.substring(0,ret.length-' and'.length)+'\n';
+                }
+            ret = ret.toLowerCase();
+            let postfix =  'where\n';   
+            if( 0 < ret.indexOf(postfix) && ret.indexOf(postfix) == ret.length-postfix.length )
+                ret = ret.substring(0, ret.length-postfix.length).trim();           
+            postfix =  'and\n';   
+            if( 0 < ret.indexOf(postfix) && ret.indexOf(postfix) == ret.length-postfix.length )
+                ret = ret.substring(0, ret.length-postfix.length).trim();           
             ret += '/\n'; 
             return ret.toLowerCase();
         };
@@ -1106,8 +1201,7 @@ let tree = (function(){
             ret += '    on '+ objName.toLowerCase() +'\n';
             ret += '    for each row\n';
 
-            let tmp = this.trimmedContent().toUpperCase();
-            if( ddl.optionEQvalue('Rowkey','yes') || 0 < tmp.indexOf('/ROWKEY') )  {
+           if( ddl.optionEQvalue('rowkey','yes') || this.isOption('rowkey') )  {
                 ret += `declare
     function compress_int (n in integer ) return varchar2
     as
@@ -1139,7 +1233,7 @@ let tree = (function(){
             if( ddl.optionEQvalue('apex','yes') ) {
                 user = 'coalesce(sys_context(\'APEX$SESSION\',\'APP_USER\'),user)';
             }
-            if( ddl.optionEQvalue('rowkey','yes') || 0 < tmp.indexOf('/ROWKEY') )  {
+            if( ddl.optionEQvalue('rowkey','yes') || this.isOption('rowkey') )  {
                 ret += '    if inserting then\n';
                 ret += '        :new.row_key := compress_int(row_key_seq.nextval);\n';
                 ret += '    end if;\n';
@@ -1157,7 +1251,7 @@ let tree = (function(){
                 ret += '    :new.'+child.parseName().toLowerCase()+' := '+method+'(:new.'+child.parseName().toLowerCase()+');\n';
                 OK = true;
             }
-            if( ddl.optionEQvalue('Row Version Number','yes') || 0 < tmp.indexOf('/ROWVERSION') )  {
+            if( ddl.optionEQvalue('Row Version Number','yes') || this.isOption('rowversion') )  {
                 ret += '    if inserting then\n';
                 ret += '        :new.row_version := 1;\n';
                 ret += '    elsif updating then\n';
@@ -1165,7 +1259,7 @@ let tree = (function(){
                 ret += '    end if;\n';
                 OK = true;
             }
-            if( ddl.optionEQvalue('Audit Columns','yes') || 0 < tmp.indexOf('/AUDITCOLS') || 0 < tmp.indexOf('/AUDIT COL') ) {
+            if( ddl.optionEQvalue('Audit Columns','yes') || this.isOption('auditcols') || this.isOption('audit','col') || this.isOption('audit','cols') || this.isOption('audit','columns') ) {
                 ret += '    if inserting then\n';
                 ret += '        :new.'+ddl.getOptionValue('createdcol')+' := SYSDATE;\n'.toLowerCase();
                 ret += '        :new.'+ddl.getOptionValue('createdbycol')+' := '+user+';\n'.toLowerCase();
@@ -1345,12 +1439,10 @@ let tree = (function(){
         };
 
         this.cardinality = function() {
-            let tmp = this.trimmedContent().toLowerCase();
-            let start = tmp.indexOf('/insert ');
+            let start = this.isOption('insert');
             if( 0 < start ) {
-                tmp = tmp.substr(start+'/insert '.length);
-                let tmps = tmp.split(' ');
-                let ret =  parseInt(tmps[0]);
+                const pos = this.indexOf('insert');
+                let ret =  parseInt(this.src[pos+1].value);
                 const limit = ddl.getOptionValue('datalimit');
                 if( limit < ret )
                     ret = limit;
@@ -1367,7 +1459,8 @@ let tree = (function(){
             const tables = this.orderedTableNodes();
             let ret = '';
             for( let i = 0; i < tables.length; i++ ) {
-                const inserts = tab2inserts[tables[i].parseName()];
+                const objName = ddl.objPrefix()  + tables[i].parseName();
+                const inserts = tab2inserts[objName];
                 if( inserts != null )
                     ret += inserts;
             }
@@ -1381,7 +1474,7 @@ let tree = (function(){
             if( ddl.optionEQvalue('inserts',false) )
                 return '';
             
-            let objName = ddl.objPrefix()  + this.parseName();
+            const objName = ddl.objPrefix()  + this.parseName();
             let insert = '';
 
             let pkName = null;
@@ -1526,13 +1619,13 @@ let tree = (function(){
                                 values = [];
                                 values[0] = tmp[i];
                             }*/
-                            let datum = generateSample(objName, cname, child.parseType(), values);
+                            let datum = generateSample(objName, cname, child.parseType(pure=>true), values);
                             insert += tab + translate(ddl.getOptionValue('Data Language'), datum)+',\n';
                         }
                     }
                 }
                 if( insert.lastIndexOf(',\n') == insert.length-2 )
-                    insert = insert.substr(0,insert.length-2)+'\n';
+                    insert = insert.substring(0,insert.length-2)+'\n';
                 insert += ');\n';
             }
  
@@ -1591,12 +1684,11 @@ let tree = (function(){
         let path = [];
         let ret = [];
 
-        const src = lexer(fullInput+'\n',true,true,'');
+        const src = lexer(fullInput+'\n',true,true,'`');
         ddl.data = null;
         let poundDirective = null;
         let line = '';
-        let lineNo = 0;
-        OUTER: for( let i in src ) {
+        OUTER: for( let i = 0; i < src.length; i++ ) {
             const t = src[i];
 
             if( t.value == '\n' ) {
@@ -1607,17 +1699,16 @@ let tree = (function(){
                     //     continue;
                     if( '' == nc ) {
                         line = '';
-                        lineNo++;
                         continue;
                     }
-                    let node = new ddlnode(lineNo,line,null);  // node not attached to anything
+                    let node = new ddlnode(t.line-1,line,null);  // node not attached to anything
                     let matched = false;
                     for( let j = 0; j < path.length; j++ ) {
                         let cmp = path[j];
                         if( node.apparentDepth() <= cmp.apparentDepth() ) {
                             if( 0 < j ) {
                                 let parent = path[j-1];
-                                node = new ddlnode(lineNo,line,parent);  // attach node to parent
+                                node = new ddlnode(t.line-1,line,parent);  // attach node to parent
                                 path[j] = node;
                                 path = path.slice(0, j+1);
                                 matched = true;
@@ -1633,7 +1724,7 @@ let tree = (function(){
                     if( !matched ) {
                         if( 0 < path.length ) {
                             let parent = path[path.length-1];
-                            node = new ddlnode(lineNo,line,parent);
+                            node = new ddlnode(t.line-1,line,parent);
                         }
                         path.push(node);
                         if( node.apparentDepth() == 0 )
@@ -1649,7 +1740,6 @@ let tree = (function(){
                         parent.fks[node.parseName()+'_id'] = refId;
                     }
 
-                    lineNo++;
                     line = '';
                     continue;
                 }
@@ -1657,7 +1747,6 @@ let tree = (function(){
 
             if( poundDirective == null && t.value == '#' ) {
                 poundDirective = '';
-                lineNo++;
                 continue;
             }
             if( poundDirective != null ) {
@@ -1719,8 +1808,6 @@ let tree = (function(){
             if( t.type == 'line-comment' ) {  
                 if( 0 < line.trim().length ) {
                     line += t.value;
-                    //lineNo++;
-                    //line = '';                                          
                 }
                 continue;
             }
@@ -1728,13 +1815,6 @@ let tree = (function(){
         }          
         
         return ret;
-    }
-
-    function replaceTrailing ( ret, pOstfix ) { 
-        let postfix = pOstfix.toLowerCase();
-        if( 0 < ret.indexOf(postfix) && ret.indexOf(postfix) == ret.length-postfix.length )
-            return ret.substring(0, ret.length-postfix.length);
-        return ret.trim();
     }
 
 

@@ -11,6 +11,15 @@ var lexer = (function(){
         this.toString = function() {
             return '{type:'+type+',value:'+value+'}';
         };
+        this.getValue = function() {
+            if( this.value == null || this.value.length < 2 )
+                return this.value;
+            if( this.value.charAt(0) == '`' ) {
+                let ret = this.value.substring(1,this.value.length-1);
+                ret = "q'[" + ret + "]'";
+            }
+            return this.value;
+        };
         this.isStandardLiteral = function () {
             // fast fail
             if( this.value.length < 2 )
@@ -77,7 +86,7 @@ var lexer = (function(){
         var line = 0;
         var col = 0;
         for( var i = 0; i < chunks.length; i++ ) {
-            var token = chunks[i]/*.intern()*/;
+            var token = chunks[i];
             var last = null;
 
             if ( ret.length > 0 )
@@ -95,22 +104,6 @@ var lexer = (function(){
             }
             pos += token.length;
             // comments
-
-            if ( isWrapped ) {    // nuke everything between WRAPPED and /
-                if ( '/'==token && last != null && '\n'==last.value ) {
-                    var marker = '"/"';
-                    ret.push( new LexerToken( marker, pos-marker.length, pos, 'identifier', line, col ) );
-                    isWrapped = false;
-                    continue;
-                } else if ( '\n' == token ) {
-                    ret.push( new LexerToken(token, pos-token.length, pos, 'ws', line, col ) );
-                    continue;
-                } else {
-                    if ( '\n' == last.value )
-                        last.value = '?';
-                    continue;
-                }
-            }
             if( last != null && last.type == 'comment' && (last.value.lastIndexOf('*/')!=last.value.length-2 || last.value == '/*/') ) {
                 if( '*' == token || '/' == token )
                     last.value = last.value + token;
@@ -173,20 +166,6 @@ var lexer = (function(){
                 last.type = 'line-comment';
                 continue;
             }
-            if( ('REM'==token.toUpperCase() || 'REMA'==token.toUpperCase() || 'REMAR'==token.toUpperCase() || 'REMARK'==token.toUpperCase()
-                ||'PRO'==token.toUpperCase() || 'PROM'==token.toUpperCase() || 'PROMP'==token.toUpperCase() || 'PROMPT'==token.toUpperCase()
-            ) && (last == null || ('\n' == last.value||'\r' == last.value)) ) {
-                ret.push(new LexerToken(token, pos-token.length, -9, 'line-comment', line, col));
-                continue;
-            }
-            if( ('SODA'==token.toUpperCase() ) && (last == null || ('\n' == last.value||'\r' == last.value)) ) {
-                ret.push(new LexerToken(token, pos-token.length, -9, 'dbtools-command', line, col));
-                continue;
-            }
-            /*if( "@".equalsIgnoreCase(token)  && (last == null || "\n" == last.value||"\r" == last.value ) ) {     //$NON-NLS-4$//$NON-NLS-5$//$NON-NLS-6$
-                ret.push(new LexerToken(token, pos-1, -11, "identifier"));
-                continue;
-            }*/
 
             if( last != null && last.type == 'identifier' && last.end == -11 && last.value.indexOf('@')==0 && !('\n' == token||'\r' == token) ) {     //$NON-NLS-4$//$NON-NLS-5$//$NON-NLS-6$
                 last.value = last.value + token;
@@ -243,27 +222,6 @@ var lexer = (function(){
                 }
                 continue;
             }
-            /* TODO:
-                * if( "WRAPPED" == token.toUpperCase() && last != null ) {
-                Iterator<LexerToken> descIter = ret.descendingIterator();
-                boolean sawId = false;
-                while(descIter.hasNext()) {
-                LexerToken t = descIter.next();
-                if( sawId && ("PROCEDURE" == t.value.toUpperCase() || "FUNCTION" == t.value.toUpperCase() || "TRIGGER" == t.value.toUpperCase() ||
-                "TYPE" == t.value.toUpperCase() || "PACKAGE"==t.value.toUpperCase() ||
-                "BODY" == t.value.toUpperCase() ) {
-                isWrapped = true;
-                break;
-                }
-                if( t.type == "ws" || t.type == "comment" )
-                continue;
-                if( t.type == "identifier" ) {
-                sawId = true;
-                continue;
-                }
-                break;
-                }
-                }*/
 
             var type = 'identifier';
             

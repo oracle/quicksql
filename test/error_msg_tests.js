@@ -100,9 +100,14 @@ teams
     `).getErrors();
     checkNoError(output);
 
+    output = new quicksql(`/* line1
+    line2 */
+team_statuses
+    name /fk undefined
+    `).getErrors();
+    checkError(output, 3, 4+4+1+3+1, errorMsgs.messages.undefinedObject+'undefined');
+    
 }
-
-
 
 error_msg_tests();
 
