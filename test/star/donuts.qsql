@@ -10,4 +10,5 @@ donuts  /insert 2
          id vc100 /pk
          type    
       
-#settings = { genpk: false, pk: none }     
+#settings = { genpk: false, pk: none }   
+#semantics: char  

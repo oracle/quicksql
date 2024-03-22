@@ -323,13 +323,13 @@ let tree = (function(){
 
             let booleanCheck = '';
             if( src[0].value.endsWith('_yn') || src[0].value.startsWith('is_') ) {
-                ret = 'varchar2(1 char)';
+                ret = 'varchar2(1'+ddl.semantics()+ ')';
                 booleanCheck = '\n' + tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+concatNames(ddl.objPrefix(),parent_child)+' check ('+this.parseName()+" in ('Y','N'))";
             }
             for( let i in boolTypes ) {
                 let pos = this.indexOf(boolTypes[i]);
                 if( 0 < pos ) {
-                    ret = 'varchar2(1 char)';
+                    ret = 'varchar2(1'+ddl.semantics()+ ')';
                     booleanCheck = '\n' + tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+concatNames(ddl.objPrefix(),parent_child)+' check ('+this.parseName()+" in ('Y','N'))";
                     break;
                 }
@@ -868,7 +868,7 @@ let tree = (function(){
 
             if( ddl.optionEQvalue('rowkey',true) || this.isOption('rowkey') ) {
                 let pad = tab+' '.repeat(this.maxChildNameLen() - 'ROW_KEY'.length);
-                ret += tab +  'row_key' + pad + 'varchar2(30 char)\n';              	
+                ret += tab +  'row_key' + pad + 'varchar2(30'+ddl.semantics()+ ')\n';              	
                 ret += tab +  tab+' '.repeat(this.maxChildNameLen()) +'constraint '+objName+'_row_key_unq unique not null,\n';
             }            	
 

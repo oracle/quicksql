@@ -6,4 +6,5 @@ app_feature_items
    name vc255 /nn
 
 #api:y
-#pk: identityDataType   
+#pk: identityDataType  
+#semantics: char 

@@ -91,7 +91,7 @@ Bug35650456
     name  vc32k
     `).getDDL();
 
-    assert( "0 < output.indexOf('name    varchar2(32767 char)')" );
+    assert( "0 < output.indexOf('name    varchar2(32767)')" );
 
     output = new quicksql(`
 Bug35668454
@@ -111,8 +111,8 @@ Bugs35692739_35692703_35692625
         `).getDDL();
                    
     assert( "0 < output.indexOf('clob check (inventory is json)')" );
-    assert( "0 < output.indexOf('varchar2(50 char),')" );
-    assert( "0 < output.indexOf('varchar2(255 char)')" );
+    assert( "0 < output.indexOf('varchar2(50),')" );
+    assert( "0 < output.indexOf('varchar2(255)')" );
     assert( "0 < output.indexOf('date_creation      timestamp,')" );
     assert( "0 < output.indexOf('date_packed        timestamp with time zone,')" );
     assert( "0 < output.indexOf('date_production    timestamp with local time zone')" );
@@ -210,8 +210,8 @@ dept
     `,
     '{"apex":"Y","api":"N","auditcols":"N","compress":"N","date":"DATE","db":"19c","drop":"N","editionable":"N","genpk":"Y","inserts":"Y","language":"EN","longvc":null,"pk":"IDENTITY","prefix":null,"prefixpkwithtname":"N","rowkey":"N","rowversion":"N","schema":null,"semantics":"CHAR","createdcol":"created","createdbycol":"created_by","updatedcol":"updated","updatedbycol":"updated_by"}'
     ).getDDL();
-    
-    assert( "0 < output.indexOf('# settings = {\"apex\":\"Y\",\"db\":\"19c\",\"pk\":\"IDENTITY\"}')" );
+    //assert( "0 < output.indexOf('# settings = {\"apex\":\"Y\",\"db\":\"19c\",\"pk\":\"IDENTITY\"}')" );
+    assert( "0 < output.indexOf('# settings = {\"apex\":\"Y\",\"semantics\":\"CHAR\",\"db\":\"19c\",\"pk\":\"IDENTITY\"}')" );
 
     output = new quicksql(`
 dept /insert 5
@@ -296,7 +296,7 @@ bug35748389_2
     file_comments                  vc(4000) 
     tags          `).getDDL();
            
-    assert( "0 < output.indexOf('file_name        varchar2(512 char),')" );
+    assert( "0 < output.indexOf('file_name        varchar2(512),')" );
     assert( "output.indexOf('file_mimetype_mimetype') < 0" );
     assert( "output.indexOf('file_lastupd_filename') < 0" );
     
@@ -370,20 +370,20 @@ projects /insert 1
 `countries
     code vc2 /pk
     `).getDDL();
-    assert( " 0 < output.indexOf('code    varchar2(2 char) not null') " ); 
+    assert( " 0 < output.indexOf('code    varchar2(2) not null') " ); 
 
     output = new quicksql( 
 `countries
     country_id vc2 /pk 
     `).getDDL();
-    assert( " 0 < output.indexOf('country_id    varchar2(2 char) not null') " ); 
+    assert( " 0 < output.indexOf('country_id    varchar2(2) not null') " ); 
                     
     output = new quicksql( 
 `Bug35827840
     col1 vc
     `).getDDL();
         
-    assert( " 0 < output.indexOf('col1    varchar2(4000 char)') " );     
+    assert( " 0 < output.indexOf('col1    varchar2(4000)') " );     
 
     output = new quicksql( 
 `Bug35827927
@@ -395,7 +395,7 @@ projects /insert 1
                 
     assert( " 0 < output.indexOf('colstr    ') " );                                     
     assert( " 0 < output.indexOf('colvarchar    ') " );                                     
-    assert( " 0 < output.indexOf('colvarchar2    varchar2(4000 char)') " );                                     
+    assert( " 0 < output.indexOf('colvarchar2    varchar2(4000)') " );                                     
     assert( " 0 < output.indexOf('colchar    ') " );   
     
     output = new quicksql( 
@@ -405,13 +405,14 @@ projects /insert 1
     important2 bool
     is_important
     `).getDDL();
-    assert( " 0 < output.indexOf('important_yn    varchar2(1 char)') " );                                     
+    console.log(output);
+    assert( " 0 < output.indexOf('important_yn    varchar2(1)') " );                                     
     assert( " 0 < output.indexOf('constraint bug35814922_important_yn') " );                                     
-    assert( " 0 < output.indexOf('important1      varchar2(1 char)')" );                                     
+    assert( " 0 < output.indexOf('important1      varchar2(1)')" );                                     
     assert( " 0 < output.indexOf('constraint bug35814922_important1') " );                                     
-    assert( " 0 < output.indexOf('important2      varchar2(1 char)') " );    
+    assert( " 0 < output.indexOf('important2      varchar2(1)') " );    
     assert( " 0 < output.indexOf('constraint bug35814922_important2') " );    
-    assert( " 0 < output.indexOf('is_important    varchar2(1 char)') " );    
+    assert( " 0 < output.indexOf('is_important    varchar2(1)') " );    
     assert( " 0 < output.indexOf('constraint bug35814922_is_important') " );    
     
     output = new quicksql( 
@@ -569,21 +570,21 @@ students
     support_email vc100 /default support@oracle.com
     `).getDDL();
                            
-    assert( "0 < output.indexOf(\"support_email    varchar2(100 char) default on null 'support@oracle.com'\")" );      
+    assert( "0 < output.indexOf(\"support_email    varchar2(100) default on null 'support@oracle.com'\")" );      
 
     // https://github.com/oracle/quicksql/issues/49
     output = new quicksql( `change_history
     data_type vc20 /check VARCHAR2,CLOB,TSWLTZ
     `).getDDL();
                            
-    assert( "0 < output.indexOf(\"data_type    varchar2(20 char)\")" );      
+    assert( "0 < output.indexOf(\"data_type    varchar2(20)\")" );      
 
     // https://github.com/oracle/quicksql/issues/51
     output = new quicksql( `foo
     bar /boolean /default y
     `).getDDL();
                         
-    assert( "0 < output.indexOf(\"varchar2(1 char) default on null 'y'\")" );   
+    assert( "0 < output.indexOf(\"varchar2(1) default on null 'y'\")" );   
     assert( "0 < output.indexOf(\"constraint foo_bar check (bar in ('Y','N'))\")" );   
     
     // https://github.com/oracle/quicksql/issues/47
@@ -649,14 +650,12 @@ students
     output = new quicksql(`boolvalues
         ok   bool
         #boolean:native`).getDDL();
-    //console.log(output);
     assert( "0 < output.indexOf('ok    boolean')" );
 
     output = new quicksql(`boolvalues
     ok   bool
     #boolean:yn
     #db:"23c"`).getDDL();
-    console.log(output);
     assert( "output.indexOf('ok    boolean') < 0" );
 
     // https://github.com/oracle/quicksql/issues/55

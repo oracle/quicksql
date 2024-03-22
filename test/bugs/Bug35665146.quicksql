@@ -2,4 +2,5 @@ dept
     name
     created_on
 
-#pk: identityDataType       
+#pk: identityDataType   
+#semantics: char    

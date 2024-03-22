@@ -142,7 +142,7 @@ var json2qsql = (function () {
         let output = tc.output(name+signature(obj), obj, 0);
 
         //output += "\n\ndv "+name+"_dv "+name +"";
-        output += '\n\n#settings = { genpk: false, drop: true, pk: identityDataType }';
+        output += '\n\n#settings = { genpk: false, drop: true, pk: identityDataType, semantics: char }';
 
         output += '\n\n#flattened = \n';
         const tableContent = {};

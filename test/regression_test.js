@@ -166,6 +166,7 @@ console.log("Compared with 364-412 ms as of 10/2/2023");
 console.log("              506 ms     as of 11/8/2023");
 console.log("              800 ms     as of 1/24/2024");
 console.log("              590 ms     as of 2/8/2024");
+console.log("              486 ms     as of 3/22/2024");
 
 
 import {quicksql} from '../dist/quick-sql.js';

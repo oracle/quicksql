@@ -6,4 +6,5 @@ dept  /unique name, email /insert 0
         name
         email 
 
-#pk: identityDataType           
+#pk: identityDataType
+#semantics: char          

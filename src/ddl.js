@@ -22,7 +22,7 @@ export const quicksql = (function () {
             updatedbycol: {label: 'Updated By Column Name', value: 'updated_by'},
         boolean: {label: 'Boolean Datatype', value:'not set',check:['yn','native']},
         genpk: {label:'Auto Primary Key', value:'yes',check:['yes','no']},
-        semantics: {label: 'Character Strings',value:'CHAR',check:['BYTE','CHAR','Default']},
+        semantics: {label: 'Character Strings',value:'default',check:['BYTE','CHAR','Default']},
         language: {label: 'Data Language', value:'EN',check:['EN','JP','KO']},
         datalimit: {label: 'Data Limit Rows', value: 10000},
         date: {label: 'Date Data Type', value:'DATE',check:['DATE','TIMESTAMP',tswtz,tswltz]},
@@ -289,7 +289,7 @@ export const quicksql = (function () {
 
                 const nodeContent = descendants[i].trimmedContent().toUpperCase();
                 if( this.optionEQvalue('rowkey',true) || 0 < nodeContent.indexOf('/ROWKEY') ) {
-                    item.columns.push({name: 'row_key', datatype: 'varchar2(30 char)'});
+                    item.columns.push({name: 'row_key', datatype: 'varchar2(30'+this.semantics()+ ')'});
                 }            	
                 if( this.optionEQvalue('rowVersion','yes') || 0 < nodeContent.indexOf('/ROWVERSION') ) {
                     item.columns.push({name: 'row_version', datatype: 'integer'});
