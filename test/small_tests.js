@@ -674,11 +674,22 @@ students
     output = new quicksql(`departments /insert 1
     name /nn
     # settings = {"prefix":"test"}`).getDDL();
-    //console.log(output);
     assert( "0 < output.indexOf(\"insert into test_departments (\")" );
 
+    output = new quicksql(`# settings = {prefixPKwithTname:true, "api":"Y"}
+person
+    first_name 
+    last_name
+    first_date
+addreess
+    address1
+    address2
+    person_id`).getDDL();
+    //console.log(output);
+    assert( "output.indexOf(\"p_id\") < 0" );
+    
+    
 } 
-
 
 small_tests();
 

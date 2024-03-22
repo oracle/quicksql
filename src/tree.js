@@ -1302,7 +1302,11 @@ let tree = (function(){
             if( kind != 'get' )
                 mode = ' in';
             let ret =  tab+'procedure '+kind+'_row (\n'; 
-            ret += tab+tab+'p_id        in  number'+modifier;
+            let idColName = this.getGenIdColName();
+            if( idColName == null ) {
+                idColName = this.getExplicitPkName();
+            }
+            ret += tab+tab+'p_'+idColName+'        in  number'+modifier;
             for( var fk in this.fks ) {	
                 let parent = this.fks[fk];				
                 let type = 'number';
@@ -1326,17 +1330,21 @@ let tree = (function(){
             return ret;
         };
         this.procBody = function( kind /* get, insert, update */ ) {
+            let idColName = this.getGenIdColName();
+            if( idColName == null ) {
+                idColName = this.getExplicitPkName();
+            }
             let objName = ddl.objPrefix()  + this.parseName();
             let ret =    tab+'is \n';
             ret +=    tab+'begin \n';
-            let prelude =    tab+tab+'for c1 in (select * from '+objName+' where id = p_id) loop \n';
+            let prelude =    tab+tab+'for c1 in (select * from '+objName+' where '+idColName+' = p_'+idColName+') loop \n';
             if( kind == 'insert' ) {
                 prelude =    tab+tab+'insert into '+objName+' ( \n';
-                prelude += tab+tab+tab+'id';
+                prelude += tab+tab+tab+idColName;
             }
             if( kind == 'update' ) {
                 prelude =    tab+tab+'update  '+objName+' set \n';
-                prelude += tab+tab+tab+'id = p_id';
+                prelude += tab+tab+tab+idColName+' = p_'+idColName;
             }
             ret += prelude;
             for( let fk in this.fks ) {	
@@ -1352,7 +1360,7 @@ let tree = (function(){
                 if( kind == 'insert' ) 
                     row = tab+tab+tab+fk;
                 if( kind == 'update' ) 
-                    row = tab+tab+tab+fk+' = P_'+fk+'\n';	
+                    row = tab+tab+tab+fk+' = P_'+fk;	
                 ret += row;
             }
             for( var i = 0; i < this.children.length; i++ ) {
@@ -1367,12 +1375,12 @@ let tree = (function(){
                 if( kind == 'insert' ) 
                     row = tab+tab+tab+child.parseName().toLowerCase();
                 if( kind == 'update' ) 
-                    row = tab+tab+tab+child.parseName().toLowerCase()+' = P_'+child.parseName().toLowerCase()+'\n';	
+                    row = tab+tab+tab+child.parseName().toLowerCase()+' = P_'+child.parseName().toLowerCase();	
                 ret += row;
             }
             if( kind == 'insert' ) {
                 ret +=    '\n'+tab+tab+') values ( \n';
-                ret +=    tab+tab+tab+'p_id';
+                ret +=    tab+tab+tab+'p_'+idColName;
                 for( let fk in this.fks ) {	
                     ret += ',\n';
                     ret += tab+tab+tab+'p_'+fk;
@@ -1391,7 +1399,7 @@ let tree = (function(){
             if( kind == 'insert' )
                 finale = '\n'+tab+tab+');';
             if( kind == 'update' )
-                finale = tab+tab+'where id = p_id;';
+                finale = '\n'+tab+tab+'where '+idColName+' = p_'+idColName+';';
             ret += finale;
             ret += '\n'+tab+'end '+kind+'_row;\n ';
             ret += '\n ';
@@ -1408,8 +1416,12 @@ let tree = (function(){
             ret += ';\n\n';
             ret += this.procDecl('update'); 
             ret += ';\n\n';
+            let idColName = this.getGenIdColName();
+            if( idColName == null ) {
+                idColName = this.getExplicitPkName();
+            }
             ret += '    procedure delete_row (\n'+
-                '        p_id              in number\n'+
+                '        p_'+idColName+'              in number\n'+
                 '    );\n'+
                 'end '+objName.toLowerCase()+'_api;\n'+
                 '/\n\n';
@@ -1427,11 +1439,11 @@ let tree = (function(){
             ret += this.procBody('update'); 
 
             ret += '    procedure delete_row (\n';
-            ret += '        p_id              in number\n';
+            ret += '        p_'+idColName+'              in number\n';
             ret += '    )\n';
             ret += '    is\n';
             ret += '    begin\n';
-            ret += '        delete from '+objName.toLowerCase()+' where id = p_id;\n';
+            ret += '        delete from '+objName.toLowerCase()+' where '+idColName+' = p_'+idColName+';\n';
             ret += '    end delete_row;\n';
             ret += 'end '+objName.toLowerCase()+'_api;\n';
             ret += '/\n';
