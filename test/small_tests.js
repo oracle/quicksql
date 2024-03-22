@@ -306,7 +306,6 @@ bug35748389_2
     # settings = {"apex":"false"}
     `, '{"apex":"true"}').getDDL();
                
-    //console.log(output);
     assert( "0 < output.indexOf(':new.created_by := user;')" );
     assert( "output.indexOf('APEX$SESSION') < 0" );
 
@@ -422,7 +421,6 @@ projects /insert 1
     locatilon;drop user sys;
     country;shutdown abort;a  
     `).getDDL();
-                    
     assert( " 0 < output.indexOf('\"ファーストネーム\"') " );                                     
     assert( " 0 < output.indexOf('\"Das Gedöns\"') " );                                     
     assert( " 0 < output.indexOf('\"locatilon;drop user sys;\"') " );                                     
@@ -632,18 +630,62 @@ students
      dname
     `).getDDL();
 
-    //console.log(output);
     assert( "0 < output.indexOf('number default on null to_number(sys_guid()')" );
 
-        
-}    
+    // https://github.com/oracle/quicksql/issues/51
+    output = new quicksql(`boolvalues
+    is_legal
+    finished_yn
+    ok   bool
+    yes  boolean
+    #db:"23c"`).getDDL();
+
+    assert( "0 < output.indexOf('is_legal       boolean,')" );
+    assert( "0 < output.indexOf('finished_yn    boolean,')" );
+    assert( "0 < output.indexOf('ok             boolean,')" );
+    assert( "0 < output.indexOf('yes            boolean')" );
+
+    // https://github.com/oracle/quicksql/issues/51
+    output = new quicksql(`boolvalues
+        ok   bool
+        #boolean:native`).getDDL();
+    //console.log(output);
+    assert( "0 < output.indexOf('ok    boolean')" );
+
+    output = new quicksql(`boolvalues
+    ok   bool
+    #boolean:yn
+    #db:"23c"`).getDDL();
+    console.log(output);
+    assert( "output.indexOf('ok    boolean') < 0" );
+
+    // https://github.com/oracle/quicksql/issues/55
+    output = new quicksql(`escape /insert 1
+    financial_year /check '23/24', \`'24/25'\`
+    surname vc60 /check 'O''Hara', q'{O'Tool}'  
+    start_date /check  \`to_date('01-APR-2025','DD-MON-YYYY')\``).getDDL();
+    assert( "0 < output.indexOf(\"check (financial_year in ('23/24','24/25')),\")" );
+    assert( "0 < output.indexOf(\"check (surname in ('O''Hara',q'{O'Tool}')),\")" );
+    assert( "0 < output.indexOf(\"check (start_date in (to_date('01-APR-2025','DD-MON-YYYY')))\")" );
+    assert( "output.indexOf(\"''24/25''\") < 0" );
+    assert( "output.indexOf(\"q''{O''Tool}''\") < 0" );
+    assert( "output.indexOf(\"to_date(''01-APR-2025'',''DD-MON-YYYY'')\") < 0" );
+  
+    output = new quicksql(`departments /insert 1
+    name /nn
+    # settings = {"prefix":"test"}`).getDDL();
+    //console.log(output);
+    assert( "0 < output.indexOf(\"insert into test_departments (\")" );
+
+} 
+
 
 small_tests();
 
 console.log(assertionCnt);
 
 // metatest that watches tests
-const minimalTestCnt = 120;
+const minimalTestCnt = 130;
 if( assertionCnt < minimalTestCnt ) {
     console.error("assertionCnt < "+minimalTestCnt);
     throw new Error('Test failed');

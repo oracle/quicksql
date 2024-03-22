@@ -20,12 +20,13 @@ export const quicksql = (function () {
             createdbycol: {label: 'Created By Column Name', value: 'created_by'},
             updatedcol: {label: 'Updated Column Name', value: 'updated'},
             updatedbycol: {label: 'Updated By Column Name', value: 'updated_by'},
+        boolean: {label: 'Boolean Datatype', value:'not set',check:['yn','native']},
         genpk: {label:'Auto Primary Key', value:'yes',check:['yes','no']},
         semantics: {label: 'Character Strings',value:'CHAR',check:['BYTE','CHAR','Default']},
         language: {label: 'Data Language', value:'EN',check:['EN','JP','KO']},
         datalimit: {label: 'Data Limit Rows', value: 10000},
         date: {label: 'Date Data Type', value:'DATE',check:['DATE','TIMESTAMP',tswtz,tswltz]},
-        db: {label: 'DB', value:'no',check:['not used']},  
+        db: {label: 'Database Version', value:'not set'},  
         dv: {label: 'Duality View', value:'no',check:['yes','no']},  // switched default to 'no' until thorough development&testig
         drop: {label: 'Include Drops', value:'no',check:['yes','no']},
         editionable: {label: 'Editinable', value:'no',check:['yes','no']},
@@ -510,6 +511,7 @@ quicksql.version = qsql_version;
 quicksql.toDDL = toDDL;  
 quicksql.toERD = toERD;  
 quicksql.toErrors = toErrors;  
-quicksql.fromJSON = fromJSON;  
+quicksql.fromJSON = fromJSON; 
+quicksql.lexer = lexer; 
 
 export default quicksql;
