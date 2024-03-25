@@ -1,12 +1,14 @@
 import  {quicksql,fromJSON} from "../src/ddl.js";
 
+import {checkNoError} from './error_msg_tests.js'
+
 import fs from "fs";
   
 try {
-    let file = '//bugs/Bug35637614.quicksql';
+    let file = '//bugs/Bug35063257.quicksql';
     //file = '//experimental/food_product.json';
-    file = '//constraints.qsql';
-    //file = '//apex/timecard.quicksql';
+    file = '//star/donuts.qsql';
+    //file = '//JSON/car_racing/1.qsql';
 
     let args = process.argv.slice(2);
     if( 0 < args.length )
@@ -40,8 +42,12 @@ try {
     let t1 = Date.now();
     if( 0 <= file.indexOf('/erd/') ) {
         output = JSON.stringify(new quicksql(input).toERD(), null, 4);
-    } else
-        output = new quicksql(input).getDDL();
+    } else {
+        const p = new quicksql(input);
+        const errors =  p.getErrors(text);
+        checkNoError(errors);
+        output = p.getDDL();
+    }
         
     console.log("DDL Time = "+(Date.now()-t1));    
     

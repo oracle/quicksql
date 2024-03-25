@@ -57,7 +57,7 @@ function compareTokens( so, sc, strict ) {
     return false;
 }
 
-import checkNoError from './error_msg_tests.js'
+import {checkNoError} from './error_msg_tests.js'
 
 
 function processFile( subdir, file ) {
@@ -152,12 +152,12 @@ console.log('small_tests.js');
 import diagram_tests from './diagram_tests.js'
 console.log('diagram_tests.js');   
 
-import error_msg_tests from './error_msg_tests.js'
-console.log('error_msg_tests.js');   
-
 
 processFile('./test', '');
 
+import {error_msg_tests} from './error_msg_tests.js'
+error_msg_tests();
+console.log('error_msg_tests.js');   
 
 console.log("All tests are OK");
 

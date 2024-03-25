@@ -3,7 +3,7 @@ import errorMsgs from '../src/errorMsgs.js'
 
 var assertionCnt = 0;
 
-function checkError(msgList, line, offset, msg) {
+export function checkError(msgList, line, offset, msg) {
     assertionCnt++;
     for( const i in msgList ) {
         if( msgList[i].from.line == line && msgList[i].from.depth == offset && msgList[i].message == msg ) {
@@ -27,7 +27,7 @@ export function checkNoError(msgList, msgPrefix) {
 
 var output;
 
-export default function error_msg_tests() {
+export function error_msg_tests() {
 
     output =toErrors(`dept
     id
@@ -107,14 +107,15 @@ team_statuses
     `).getErrors();
     checkError(output, 3, 4+4+1+3+1, errorMsgs.messages.undefinedObject+'undefined');
     
+    console.log(assertionCnt);
+
+    const minimalTestCnt = 10;
+    if( assertionCnt < minimalTestCnt ) {
+        console.error("assertionCnt < "+minimalTestCnt);
+        throw new Error('Test failed');
+    } 
 }
 
-error_msg_tests();
 
-console.log(assertionCnt);
 
-const minimalTestCnt = 10;
-if( assertionCnt < minimalTestCnt ) {
-    console.error("assertionCnt < "+minimalTestCnt);
-    throw new Error('Test failed');
-} 
+

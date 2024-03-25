@@ -47,7 +47,7 @@ export default function diagram_tests() {
     output = new quicksql(input).getERD();
 
     assert( "output.items[0].columns[2].name == 'data_filename'" );
-    assert( "output.items[0].columns[2].datatype == 'varchar2(255)'" );
+    assert( "output.items[0].columns[2].datatype == 'varchar2(255 char)'" );
     assert( "output.items[0].columns[5].name == 'data_lastupd'" );
     assert( "output.items[0].columns[5].datatype == 'date'" );
 
