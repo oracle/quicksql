@@ -6,26 +6,25 @@ import './renderer.js';
 import './quick-erd.css';
 
 import utils from './utils.js';
-import AutoLayout from './auto-layout.js';
 
 export class Diagram {
-    constructor( data, elementOrSelector = '#quickERD' ) {
+    constructor(data, elementOrSelector = '#quickERD') {
         if (
             !elementOrSelector
             || (
                 !(
                     typeof elementOrSelector === 'string'
-                    && ( this.element = document.querySelector( elementOrSelector ) )
+                    && (this.element = document.querySelector(elementOrSelector))
                 )
                 && !(
                     typeof elementOrSelector === 'object'
-                    && ( this.element = elementOrSelector )
+                    && (this.element = elementOrSelector)
                     // Duck typing for now
-                    && ( typeof this.element.append === 'function' )
+                    && (typeof this.element.append === 'function')
                 )
             )
         ) {
-            throw new Error( 'Invalid element or selector provided' );
+            throw new Error('Invalid element or selector provided');
         }
 
         joint.anchors.columnAnchor = function (view, magnet, ref) {
@@ -61,7 +60,7 @@ export class Diagram {
             interactive: {
                 vertexAdd: false,
                 linkMove: false,
-                elementMove: false
+                elementMove: true
             }
         });
 
@@ -88,33 +87,35 @@ export class Diagram {
             this.onMouseWheel(evt, x, y, delta);
         });
 
+        new joint.ui.Snaplines({ paper: this.paper });
+
         if (this.keyboard) {
             this.keyboard.disable();
         }
         this.keyboard = new joint.ui.Keyboard();
         this.keyboard.on({
 
-            'alt+a': function (evt) {
+            'shift+alt+a': function (evt) {
                 this.actualSize();
                 evt.preventDefault();
                 evt.stopPropagation();
             },
-            'alt+c': function (evt) {
+            'shift+alt+c': function (evt) {
                 this.paperScroller.centerContent();
                 evt.preventDefault();
                 evt.stopPropagation();
             },
-            'alt+f': function (evt) {
+            'shift+alt+f': function (evt) {
                 this.fitScreen();
                 evt.preventDefault();
                 evt.stopPropagation();
             },
-            'alt+p': function (evt) {
+            'shift+alt+p': function (evt) {
                 this.printDiagram();
                 evt.preventDefault();
                 evt.stopPropagation();
             },
-            'alt+s': function (evt) {
+            'shift+alt+s': function (evt) {
                 this.exportAsSVG();
                 evt.preventDefault();
                 evt.stopPropagation();
@@ -122,7 +123,7 @@ export class Diagram {
 
         }, this);
 
-        this.element.append( this.paperScroller.render().el );
+        this.element.append(this.paperScroller.render().el);
 
         this.updateDiagram();
     }
@@ -191,7 +192,7 @@ export class Diagram {
 
         let table = new joint.shapes.quicksql.Table({
             id: utils.newGuid(),
-            size: {width: objectWidth}
+            size: { width: objectWidth }
         });
 
         table.setName(fullName);
@@ -207,7 +208,7 @@ export class Diagram {
 
         let view = new joint.shapes.quicksql.View({
             id: utils.newGuid(),
-            size: {width: objectWidth}
+            size: { width: objectWidth }
         });
 
         view.setName(fullName);
@@ -224,45 +225,6 @@ export class Diagram {
         });
         return link;
     };
-
-
-    getAllElements() {
-        let list = [];
-        let elements = this.graph.getElements();
-        let count = elements.length;
-        for (var i = 0; i < count; i++) {
-            let element = elements[i];
-            let obj = {};
-            obj.element = element;
-            obj.type = element.attributes.type;
-            obj.name = element.attributes.name;
-            obj.schema = element.attributes.schema;
-            obj.id = element.id;
-            obj.pos = { x: element.attributes.position.x, y: element.attributes.position.y };
-            obj.size = { width: element.attributes.size.width, height: element.attributes.size.height };
-
-            list.push(obj);
-        }
-        return list;
-    }
-
-    getAllLinks() {
-        let list = [];
-        let links = this.graph.getLinks();
-        let count = links.length;
-        for (var i = 0; i < count; i++) {
-            let link = links[i];
-            if (link.attributes.type === 'quicksql.Relation') {
-                var obj = {};
-                obj.link = link;
-                obj.sourceID = link.attributes.target.id; // JointJS has opposite source and target
-                obj.targetID = link.attributes.source.id;
-                obj.id = obj.targetID.concat('_').concat(obj.sourceID);
-                list.push(obj);
-            }
-        }
-        return list;
-    }
 
     printDiagram = () => {
         this.paper.print();
@@ -347,9 +309,15 @@ export class Diagram {
     };
 
     autoLayout() {
-        var layout = new AutoLayout(this);
-        layout.rearrangeDiagram(3, false);
-        this.paperScroller.centerContent();
+        joint.layout.DirectedGraph.layout(this.graph, {
+            nodeSep: 120,
+            edgeSep: 100,
+            rankSep: 100
+        });
+
+        this.graph.getLinks().forEach(link => {
+            link.toBack();
+        });
     }
 }
 

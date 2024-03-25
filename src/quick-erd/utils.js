@@ -18,7 +18,7 @@ utils.calcWidth = function (schema, name, columns) {
     if (schema) {
         objName = schema.concat('.').concat(name);
     }
-    var nameWidth = utils.getTextWidth(objName, `12pt ${FONT_NAME}`);
+    var nameWidth = utils.getTextWidth(objName, `12pt ${FONT_NAME}`) + 0;
     var colWidth = 0;
     var dtWidth = 0;
     for (var i = 0; i < columns.length; i++) {
@@ -26,9 +26,9 @@ utils.calcWidth = function (schema, name, columns) {
         dtWidth = Math.max(dtWidth, utils.getTextWidth(columns[i].datatype, `10pt ${FONT_NAME}`));
     }
 
-    const cdtWidth = (dtWidth > colWidth) ? (dtWidth * 2) : colWidth + dtWidth + 20;
+    const cdtWidth = (dtWidth > colWidth) ? (dtWidth * 2) + 20 : colWidth + dtWidth + 20;
     let width = Math.max(nameWidth, cdtWidth);
-    return width;
+    return Math.max(width, 230);
 };
 
 utils.getTextWidth = function (text, font) {
