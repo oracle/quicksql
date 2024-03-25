@@ -9259,7 +9259,7 @@ function Ee(h, d) {
   return new Y(h, d).getErrors();
 }
 function le() {
-  return "1.2.9";
+  return "1.2.10";
 }
 Y.version = le;
 Y.toDDL = Pe;

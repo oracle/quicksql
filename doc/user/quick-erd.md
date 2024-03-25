@@ -20,6 +20,8 @@ You need to add the following dependencies to your HTML:
     - jQuery
     - lodash
     - Backbone JS
+    - graphlib
+    - dagre
 
 ## ERD Browser ESM Example
 
@@ -53,6 +55,8 @@ You need to add the following dependencies to your HTML:
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js" integrity="sha256-qXBd/EfAdjOA2FGrGAG+b3YBn2tn5A6bhz+LSgYD96k=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/backbone@1.5.0/backbone-min.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/graphlib@2.1.8/dist/graphlib.core.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.core.min.js"></script>
 
         <!-- Assuming you put the rappid.min.js file in this path -->
         <script src="./examples/diagram-generator/libs/rappid.min.js"></script>
@@ -119,6 +123,8 @@ view emp_v departments employees
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js" integrity="sha256-qXBd/EfAdjOA2FGrGAG+b3YBn2tn5A6bhz+LSgYD96k=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/backbone@1.5.0/backbone-min.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/graphlib@2.1.8/dist/graphlib.core.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.core.min.js"></script>
 
         <!-- Assuming you put the rappid.min.js file in this path -->
         <script src="./examples/diagram-generator/libs/rappid.min.js"></script>
