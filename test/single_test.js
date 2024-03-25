@@ -7,7 +7,7 @@ import fs from "fs";
 try {
     let file = '//bugs/Bug35063257.quicksql';
     //file = '//experimental/food_product.json';
-    file = '//star/donuts.qsql';
+    file = '//erd/Bug35814250/1-3.qsql';
     //file = '//JSON/car_racing/1.qsql';
 
     let args = process.argv.slice(2);
@@ -41,7 +41,8 @@ try {
     }
     let t1 = Date.now();
     if( 0 <= file.indexOf('/erd/') ) {
-        output = JSON.stringify(new quicksql(input).toERD(), null, 4);
+        const p = new quicksql(input);
+        output = JSON.stringify(p.getERD(), null, 4);
     } else {
         const p = new quicksql(input);
         const errors =  p.getErrors(text);

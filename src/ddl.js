@@ -269,13 +269,61 @@ export const quicksql = (function () {
                 
                 output.items.push(item);
 
-                let id = descendants[i].getGenIdColName();
-                if( id != null )
-                    item.columns.push({name: id, datatype: "number"});
-
+                let idColName = descendants[i].getGenIdColName();
+                if( idColName != null && !descendants[i].isOption('pk') ) {
+                    item.columns.push({name: idColName, datatype: "number"});
+                } else {
+                    let pkName = descendants[i].getExplicitPkName();
+                    if( pkName != null && pkName.indexOf(',') < 0 ) {
+                        let type = 'number';
+                        const child = descendants[i].findChild(pkName);
+                        if( child != null )
+                            type = child.parseType();
+                        item.columns.push({name: pkName, datatype: type});
+                    }
+                }
+     
+                descendants[i].lateInitFks();
+                for( let fk in descendants[i].fks ) {
+                    let parent = descendants[i].fks[fk];
+                    if( 0 < fk.indexOf(',') ) {
+                        let refNode = this.find(parent);
+                        var chunks = split_str(fk,', ');
+                        for( var ii = 0; ii < chunks.length; ii++ ) {
+                            var col = chunks[ii];
+                            if( col == ',' )
+                                continue;
+                            const pChild = refNode.findChild(col);
+                            item.columns.push({name: col, datatype: pChild.parseType(pure=>true)});
+                        }
+                        continue;
+                    }
+                    let type = 'number';
+                    const attr = descendants[i].findChild(fk);
+                    if( attr != null )
+                        type = attr.parseType('fk');		
+                    let refNode = this.find(parent);
+                    let _id = ''; 
+                    if( refNode != null ) {
+                        const rname = refNode.getExplicitPkName();  
+                        if( rname != null && rname.indexOf(',') < 0 )
+                            type = refNode.getPkType();  
+                    } else {
+                        refNode = this.find(fk);
+                        if( refNode.isMany2One() & !fk.endsWith('_id') ) {
+                            parent = fk;
+                            fk = singular(fk);
+                            _id = '_id';  
+                        }
+                    }
+                    item.columns.push({name: fk, datatype: type});                    
+                }
+    
                 for( let j = 0; j < descendants[i].children.length; j++ ) {
                     let child = descendants[i].children[j];
                     if( child.parseType() == 'table' ) 
+                        continue;
+                    if( child.refId() != null )
                         continue;
                     item.columns.push({name: child.parseName(''), datatype: child.parseType(pure=>true)});
                     if( 0 < child.indexOf('file') ) {

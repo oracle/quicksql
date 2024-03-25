@@ -735,19 +735,10 @@ let tree = (function(){
             return 'number';
         }
 
-        this.singleDDL = function() {
-            
-            if( this.children.length == 0 && 0 < this.apparentDepth() ) {
-                let pad = tab;
-                if( this.parent != undefined )
-                    pad += ' '.repeat(this.parent.maxChildNameLen() - this.parseName().length);
-                return this.parseName()+pad+this.parseType();
-            }
-
+        this.lateInitFks = function() {
             if( this.fks == null ) {
                 this.fks = [];
             }
-
 
             if( !this.isMany2One() ) {
                 if( this.parent != null && this.parseType() == 'table' ) {
@@ -762,6 +753,18 @@ let tree = (function(){
                         this.fks[this.children[i].parseName()]=this.children[i].refId();
                     }
             } //...else   -- too lae to do here, performed earlier, during recognize()
+        }
+
+        this.singleDDL = function() {
+            
+            if( this.children.length == 0 && 0 < this.apparentDepth() ) {
+                let pad = tab;
+                if( this.parent != undefined )
+                    pad += ' '.repeat(this.parent.maxChildNameLen() - this.parseName().length);
+                return this.parseName()+pad+this.parseType();
+            }
+
+            this.lateInitFks();
             
             const cp = this.getOptionValue('colprefix');
             if( cp != null )
