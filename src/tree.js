@@ -197,6 +197,10 @@ let tree = (function(){
         }
  
         this.src = lexer( this.content/*.toLowerCase()*/, false, true, '`' ); 
+
+        const cp = this.getOptionValue('colprefix');
+        if( cp != null )
+            this.colprefix = cp;
          
         this.parsedName = null;
         this.parseName = function () {  
@@ -766,10 +770,6 @@ let tree = (function(){
 
             this.lateInitFks();
             
-            const cp = this.getOptionValue('colprefix');
-            if( cp != null )
-                this.colprefix = cp;
-
             //var indexedColumns = [];
             var ret = '';
 
@@ -1716,7 +1716,7 @@ let tree = (function(){
                         line = '';
                         continue;
                     }
-                    let node = new ddlnode(t.line-1,line,null);  // node not attached to anything
+                    let node = new ddlnode(t.line-1,line,null);  // node not attached to anything        
                     let matched = false;
                     for( let j = 0; j < path.length; j++ ) {
                         let cmp = path[j];
