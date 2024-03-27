@@ -3,3 +3,4 @@ bug35756025
     dname vc14
     loc   vc13
 # pk: none
+#semantics: char

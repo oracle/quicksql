@@ -4,3 +4,4 @@ bug35756025
     loc   vc13
 
 #pk: identityDataType    
+#semantics: char

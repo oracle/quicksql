@@ -4,3 +4,4 @@ dept
 emp   
 
 #pk: identityDataType   
+#semantics: char

@@ -8,4 +8,5 @@ departments /audit
       job vc255
       hiredate
 
-#pk: identityDataType         
+#pk: identityDataType  
+#semantics: char      

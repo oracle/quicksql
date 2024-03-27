@@ -3,4 +3,5 @@ BOOKS
     AUTHOR
     AVAILABLE /NN /default Y
 
-#pk: identityDataType       
+#pk: identityDataType    
+#semantics: char   

@@ -1,5 +1,7 @@
 #apex: true, auditcols: true 
 #pk: identityDataType   
+#semantics: char
+
 assignees /insert 10
   full_name /nn
   email

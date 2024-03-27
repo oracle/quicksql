@@ -14,3 +14,5 @@ order_lines
     order_id /fk orders /cascade
     product_id /fk products
     quantity num(8,2)
+
+#semantics: char    

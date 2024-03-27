@@ -41,3 +41,13 @@ Fixed invalid 'Misaligned Table ...' error, exhibited in vscode QSQL extension (
 NPX command
 
 Error diagnostic fixes
+
+## [1.2.10] - 2024-3-22
+
+#41
+
+## [1.2.11] - 2024-3-22
+
+#57
+
+

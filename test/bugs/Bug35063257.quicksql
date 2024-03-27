@@ -20,4 +20,5 @@ line_fulfillments
     warehouse_id /fk warehouses
     line_id /cascade /fk order_lines
 
-#pk: identityDataType       
+#pk: identityDataType      
+#semantics: char 

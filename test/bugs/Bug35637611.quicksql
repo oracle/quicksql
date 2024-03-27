@@ -7,4 +7,5 @@ departments /api
       email /lower
       cost center num
 
-#pk: identityDataType         
+#pk: identityDataType      
+#semantics: char   

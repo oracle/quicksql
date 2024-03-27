@@ -11,6 +11,7 @@ function assert( condition ) {
 }
 
 var output;
+var output1;
 var input;
 
 
@@ -29,7 +30,6 @@ export default function diagram_tests() {
         name
     `
     output = JSON.stringify(toERD(input,opt), null, 4); // 1.1.5 compatibility
-    //console.log(output);
 
     assert( "0 < output.indexOf('prefix_dept')" );
     assert( "0 < output.indexOf('\"schema\": \"my_schema\",')" );
@@ -51,6 +51,27 @@ export default function diagram_tests() {
     assert( "output.items[0].columns[5].name == 'data_lastupd'" );
     assert( "output.items[0].columns[5].datatype == 'date'" );
 
+    input = 
+    `customers
+    name vc40
+    customer_addresses /cascade
+        street vc40`
+    output = new quicksql(input).getERD();
+
+    input = 
+    `customers
+    name vc40
+
+customer_addresses /cascade
+    customer_id /fk customers
+    street vc40`
+    output1 = new quicksql(input).getERD();
+
+    //console.log(output.items[1].columns[1]);
+    assert( "output.items[1].columns[1].name == output1.items[1].columns[1].name" );
+    assert( "output.items[1].columns[1].datatype == output1.items[1].columns[1].datatype" );  
+
 }
+
 
 diagram_tests();

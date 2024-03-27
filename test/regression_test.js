@@ -57,7 +57,7 @@ function compareTokens( so, sc, strict ) {
     return false;
 }
 
-import checkNoError from './error_msg_tests.js'
+import {checkNoError} from './error_msg_tests.js'
 
 
 function processFile( subdir, file ) {
@@ -152,12 +152,12 @@ console.log('small_tests.js');
 import diagram_tests from './diagram_tests.js'
 console.log('diagram_tests.js');   
 
-import error_msg_tests from './error_msg_tests.js'
-console.log('error_msg_tests.js');   
-
 
 processFile('./test', '');
 
+import {error_msg_tests} from './error_msg_tests.js'
+error_msg_tests();
+console.log('error_msg_tests.js');   
 
 console.log("All tests are OK");
 
@@ -166,6 +166,7 @@ console.log("Compared with 364-412 ms as of 10/2/2023");
 console.log("              506 ms     as of 11/8/2023");
 console.log("              800 ms     as of 1/24/2024");
 console.log("              590 ms     as of 2/8/2024");
+console.log("              486 ms     as of 3/22/2024");
 
 
 import {quicksql} from '../dist/quick-sql.js';

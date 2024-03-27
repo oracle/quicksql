@@ -26,7 +26,7 @@ const findErrors = (function () {
 
         const lines = input.split("\n");
     
-        ret = ret.concat(line_mismatch(lines));
+        ret = ret.concat(line_mismatch(parsed.forest[0].descendants()));
         const descendants = ddl.descendants();
  
         for( let i = 0; i < descendants.length; i++ ) {
@@ -43,7 +43,7 @@ const findErrors = (function () {
                 continue;
             }
             const src1 = node.src[1];
-            if( 1 < node.src.length && 0 < src1.value.indexOf('0') ) {
+            if( 1 < node.src.length && src1.value.length == 3 && 0 < src1.value.indexOf('0') ) { // vc0
                 const depth = src1.begin;
                 ret.push(new SyntaxError( messages.invalidDatatype, new Offset(node.line,depth) ));
                 continue;
@@ -84,6 +84,8 @@ const findErrors = (function () {
                 pos = node.indexOf('reference');
             pos++;
             if( node.src.length-1 < pos )
+                return ret;
+            if( node.src[pos].value == '/' )
                 return ret;
             var tbl = ddl.find(node.src[pos].value);
             if(  tbl == null ) {
@@ -156,21 +158,7 @@ function guessIndent( lines ) {
 }
 
 function depth( line ) {
-    var chunks = line.split(/ |\t/);
-    var offset = 0;
-    for( var j = 0; j < chunks.length; j++ ) {
-        var chunk = chunks[j];
-        if( "\t" == chunk ) {
-            offset += 4; //TODO;
-        }
-        if( "" == chunk  ) {
-            offset++;
-            continue;
-        }
-        if( !/[^.a-zA-Z0-9_"]/.test(chunk) ) 
-            return offset;
-    }
-    return 0;
+    return line.src[0].begin;
 }
 
 function parentIndex( depths, lineNo ) {

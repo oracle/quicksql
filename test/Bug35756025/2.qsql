@@ -2,3 +2,5 @@ bug35756025
     deptno num
     dname vc14
     loc   vc13
+
+#semantics: char    

@@ -12,7 +12,7 @@ donuts  /insert 3
          id vc32 /pk
          type 
 
-#settings = { genpk: false, drop: true, pk: identityDataType  }
+#settings = { genpk: false, drop: true, pk: identityDataType, semantics: char  }
 
 #flattened = 
 {

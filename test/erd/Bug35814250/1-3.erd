@@ -9,20 +9,20 @@
                     "datatype": "number"
                 },
                 {
-                    "name": "name",
-                    "datatype": "varchar2(40 char)"
-                },
-                {
-                    "name": "date_of_birth",
-                    "datatype": "date"
-                },
-                {
                     "name": "mother",
                     "datatype": "number"
                 },
                 {
                     "name": "father",
                     "datatype": "number"
+                },
+                {
+                    "name": "name",
+                    "datatype": "varchar2(40 char)"
+                },
+                {
+                    "name": "date_of_birth",
+                    "datatype": "date"
                 }
             ]
         }

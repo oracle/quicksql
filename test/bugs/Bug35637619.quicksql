@@ -10,4 +10,5 @@ departments /insert 2
       date hired
       job vc255
 
-#pk: identityDataType   
+#pk: identityDataType  
+#semantics: char 
