@@ -79,7 +79,6 @@
 | /compress, /compressed                  | Table will be created compressed. |
 | /insert NN                              | Generate NN SQL INSERT statement(s) with random data, for example: /INSERT 20. (Maximum = 1000) |
 | /rest                                   | Generate REST enablement of the table using Oracle REST Data Services (ORDS) |
-| /select                                 | Generate SQL SELECT statement after generating data for each table |
 | /unique, /uk                            | Generate table level unique constraint |
 | /pk                                     | Generate primary key constraint (on table level it is usually a composite key) |
 <!-- markdownlint-enable MD013 -->
@@ -122,7 +121,6 @@ and is usually omitted from QSQL schema definition.
 | /lower                         | Forces column values to lower case         |
 | /nn, /not null                 | Adds a not null constraint on the column   |
 | /between                       | Adds a between check constraint on the column, for example /between 1 and 100 |
-| /hidden, /invisible            | Hidden columns are not displayed using select * from table. |
 | /references, /reference, /fk   | Foreign key references e.g. /references table_name. Note you can reference tables that are not part of your model. |
 | /cascade                       | on delete cascade                          |
 | /setnull                       | on delete set null                         |
@@ -467,7 +465,6 @@ tableDirective::= '/'
       |'compress'|'compressed'
       |'insert' integer
       |'rest'
-      |'select'
       |'unique' | 'uk'
       |'pk'
       )
