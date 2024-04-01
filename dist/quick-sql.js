@@ -7739,7 +7739,7 @@ let me = function() {
         return d;
       }
       (this.isOption("unique") || this.isOption("uk")) && (d += `
-`, d += m + m + " ".repeat(i.maxChildNameLen()) + "constraint " + v + "_unq unique");
+`, d += m + m + " ".repeat(i.maxChildNameLen()) + "constraint " + K(u.objPrefix(), v, "_unq") + " unique");
       var F = "'";
       if ((d.startsWith("integer") || d.startsWith("number") || d.startsWith("date")) && (F = ""), this.isOption("default")) {
         let G = "";

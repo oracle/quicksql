@@ -394,7 +394,7 @@ let tree = (function(){
 
             if( this.isOption('unique') || this.isOption('uk') ) {
                 ret += '\n';  
-                ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+parent_child+'_unq unique';
+                ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+concatNames(ddl.objPrefix(),parent_child,'_unq')+' unique';
             } 
             var optQuote = '\'';
             if(  ret.startsWith('integer') || ret.startsWith('number') || ret.startsWith('date')  ) 
