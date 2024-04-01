@@ -49,5 +49,7 @@ Error diagnostic fixes
 ## [1.2.11] - 2024-3-22
 
 #57
+#62
+#63
 
 
