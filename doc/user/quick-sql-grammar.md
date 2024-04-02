@@ -124,7 +124,6 @@ and is usually omitted from QSQL schema definition.
 | /references, /reference, /fk   | Foreign key references e.g. /references table_name. Note you can reference tables that are not part of your model. |
 | /cascade                       | on delete cascade                          |
 | /setnull                       | on delete set null                         |
-| /references, /reference, /fk   | Foreign key references e.g. /references table_name. Note you can reference tables that are not part of your model. |
 | /pk                            | Identifies column as the primary key of the table. It is recommended not manually specify primary keys and let this app create primary key columns automatically. |
 | --, [comments]                 |  Enclose comments using square brackets or using dash dash syntax |
 <!-- markdownlint-enable MD013 -->
@@ -467,6 +466,8 @@ tableDirective::= '/'
       |'rest'
       |'unique' | 'uk'
       |'pk'
+      |'check'
+      |'cascade'
       )
 
 columnDirective::= '/'
@@ -482,6 +483,7 @@ columnDirective::= '/'
       |'between'
       |'hidden'|'invisible'
       |'references'|'reference'
+      |'cascade'|'setnull'
       |'fk'
       |'pk' 
       )

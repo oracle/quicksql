@@ -365,7 +365,7 @@ class T {
     });
   }
 }
-const _ = "1.2.11", R = {
+const _ = "1.2.12", R = {
   Diagram: T,
   version: _
 };

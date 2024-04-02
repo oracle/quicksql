@@ -26,7 +26,12 @@ const findErrors = (function () {
 
         const lines = input.split("\n");
     
-        ret = ret.concat(line_mismatch(parsed.forest[0].descendants()));
+        let branches = []
+        for( var i = 0; i < parsed.forest.length; i++ ) {
+            if( parsed.forest[i].parseType() == 'table' )
+                branches = branches.concat(parsed.forest[i].descendants());
+        }
+        ret = ret.concat(line_mismatch(branches));
         const descendants = ddl.descendants();
  
         for( let i = 0; i < descendants.length; i++ ) {
@@ -51,10 +56,44 @@ const findErrors = (function () {
 
             ret = ret.concat(ref_error_in_view(ddl,node));
             ret = ret.concat(fk_ref_error(ddl,node));
+            ret = ret.concat(directive_typo(ddl,node));
         }
 
         return ret;
     }
+
+    function directive_typo( ddl, node ) {
+        const isTable = node.parseType() == 'table';
+        var ret  = [];
+            
+        var chunks = node.src;
+        var sawSlash = false;
+        for( var j = 1; j < chunks.length; j++ ) { 
+            if( chunks[j].value == '/' ) {
+                sawSlash = true;
+                continue;
+            }
+            if( sawSlash ) {
+                sawSlash = false;
+                if(  isTable && tableDirectives.indexOf(chunks[j].value.toLowerCase()) < 0 )
+                    ret.push( new SyntaxError(
+                        messages.tableDirectiveTypo,
+                        new Offset(node.line, chunks[j].begin),
+                        new Offset(node.line, chunks[j].begin+chunks[j].value.length)
+                    ));
+                if( !isTable && columnDirectives.indexOf(chunks[j].value.toLowerCase()) < 0 )        
+                    ret.push( new SyntaxError(
+                        messages.columnDirectiveTypo,
+                        new Offset(node.line, chunks[j].begin),
+                        new Offset(node.line, chunks[j].begin+chunks[j].value.length)
+                    ));
+
+                continue;
+            }
+        }
+        return ret;
+    }
+
 
     function ref_error_in_view( ddl, node ) {
         var ret  = [];
@@ -105,19 +144,14 @@ const findErrors = (function () {
         var indent = guessIndent( lines )
         
         for( var i = 1; i < lines.length; i++ ) {
-            var priorline = lines[i-1];
             var line = lines[i];
             
-            var priorIndent = depth(priorline);
             var lineIndent = depth(line);
-            
-            if( lineIndent == 0 )
-                continue;
-           
-            if( priorIndent < lineIndent && lineIndent < priorIndent+indent )
+                       
+            if( lineIndent%indent != 0 )
                 ret.push(new SyntaxError(
                     messages.misalignedAttribute+indent,
-                    new Offset(i, lineIndent)
+                    new Offset(line.line, lineIndent)
                 )
             );
         }
@@ -127,7 +161,37 @@ const findErrors = (function () {
     return checkSyntax;
 }());
 
+const tableDirectives = [
+       'api'
+      ,'audit','auditcols',//'audit cols','audit columns'
+      ,'check'
+      ,'colprefix'
+      ,'compress','compressed'
+      ,'insert'
+      ,'rest'
+      ,'select'
+      ,'unique' , 'uk'
+      ,'pk'
+      ,'cascade','setnull' //'set null'
+];
 
+const columnDirectives = [
+       'idx','index','indexed'
+      ,'unique','uk'
+      ,'check'
+      ,'constant'
+      ,'default'
+      ,'values'
+      ,'upper'
+      ,'lower'
+      ,'nn','not'//,'not null'
+      ,'between'
+      ,'hidden','invisible'
+      ,'references','reference'
+      ,'cascade','setnull' //'set null'
+      ,'fk'
+      ,'pk' 
+];
 
 function guessIndent( lines ) {    	
     let depths = [];
@@ -174,6 +238,8 @@ const messages = {
     invalidDatatype: 'Invalid Datatype',
     undefinedObject: 'Undefined Object: ',
     misalignedAttribute: 'Misaligned Table or Column; apparent indent = ',
+    tableDirectiveTypo: 'Unknown Table directive',
+    columnDirectiveTypo: 'Unknown Column directive',
 }
 
 export default {findErrors, messages};

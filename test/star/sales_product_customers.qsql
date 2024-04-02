@@ -1,9 +1,9 @@
 sales    /insert 2
     quantity
     > product   /insert 1
-         name
+        name
     > customers  /insert 1
-         first name 
+        first name 
 
 #pk: identityDataType  
 #semantics: char        

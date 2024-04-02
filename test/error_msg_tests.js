@@ -106,6 +106,20 @@ team_statuses
     name /fk undefined
     `).getErrors();
     checkError(output, 3, 4+4+1+3+1, errorMsgs.messages.undefinedObject+'undefined');
+
+    output = new quicksql(`emp
+    ename
+    deptno /fk dept
+  
+dept 
+   dname`).getErrors();
+    checkError(output, 5, 3, errorMsgs.messages.misalignedAttribute+"4");
+  
+    output = new quicksql(`emp /fk
+    ename  /audit
+    `).getErrors();
+    checkError(output, 0, 5, errorMsgs.messages.tableDirectiveTypo);
+    checkError(output, 1, 4+5+1+1+1, errorMsgs.messages.columnDirectiveTypo);
     
     console.log(assertionCnt);
 
@@ -114,6 +128,7 @@ team_statuses
         console.error("assertionCnt < "+minimalTestCnt);
         throw new Error('Test failed');
     } 
+ 
 }
 
 

@@ -52,4 +52,9 @@ Error diagnostic fixes
 #62
 #63
 
+## [1.2.12] - 2024-4-2
+
+Misindented error diagnostics, one more time
+Table and column directive syntax check
+
 

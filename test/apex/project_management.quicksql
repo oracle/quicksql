@@ -3,25 +3,25 @@
 #semantics: char
 
 projects /insert 5 
-    name /nn 
-    owner 
-    milestones /insert 10 
-       name /nn
-       status /check open completed closed /values open, open, open, open, closed, completed 
-       owner 
-       started date 
-       closed date 
-    links /insert 5 
-       name  /nn
-       url 
-    attachments 
-       contributed by 
-       attachment file 
-    action items /insert 12 
-       action 
-       desc clob 
-       owner 
-       status /check open completed closed 
+   name /nn 
+   owner 
+   milestones /insert 10 
+      name /nn
+      status /check open completed closed /values open, open, open, open, closed, completed 
+      owner 
+      started date 
+      closed date 
+   links /insert 5 
+      name  /nn
+      url 
+   attachments 
+      contributed by 
+      attachment file 
+   action items /insert 12 
+      action 
+      desc clob 
+      owner 
+      status /check open completed closed 
  
 view project_ms projects milestones 
 view project_ai projects action_items
