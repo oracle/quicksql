@@ -8891,7 +8891,7 @@ const ye = function() {
         continue;
       }
       const M = o.src[1];
-      if (1 < o.src.length && M.value.length == 3 && 0 < M.value.indexOf("0")) {
+      if (1 < o.src.length && M.value == "vc0") {
         const d = M.begin;
         i.push(new u(Y.invalidDatatype, new m(o.line, d)));
         continue;

@@ -48,7 +48,7 @@ const findErrors = (function () {
                 continue;
             }
             const src1 = node.src[1];
-            if( 1 < node.src.length && src1.value.length == 3 && 0 < src1.value.indexOf('0') ) { // vc0
+            if( 1 < node.src.length && src1.value == 'vc0' ) { 
                 const depth = src1.begin;
                 ret.push(new SyntaxError( messages.invalidDatatype, new Offset(node.line,depth) ));
                 continue;

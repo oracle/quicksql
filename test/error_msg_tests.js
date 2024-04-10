@@ -38,7 +38,7 @@ export function error_msg_tests() {
     name vc-200
     name vc0
     `).getErrors();
-    checkError(output, 1, 4+4+2+1, errorMsgs.messages.invalidDatatype);
+    checkError(output, 1, 4 + 4 + 2 + 1, errorMsgs.messages.invalidDatatype);
     checkError(output, 2, 4+4+1, errorMsgs.messages.invalidDatatype);
     checkNoError(output, errorMsgs.messages.misalignedAttribute);
 
