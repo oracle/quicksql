@@ -1,9 +1,10 @@
 feature_masters
-    name
+   name
 
 app_feature_items
    feature_master_id number /fk feature_masters
    name vc255 /nn
 
 #api:y
-#pk: identityDataType   
+#pk: identityDataType  
+#semantics: char 

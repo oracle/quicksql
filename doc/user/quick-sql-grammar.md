@@ -79,7 +79,6 @@
 | /compress, /compressed                  | Table will be created compressed. |
 | /insert NN                              | Generate NN SQL INSERT statement(s) with random data, for example: /INSERT 20. (Maximum = 1000) |
 | /rest                                   | Generate REST enablement of the table using Oracle REST Data Services (ORDS) |
-| /select                                 | Generate SQL SELECT statement after generating data for each table |
 | /unique, /uk                            | Generate table level unique constraint |
 | /pk                                     | Generate primary key constraint (on table level it is usually a composite key) |
 <!-- markdownlint-enable MD013 -->
@@ -122,11 +121,9 @@ and is usually omitted from QSQL schema definition.
 | /lower                         | Forces column values to lower case         |
 | /nn, /not null                 | Adds a not null constraint on the column   |
 | /between                       | Adds a between check constraint on the column, for example /between 1 and 100 |
-| /hidden, /invisible            | Hidden columns are not displayed using select * from table. |
 | /references, /reference, /fk   | Foreign key references e.g. /references table_name. Note you can reference tables that are not part of your model. |
 | /cascade                       | on delete cascade                          |
 | /setnull                       | on delete set null                         |
-| /references, /reference, /fk   | Foreign key references e.g. /references table_name. Note you can reference tables that are not part of your model. |
 | /pk                            | Identifies column as the primary key of the table. It is recommended not manually specify primary keys and let this app create primary key columns automatically. |
 | --, [comments]                 |  Enclose comments using square brackets or using dash dash syntax |
 <!-- markdownlint-enable MD013 -->
@@ -467,9 +464,10 @@ tableDirective::= '/'
       |'compress'|'compressed'
       |'insert' integer
       |'rest'
-      |'select'
       |'unique' | 'uk'
       |'pk'
+      |'check'
+      |'cascade'
       )
 
 columnDirective::= '/'
@@ -483,8 +481,8 @@ columnDirective::= '/'
       |'lower'
       |'nn'|'not null'
       |'between'
-      |'hidden'|'invisible'
       |'references'|'reference'
+      |'cascade'|'setnull'
       |'fk'
       |'pk' 
       )

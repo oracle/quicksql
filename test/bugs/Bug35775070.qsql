@@ -11,3 +11,4 @@ session_speakers
   sort_sequence                  num 
 
 #pk: identityDataType   
+#semantics: char

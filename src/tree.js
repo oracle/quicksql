@@ -197,6 +197,10 @@ let tree = (function(){
         }
  
         this.src = lexer( this.content/*.toLowerCase()*/, false, true, '`' ); 
+
+        const cp = this.getOptionValue('colprefix');
+        if( cp != null )
+            this.colprefix = cp;
          
         this.parsedName = null;
         this.parseName = function () {  
@@ -323,13 +327,13 @@ let tree = (function(){
 
             let booleanCheck = '';
             if( src[0].value.endsWith('_yn') || src[0].value.startsWith('is_') ) {
-                ret = 'varchar2(1 char)';
+                ret = 'varchar2(1'+ddl.semantics()+ ')';
                 booleanCheck = '\n' + tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+concatNames(ddl.objPrefix(),parent_child)+' check ('+this.parseName()+" in ('Y','N'))";
             }
             for( let i in boolTypes ) {
                 let pos = this.indexOf(boolTypes[i]);
                 if( 0 < pos ) {
-                    ret = 'varchar2(1 char)';
+                    ret = 'varchar2(1'+ddl.semantics()+ ')';
                     booleanCheck = '\n' + tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+concatNames(ddl.objPrefix(),parent_child)+' check ('+this.parseName()+" in ('Y','N'))";
                     break;
                 }
@@ -390,7 +394,7 @@ let tree = (function(){
 
             if( this.isOption('unique') || this.isOption('uk') ) {
                 ret += '\n';  
-                ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+parent_child+'_unq unique';
+                ret += tab +  tab+' '.repeat(parent.maxChildNameLen()) +'constraint '+concatNames(ddl.objPrefix(),parent_child,'_unq')+' unique';
             } 
             var optQuote = '\'';
             if(  ret.startsWith('integer') || ret.startsWith('number') || ret.startsWith('date')  ) 
@@ -735,19 +739,10 @@ let tree = (function(){
             return 'number';
         }
 
-        this.singleDDL = function() {
-            
-            if( this.children.length == 0 && 0 < this.apparentDepth() ) {
-                let pad = tab;
-                if( this.parent != undefined )
-                    pad += ' '.repeat(this.parent.maxChildNameLen() - this.parseName().length);
-                return this.parseName()+pad+this.parseType();
-            }
-
+        this.lateInitFks = function() {
             if( this.fks == null ) {
                 this.fks = [];
             }
-
 
             if( !this.isMany2One() ) {
                 if( this.parent != null && this.parseType() == 'table' ) {
@@ -762,11 +757,19 @@ let tree = (function(){
                         this.fks[this.children[i].parseName()]=this.children[i].refId();
                     }
             } //...else   -- too lae to do here, performed earlier, during recognize()
-            
-            const cp = this.getOptionValue('colprefix');
-            if( cp != null )
-                this.colprefix = cp;
+        }
 
+        this.singleDDL = function() {
+            
+            if( this.children.length == 0 && 0 < this.apparentDepth() ) {
+                let pad = tab;
+                if( this.parent != undefined )
+                    pad += ' '.repeat(this.parent.maxChildNameLen() - this.parseName().length);
+                return this.parseName()+pad+this.parseType();
+            }
+
+            this.lateInitFks();
+            
             //var indexedColumns = [];
             var ret = '';
 
@@ -868,7 +871,7 @@ let tree = (function(){
 
             if( ddl.optionEQvalue('rowkey',true) || this.isOption('rowkey') ) {
                 let pad = tab+' '.repeat(this.maxChildNameLen() - 'ROW_KEY'.length);
-                ret += tab +  'row_key' + pad + 'varchar2(30 char)\n';              	
+                ret += tab +  'row_key' + pad + 'varchar2(30'+ddl.semantics()+ ')\n';              	
                 ret += tab +  tab+' '.repeat(this.maxChildNameLen()) +'constraint '+objName+'_row_key_unq unique not null,\n';
             }            	
 
@@ -1302,7 +1305,11 @@ let tree = (function(){
             if( kind != 'get' )
                 mode = ' in';
             let ret =  tab+'procedure '+kind+'_row (\n'; 
-            ret += tab+tab+'p_id        in  number'+modifier;
+            let idColName = this.getGenIdColName();
+            if( idColName == null ) {
+                idColName = this.getExplicitPkName();
+            }
+            ret += tab+tab+'p_'+idColName+'        in  number'+modifier;
             for( var fk in this.fks ) {	
                 let parent = this.fks[fk];				
                 let type = 'number';
@@ -1326,17 +1333,21 @@ let tree = (function(){
             return ret;
         };
         this.procBody = function( kind /* get, insert, update */ ) {
+            let idColName = this.getGenIdColName();
+            if( idColName == null ) {
+                idColName = this.getExplicitPkName();
+            }
             let objName = ddl.objPrefix()  + this.parseName();
             let ret =    tab+'is \n';
             ret +=    tab+'begin \n';
-            let prelude =    tab+tab+'for c1 in (select * from '+objName+' where id = p_id) loop \n';
+            let prelude =    tab+tab+'for c1 in (select * from '+objName+' where '+idColName+' = p_'+idColName+') loop \n';
             if( kind == 'insert' ) {
                 prelude =    tab+tab+'insert into '+objName+' ( \n';
-                prelude += tab+tab+tab+'id';
+                prelude += tab+tab+tab+idColName;
             }
             if( kind == 'update' ) {
                 prelude =    tab+tab+'update  '+objName+' set \n';
-                prelude += tab+tab+tab+'id = p_id';
+                prelude += tab+tab+tab+idColName+' = p_'+idColName;
             }
             ret += prelude;
             for( let fk in this.fks ) {	
@@ -1352,7 +1363,7 @@ let tree = (function(){
                 if( kind == 'insert' ) 
                     row = tab+tab+tab+fk;
                 if( kind == 'update' ) 
-                    row = tab+tab+tab+fk+' = P_'+fk+'\n';	
+                    row = tab+tab+tab+fk+' = P_'+fk;	
                 ret += row;
             }
             for( var i = 0; i < this.children.length; i++ ) {
@@ -1367,12 +1378,12 @@ let tree = (function(){
                 if( kind == 'insert' ) 
                     row = tab+tab+tab+child.parseName().toLowerCase();
                 if( kind == 'update' ) 
-                    row = tab+tab+tab+child.parseName().toLowerCase()+' = P_'+child.parseName().toLowerCase()+'\n';	
+                    row = tab+tab+tab+child.parseName().toLowerCase()+' = P_'+child.parseName().toLowerCase();	
                 ret += row;
             }
             if( kind == 'insert' ) {
                 ret +=    '\n'+tab+tab+') values ( \n';
-                ret +=    tab+tab+tab+'p_id';
+                ret +=    tab+tab+tab+'p_'+idColName;
                 for( let fk in this.fks ) {	
                     ret += ',\n';
                     ret += tab+tab+tab+'p_'+fk;
@@ -1391,7 +1402,7 @@ let tree = (function(){
             if( kind == 'insert' )
                 finale = '\n'+tab+tab+');';
             if( kind == 'update' )
-                finale = tab+tab+'where id = p_id;';
+                finale = '\n'+tab+tab+'where '+idColName+' = p_'+idColName+';';
             ret += finale;
             ret += '\n'+tab+'end '+kind+'_row;\n ';
             ret += '\n ';
@@ -1408,8 +1419,12 @@ let tree = (function(){
             ret += ';\n\n';
             ret += this.procDecl('update'); 
             ret += ';\n\n';
+            let idColName = this.getGenIdColName();
+            if( idColName == null ) {
+                idColName = this.getExplicitPkName();
+            }
             ret += '    procedure delete_row (\n'+
-                '        p_id              in number\n'+
+                '        p_'+idColName+'              in number\n'+
                 '    );\n'+
                 'end '+objName.toLowerCase()+'_api;\n'+
                 '/\n\n';
@@ -1427,11 +1442,11 @@ let tree = (function(){
             ret += this.procBody('update'); 
 
             ret += '    procedure delete_row (\n';
-            ret += '        p_id              in number\n';
+            ret += '        p_'+idColName+'              in number\n';
             ret += '    )\n';
             ret += '    is\n';
             ret += '    begin\n';
-            ret += '        delete from '+objName.toLowerCase()+' where id = p_id;\n';
+            ret += '        delete from '+objName.toLowerCase()+' where '+idColName+' = p_'+idColName+';\n';
             ret += '    end delete_row;\n';
             ret += 'end '+objName.toLowerCase()+'_api;\n';
             ret += '/\n';
@@ -1701,7 +1716,7 @@ let tree = (function(){
                         line = '';
                         continue;
                     }
-                    let node = new ddlnode(t.line-1,line,null);  // node not attached to anything
+                    let node = new ddlnode(t.line-1,line,null);  // node not attached to anything        
                     let matched = false;
                     for( let j = 0; j < path.length; j++ ) {
                         let cmp = path[j];

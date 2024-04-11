@@ -9,3 +9,4 @@ departments /rest
       hiredate
 
 #pk: identityDataType         
+#semantics: char

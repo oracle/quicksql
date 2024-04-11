@@ -1,8 +1,8 @@
 employees /insert 50 /api
-    name /nn /unique
+    name /nn /unique  
     email /nn /lower /unique
     country vc100 /nn /values US, Canada, Mexico
-    employee type vc30 /n /check full time, part time 
+    employee type vc30 /*/n*/ /check full time, part time 
     approver vc255 /nn /index /values tbd
     timecards /api /auditcols /insert 200
         status /check SUBMITTED, APPROVED, DECLINED /default SUBMITTED

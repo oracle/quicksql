@@ -3,3 +3,5 @@ person
     date_of_birth date
     mother /fk person
     father /fk person
+
+#semantics: char    

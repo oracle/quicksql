@@ -7,3 +7,4 @@ dept
 
 #pk: identityDataType
 #prefix: abc
+#semantics: char

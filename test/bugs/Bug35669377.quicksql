@@ -12,4 +12,5 @@ sales
    promotion id
    channel id
 
-#pk: identityDataType      
+#pk: identityDataType     
+#semantics: char 

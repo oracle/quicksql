@@ -26,12 +26,12 @@ patients
     registration_date date
 
 patient_procedures
-  patient_id num  /fk patients
-  doctor vc30
-  medical_procedure vc30
-  procedure_date date 
-  status vc30
-  amount_due num 
+    patient_id num  /fk patients
+    doctor vc30
+    medical_procedure vc30
+    procedure_date date 
+    status vc30
+    amount_due num 
 
 doctor_procedures
     doctor vc30
