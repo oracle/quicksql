@@ -116,5 +116,11 @@ export function concatNames(chunk1, chunk2, chunk3) {
     return ret;
 }
 
+export function getNumericVersion( pVersionString ) {
+    let lMatch = pVersionString.match( /^([0-9]+(?:[.][0-9]+)?)/ );
+    if ( !lMatch ) return null;
+    return lMatch[0];
+}
+
 
 export default {singular, canonicalObjectName, concatNames};
