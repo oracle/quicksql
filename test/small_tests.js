@@ -639,13 +639,37 @@ students
     finished_yn
     ok   bool
     yes  boolean
-    #db:"23c"`).getDDL();
+    #db:"23"`).getDDL();
 
     assert( "0 < output.indexOf('is_legal       boolean,')" );
     assert( "0 < output.indexOf('finished_yn    boolean,')" );
     assert( "0 < output.indexOf('ok             boolean,')" );
     assert( "0 < output.indexOf('yes            boolean')" );
 
+    // https://github.com/oracle/quicksql/issues/51
+    output = new quicksql(`boolvalues
+    is_legal
+    finished_yn
+    ok   bool
+    yes  boolean
+    #db:"23c"`).getDDL();
+
+    assert( "0 < output.indexOf('is_legal       boolean,')" );
+    assert( "0 < output.indexOf('finished_yn    boolean,')" );
+    assert( "0 < output.indexOf('ok             boolean,')" );
+    assert( "0 < output.indexOf('yes            boolean')" );
+    // https://github.com/oracle/quicksql/issues/51
+    output = new quicksql(`boolvalues
+    is_legal
+    finished_yn
+    ok   bool
+    yes  boolean
+    #db:"23.1.1"`).getDDL();
+
+    assert( "0 < output.indexOf('is_legal       boolean,')" );
+    assert( "0 < output.indexOf('finished_yn    boolean,')" );
+    assert( "0 < output.indexOf('ok             boolean,')" );
+    assert( "0 < output.indexOf('yes            boolean')" );
     // https://github.com/oracle/quicksql/issues/51
     output = new quicksql(`boolvalues
         ok   bool
