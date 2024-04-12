@@ -1,4 +1,4 @@
-import {singular,concatNames,canonicalObjectName, getNumericVersion} from './naming.js';
+import {singular,concatNames,canonicalObjectName, getMajorVersion} from './naming.js';
 import translate from './translate.js';
 import {generateSample, resetSeed} from './sample.js';
 import lexer from './lexer.js';
@@ -340,7 +340,7 @@ let tree = (function(){
             } 
             const dbVer = ddl.getOptionValue('db');
             if( booleanCheck != '' && ( ddl.getOptionValue('boolean')=='native' 
-                                      || ddl.getOptionValue('boolean') != 'yn' && 0 < dbVer.length && 23 <= getNumericVersion(dbVer) ) 
+                                      || ddl.getOptionValue('boolean') != 'yn' && 0 < dbVer.length && 23 <= getMajorVersion(dbVer) ) 
             ) {
                 booleanCheck = '';
                 ret = 'boolean';

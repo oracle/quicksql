@@ -37,8 +37,7 @@ function K(u, m, D) {
   return R ? k = '"' + k + '"' : k = k.toLowerCase(), k;
 }
 function pe(u) {
-  let m = u.match(/^([0-9]+(?:[.][0-9]+)?)/);
-  return m ? m[0] : null;
+  return u.length < 2 ? null : parseInt(u.substring(0, 2));
 }
 var le = function() {
   var u = [
