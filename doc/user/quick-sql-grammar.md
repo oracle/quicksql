@@ -271,7 +271,7 @@ setting to override this default.
 **Possible Values**: `11g`, `12c`, `19c`, `21c`, `23c`
 **Default Value**: `19c`
 
-Specifies the database version the syntax should be compatible with. Only major version number is significant (and the postfix, such as "c", "ai" is ignored). Therefore, 21, 21ai, and 23.1.1 are all legitimate values.
+Specifies the database version the syntax should be compatible with. The version string is reduced to major version number.  Therefore, 23, 23c, 23ai, and 23.1.1 are all legitimate values equivalent to 21.
 
 ### drop
 
