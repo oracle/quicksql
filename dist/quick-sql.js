@@ -8221,7 +8221,8 @@ let ue = function() {
       let h = `where
 `;
       return 0 < o.indexOf(h) && o.indexOf(h) == o.length - h.length && (o = o.substring(0, o.length - h.length).trim()), h = `and
-`, 0 < o.indexOf(h) && o.indexOf(h) == o.length - h.length && (o = o.substring(0, o.length - h.length).trim()), o += `/
+`, 0 < o.indexOf(h) && o.indexOf(h) == o.length - h.length && (o = o.substring(0, o.length - h.length).trim()), o.endsWith("/n") || (o += `
+`), o += `/
 `, o.toLowerCase();
     }, this.restEnable = function() {
       if (this.parseType() != "table" || !this.isOption("rest"))

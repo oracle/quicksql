@@ -1168,7 +1168,9 @@ let tree = (function(){
                 ret = ret.substring(0, ret.length-postfix.length).trim();           
             postfix =  'and\n';   
             if( 0 < ret.indexOf(postfix) && ret.indexOf(postfix) == ret.length-postfix.length )
-                ret = ret.substring(0, ret.length-postfix.length).trim();           
+                ret = ret.substring(0, ret.length-postfix.length).trim(); 
+            if( !ret.endsWith('/n') )
+                ret += '\n';         
             ret += '/\n'; 
             return ret.toLowerCase();
         };

@@ -82,7 +82,8 @@
 `;for(let f=2;f<t.length;f++)for(let B=2;B<t.length;B++)if(B!=f){var x=t[f].value,P=t[B].value,e=u.find(x);if(e!=null){var a=u.find(P);if(a!=null)for(var n in e.fks){var c=e.fks[n];c==P&&(o+=m+x+"."+H(c)+"_id(+) = "+P+`.id and
 `)}}}o=o.toLowerCase();let h=`where
 `;return 0<o.indexOf(h)&&o.indexOf(h)==o.length-h.length&&(o=o.substring(0,o.length-h.length).trim()),h=`and
-`,0<o.indexOf(h)&&o.indexOf(h)==o.length-h.length&&(o=o.substring(0,o.length-h.length).trim()),o+=`/
+`,0<o.indexOf(h)&&o.indexOf(h)==o.length-h.length&&(o=o.substring(0,o.length-h.length).trim()),o.endsWith("/n")||(o+=`
+`),o+=`/
 `,o.toLowerCase()},this.restEnable=function(){if(this.parseType()!="table"||!this.isOption("rest"))return"";let r=this.parseName();const t=r.indexOf('"')==0;let o=u.objPrefix()+r;return t?o=u.objPrefix()+r.substring(1,r.length-1):o=(u.objPrefix()+r).toUpperCase(),`begin
 `+m+"ords.enable_object(p_enabled=>TRUE, p_object=>'"+o+`');
 end;
