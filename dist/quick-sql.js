@@ -22,7 +22,7 @@ function be(u, m) {
   }
   return (u.startsWith("_") || u.startsWith("$") || u.startsWith("#")) && (R = !0), R || (D = ""), D + u + D;
 }
-function X(u) {
+function Q(u) {
   if (u == null)
     return null;
   if (u.indexOf('"') == 0)
@@ -35,6 +35,9 @@ function K(u, m, D) {
   D == null && (D = ""), u.indexOf('"') == 0 && (R = !0, u = u.substring(1, u.length - 1)), m.indexOf('"') == 0 && (R = !0, m = m.substring(1, m.length - 1)), D.indexOf('"') == 0 && (R = !0, D = D.substring(1, D.length - 1));
   let k = u + m + D;
   return R ? k = '"' + k + '"' : k = k.toLowerCase(), k;
+}
+function pe(u) {
+  return u.length < 2 ? null : parseInt(u.substring(0, 2));
 }
 var le = function() {
   var u = [
@@ -89,7 +92,7 @@ var le = function() {
   }
   return R;
 }();
-function pe(u) {
+function ge(u) {
   return u && u.__esModule && Object.prototype.hasOwnProperty.call(u, "default") ? u.default : u;
 }
 var ie = { exports: {} };
@@ -7208,59 +7211,8 @@ var ie = { exports: {} };
     }, u.exports && (m = u.exports = i), m.Chance = i, typeof importScripts < "u" && (chance = new i(), self.Chance = i), typeof window == "object" && typeof window.document == "object" && (window.Chance = i, window.chance = new i());
   })();
 })(ie, ie.exports);
-var ge = ie.exports;
-const Ce = /* @__PURE__ */ pe(ge);
-function se(u, m, D, R) {
-  var k = new Ce(te);
-  D == null && console.log();
-  let N = D.toUpperCase(), v = u.toUpperCase(), g = m.toUpperCase();
-  if (R != null && 0 < R.length) {
-    let l = 0, p = R.length, r = R[Math.floor(Z() * (p - l)) + l];
-    return !N.startsWith("INTEGER") && !N.startsWith("NUMBER") && !N.startsWith("DATE") && (!r.toLowerCase || r.toLowerCase() != "null") && (!r.charAt || r.charAt(0) != "q" && r.charAt(1) != "'") && (r.charAt && r.charAt(0) == "'" && (r = r.substring(1, r.length - 1)), r = r.replaceAll("'", "''"), r = "'" + r + "'"), r;
-  }
-  if (g == "NAME" && 0 <= v.indexOf("DEPARTMENT")) {
-    var S = ["Sales", "Finance", "Delivery", "Manufacturing"];
-    let l = 0, p = S.length;
-    return "'" + S[Math.floor(Z() * (p - l)) + l] + "'";
-  }
-  if (k[g.toLowerCase()] != null && g.indexOf("NAME") < 0)
-    return "'" + k[g.toLowerCase()]() + "'";
-  if (g == "FIRST_NAME")
-    return "'" + k.first() + "'";
-  if (g == "LAST_NAME")
-    return "'" + k.last() + "'";
-  if (0 <= g.indexOf("NAME"))
-    return "'" + k.name() + "'";
-  if (0 < g.indexOf("ADDRESS"))
-    return "'" + k.address() + "'";
-  if (g == "LOCATION")
-    return "'" + k.city() + "'";
-  if (g == "DESCRIPTION")
-    return "'" + k.paragraph({ sentences: 2 }) + "'";
-  if (g == "JOB") {
-    var E = ["Engineer", "Consultant", "Architect", "Manager", "Analyst", "Specialist", "Evangelist", "Salesman"];
-    let l = 0, p = E.length;
-    return "'" + E[Math.floor(Z() * (p - l)) + l] + "'";
-  }
-  if (N.startsWith("INTEGER") || N.startsWith("NUMBER")) {
-    let l = 0, p = 100;
-    return Math.floor(Z() * (p - l)) + l;
-  }
-  if (N.startsWith("DATE") || N.startsWith("TIMESTAMP")) {
-    let l = 0, p = 100;
-    var i = Math.floor(Z() * (p - l)) + l;
-    return "sysdate-" + i;
-  }
-  return "'N/A'";
-}
-var te = 1;
-function ve() {
-  te = 1;
-}
-function Z() {
-  var u = Math.sin(te++) * 1e4;
-  return u - Math.floor(u);
-}
+var Ce = ie.exports;
+const ve = /* @__PURE__ */ ge(Ce);
 var re = function() {
   function u(m, D) {
     for (var R = [], k = "", N = 0; N < m.length; N++) {
@@ -7276,7 +7228,7 @@ var re = function() {
     return 0 < k.length && R.push(k), R;
   }
   return u;
-}(), Q = function() {
+}(), Z = function() {
   function u(k, N, v, g, S, E) {
     this.type = g, this.value = k, this.begin = N, this.end = v, this.line = S, this.col = E, this.toString = function() {
       return "{type:" + g + ",value:" + k + "}";
@@ -7447,6 +7399,69 @@ var re = function() {
   }
   return R;
 }();
+function se(u, m, D, R) {
+  var k = new ve(te);
+  let N = D.toUpperCase(), v = u.toUpperCase(), g = m.toUpperCase();
+  if (R != null && 0 < R.length) {
+    let l = 0, p = R.length, r = R[Math.floor(X() * (p - l)) + l];
+    return !N.startsWith("INTEGER") && !N.startsWith("NUMBER") && !N.startsWith("DATE") && (!r.toLowerCase || r.toLowerCase() != "null") && (!r.charAt || r.charAt(0) != "q" && r.charAt(1) != "'") && (r.charAt && r.charAt(0) == "'" && (r = r.substring(1, r.length - 1)), r = r.replaceAll("'", "''"), r = "'" + r + "'"), r;
+  }
+  if (g == "NAME" && 0 <= v.indexOf("DEPARTMENT")) {
+    var S = ["Sales", "Finance", "Delivery", "Manufacturing"];
+    let l = 0, p = S.length;
+    return "'" + S[Math.floor(X() * (p - l)) + l] + "'";
+  }
+  if (k[g.toLowerCase()] != null && g.indexOf("NAME") < 0)
+    return "'" + k[g.toLowerCase()]() + "'";
+  if (g == "FIRST_NAME")
+    return "'" + k.first() + "'";
+  if (g == "LAST_NAME")
+    return "'" + k.last() + "'";
+  if (0 <= g.indexOf("NAME"))
+    return "'" + k.name() + "'";
+  if (0 < g.indexOf("ADDRESS"))
+    return "'" + k.address() + "'";
+  if (g == "LOCATION")
+    return "'" + k.city() + "'";
+  if (g == "DESCRIPTION") {
+    let l = k.paragraph({ sentences: 2 }), p = Z(D, !1, !0, ""), r = 400, t = -1;
+    for (let o = 0; o < p.length; o++) {
+      const s = p[o].value;
+      if (s == "(") {
+        t = o + 1;
+        continue;
+      }
+      if (0 < t && s == ")") {
+        r = parseInt(p[t].value);
+        break;
+      }
+    }
+    return r < l.length && (l = l.substring(0, r)), "'" + l + "'";
+  }
+  if (g == "JOB") {
+    var E = ["Engineer", "Consultant", "Architect", "Manager", "Analyst", "Specialist", "Evangelist", "Salesman"];
+    let l = 0, p = E.length;
+    return "'" + E[Math.floor(X() * (p - l)) + l] + "'";
+  }
+  if (N.startsWith("INTEGER") || N.startsWith("NUMBER")) {
+    let l = 0, p = 100;
+    return Math.floor(X() * (p - l)) + l;
+  }
+  if (N.startsWith("DATE") || N.startsWith("TIMESTAMP")) {
+    let l = 0, p = 100;
+    var i = Math.floor(X() * (p - l)) + l;
+    return "sysdate-" + i;
+  }
+  return N == "BLOB" || N == "LONG" ? "null" : "'N/A'";
+}
+var te = 1;
+function Ae() {
+  te = 1;
+}
+function X() {
+  var u = Math.sin(te++) * 1e4;
+  return u - Math.floor(u);
+}
 function ce(u) {
   const m = {
     ACCESS: "N",
@@ -7656,14 +7671,14 @@ let ue = function() {
       let s = "", M = "_";
       for (let C = r; C < t; C++) {
         const I = this.src[C].value, L = '"' + I + '"';
-        if (this.src[C].type != "constant.numeric" && I != X(L))
-          return s = this.content.substring(this.src[r].begin, this.src[t - 1].end), this.parsedName = o + ce(X(s)), this.parsedName;
+        if (this.src[C].type != "constant.numeric" && I != Q(L))
+          return s = this.content.substring(this.src[r].begin, this.src[t - 1].end), this.parsedName = o + ce(Q(s)), this.parsedName;
       }
       for (let C = r; C < t; C++)
         r < C && (s += M), s += this.src[C].value;
       var d = s.charAt(0);
-      return d >= "0" && d <= "9" && (s = "x" + s), this.parsedName = o + ce(X(s)), this.parsedName;
-    }, this.src = Q(this.content, !1, !0, "`");
+      return d >= "0" && d <= "9" && (s = "x" + s), this.parsedName = o + ce(Q(s)), this.parsedName;
+    }, this.src = Z(this.content, !1, !0, "`");
     const p = this.getOptionValue("colprefix");
     p != null && (this.colprefix = p), this.parsedName = null, this.parseName = function() {
       if (this.parsedName != null)
@@ -7724,7 +7739,7 @@ let ue = function() {
           break;
         }
       const L = u.getOptionValue("db");
-      I != "" && (u.getOptionValue("boolean") == "native" || u.getOptionValue("boolean") != "yn" && 0 < L.length && L.charAt(0) == "2" && L.charAt(1) == "3") && (I = "", d = "boolean"), this.indexOf("phone_number") == 0 && (d = "number");
+      I != "" && (u.getOptionValue("boolean") == "native" || u.getOptionValue("boolean") != "yn" && 0 < L.length && 23 <= pe(L)) && (I = "", d = "boolean"), this.indexOf("phone_number") == 0 && (d = "number");
       let O = this.indexOf("num", !0);
       0 < O && (d = "number");
       let w = this.indexOf(")");
@@ -8206,7 +8221,8 @@ let ue = function() {
       let h = `where
 `;
       return 0 < o.indexOf(h) && o.indexOf(h) == o.length - h.length && (o = o.substring(0, o.length - h.length).trim()), h = `and
-`, 0 < o.indexOf(h) && o.indexOf(h) == o.length - h.length && (o = o.substring(0, o.length - h.length).trim()), o += `/
+`, 0 < o.indexOf(h) && o.indexOf(h) == o.length - h.length && (o = o.substring(0, o.length - h.length).trim()), o.endsWith("/n") || (o += `
+`), o += `/
 `, o.toLowerCase();
     }, this.restEnable = function() {
       if (this.parseType() != "table" || !this.isOption("rest"))
@@ -8410,7 +8426,7 @@ is
       }
       return 0;
     }, this.generateData = function(r) {
-      if (ve(), u.optionEQvalue("inserts", !1))
+      if (Ae(), u.optionEQvalue("inserts", !1))
         return "";
       const t = this.inserts4tbl(r), o = this.orderedTableNodes();
       let s = "";
@@ -8548,7 +8564,7 @@ modify ` + C + " generated always  as identity restart start with " + (this.card
     u = S;
     const E = S.input;
     let i = [], l = [];
-    const p = Q(E + `
+    const p = Z(E + `
 `, !0, !0, "`");
     u.data = null;
     let r = null, t = "";
@@ -8596,7 +8612,7 @@ modify ` + C + " generated always  as identity restart start with " + (this.card
           if (r += s.value, s.value != `
 ` && s.value != "}")
             continue;
-          const M = Q(r, !1, !0, "");
+          const M = Z(r, !1, !0, "");
           if (M.length % 4 == 3 && M[1].value == ":") {
             S.setOptions(r), r = null, t = "";
             continue;
@@ -8656,7 +8672,7 @@ modify ` + C + " generated always  as identity restart start with " + (this.card
   }
   return v;
 }();
-var Ae = function() {
+var ye = function() {
   function u(i) {
     for (var l = "", p = 0; p < i; p++)
       l = l + "   ";
@@ -8860,7 +8876,7 @@ var Ae = function() {
   }
   return S;
 }();
-const ye = function() {
+const Se = function() {
   function u(g, S, E, i) {
     this.from = S, this.to = E, E == null && (this.to = new m(S.line, S.depth + 1)), this.message = g, this.severity = i, i == null && (this.severity = "error");
   }
@@ -8908,11 +8924,11 @@ const ye = function() {
         continue;
       }
       if (p) {
-        p = !1, E && Se.indexOf(l[r].value.toLowerCase()) < 0 && i.push(new u(
+        p = !1, E && Me.indexOf(l[r].value.toLowerCase()) < 0 && i.push(new u(
           Y.tableDirectiveTypo,
           new m(S.line, l[r].begin),
           new m(S.line, l[r].begin + l[r].value.length)
-        )), !E && Me.indexOf(l[r].value.toLowerCase()) < 0 && i.push(new u(
+        )), !E && Te.indexOf(l[r].value.toLowerCase()) < 0 && i.push(new u(
           Y.columnDirectiveTypo,
           new m(S.line, l[r].begin),
           new m(S.line, l[r].begin + l[r].value.length)
@@ -8951,7 +8967,7 @@ const ye = function() {
     return E;
   }
   function v(g) {
-    for (var S = [], E = Te(g), i = 1; i < g.length; i++) {
+    for (var S = [], E = Ie(g), i = 1; i < g.length; i++) {
       var l = g[i], p = fe(l);
       p % E != 0 && S.push(
         new u(
@@ -8963,7 +8979,7 @@ const ye = function() {
     return S;
   }
   return D;
-}(), Se = [
+}(), Me = [
   "api",
   "audit",
   "auditcols",
@@ -8980,7 +8996,7 @@ const ye = function() {
   "cascade",
   "setnull"
   //'set null'
-], Me = [
+], Te = [
   "idx",
   "index",
   "indexed",
@@ -9002,7 +9018,7 @@ const ye = function() {
   "fk",
   "pk"
 ];
-function Te(u) {
+function Ie(u) {
   let m = [];
   for (var D = 0; D < u.length; D++) {
     var R = u[D];
@@ -9010,7 +9026,7 @@ function Te(u) {
   }
   let k = [];
   for (let v = 0; v < m.length; v++) {
-    let g = Ie(m, v);
+    let g = Be(m, v);
     if (g != null) {
       let S = k[m[v] - m[g]];
       S == null && (S = 0), k[m[v] - m[g]] = S + 1;
@@ -9024,7 +9040,7 @@ function Te(u) {
 function fe(u) {
   return u.src[0].begin;
 }
-function Ie(u, m) {
+function Be(u, m) {
   for (let D = m; 0 <= D; D--)
     if (u[D] < u[m])
       return D;
@@ -9037,7 +9053,7 @@ const Y = {
   misalignedAttribute: "Misaligned Table or Column; apparent indent = ",
   tableDirectiveTypo: "Unknown Table directive",
   columnDirectiveTypo: "Unknown Column directive"
-}, Be = { findErrors: ye, messages: Y }, me = "identityDataType", ne = "guid", he = "Timestamp with time zone", de = "Timestamp with local time zone", j = function() {
+}, Pe = { findErrors: Se, messages: Y }, me = "identityDataType", ne = "guid", he = "Timestamp with time zone", de = "Timestamp with local time zone", j = function() {
   const u = {
     apex: { label: "APEX", value: "no", check: ["yes", "no"] },
     auditcols: { label: "Audit Columns", value: "no", check: ["yes", "no"] },
@@ -9121,20 +9137,20 @@ const Y = {
       return this.optionEQvalue("semantics", "CHAR") ? v = " char" : this.optionEQvalue("semantics", "BYTE") && (v = " byte"), v;
     }, this.name2node = null, this.find = function(v) {
       if (this.name2node != null)
-        return this.name2node[X(v)];
+        return this.name2node[Q(v)];
       this.name2node = {};
       for (var g = 0; g < this.forest.length; g++)
         for (var S = this.forest[g].descendants(), E = 0; E < S.length; E++) {
           var i = S[E];
           this.name2node[i.parseName()] = i;
         }
-      return this.name2node[X(v)];
+      return this.name2node[Q(v)];
     }, this.setOptions = function(v) {
       v = v.trim(), v.startsWith("#") && (v = v.substring(1).trim());
       const g = v.indexOf("=");
       let S = v.substring(g + 1).trim();
       S.indexOf("{") < 0 && (S = "{" + v + "}");
-      let E = "", i = Q(S, !0, !0, "");
+      let E = "", i = Z(S, !0, !0, "");
       for (let p in i) {
         let r = i[p];
         r.type == "identifier" && r.value != "true" && r.value != "false" && r.value != "null" ? E += '"' + r.value + '"' : E += r.value;
@@ -9336,38 +9352,38 @@ const Y = {
 `, v += `
 */`, this.ddl = v, v;
     }, this.getErrors = function() {
-      return this.errors != null ? this.errors : (this.errors = Be.findErrors(this, this.fullInput), this.errors);
+      return this.errors != null ? this.errors : (this.errors = Pe.findErrors(this, this.fullInput), this.errors);
     }, this.version = oe;
   }
   return D;
 }();
-function Pe(u, m) {
-  return Ae(u, m);
-}
 function ke(u, m) {
-  return new j(u, m).getERD();
+  return ye(u, m);
 }
 function Ee(u, m) {
-  return new j(u, m).getDDL();
+  return new j(u, m).getERD();
 }
 function Le(u, m) {
+  return new j(u, m).getDDL();
+}
+function Ne(u, m) {
   return new j(u, m).getErrors();
 }
 function oe() {
-  return "1.2.12";
+  return "1.2.13";
 }
 j.version = oe;
-j.toDDL = Ee;
-j.toERD = ke;
-j.toErrors = Le;
-j.fromJSON = Pe;
-j.lexer = Q;
+j.toDDL = Le;
+j.toERD = Ee;
+j.toErrors = Ne;
+j.fromJSON = ke;
+j.lexer = Z;
 export {
   j as default,
-  Pe as fromJSON,
+  ke as fromJSON,
   oe as qsql_version,
   j as quicksql,
-  Ee as toDDL,
-  ke as toERD,
-  Le as toErrors
+  Le as toDDL,
+  Ee as toERD,
+  Ne as toErrors
 };

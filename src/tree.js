@@ -1,4 +1,4 @@
-import {singular,concatNames,canonicalObjectName} from './naming.js';
+import {singular,concatNames,canonicalObjectName, getMajorVersion} from './naming.js';
 import translate from './translate.js';
 import {generateSample, resetSeed} from './sample.js';
 import lexer from './lexer.js';
@@ -340,7 +340,7 @@ let tree = (function(){
             } 
             const dbVer = ddl.getOptionValue('db');
             if( booleanCheck != '' && ( ddl.getOptionValue('boolean')=='native' 
-                                      || ddl.getOptionValue('boolean') != 'yn' && 0 < dbVer.length && dbVer.charAt(0) == '2' && dbVer.charAt(1) == '3' )
+                                      || ddl.getOptionValue('boolean') != 'yn' && 0 < dbVer.length && 23 <= getMajorVersion(dbVer) ) 
             ) {
                 booleanCheck = '';
                 ret = 'boolean';
@@ -1168,7 +1168,9 @@ let tree = (function(){
                 ret = ret.substring(0, ret.length-postfix.length).trim();           
             postfix =  'and\n';   
             if( 0 < ret.indexOf(postfix) && ret.indexOf(postfix) == ret.length-postfix.length )
-                ret = ret.substring(0, ret.length-postfix.length).trim();           
+                ret = ret.substring(0, ret.length-postfix.length).trim(); 
+            if( !ret.endsWith('/n') )
+                ret += '\n';         
             ret += '/\n'; 
             return ret.toLowerCase();
         };

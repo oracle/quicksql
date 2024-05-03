@@ -1,11 +1,9 @@
 import Chance from 'chance';
-//import lexer from './lexer.js';
+import lexer from './lexer.js';
 
 
 export function generateSample( lTable, lColumn, lType, values ) {
     var chance = new Chance(seed);
-    if( lType == null )
-        console.log();
     let type = lType.toUpperCase();
     let table = lTable.toUpperCase();
     let column = lColumn.toUpperCase();
@@ -57,7 +55,25 @@ export function generateSample( lTable, lColumn, lType, values ) {
     }
 
     if( column == 'DESCRIPTION') {
-        return '\''+chance.paragraph({sentences: 2})+'\'';
+        let descr = chance.paragraph({sentences: 2});
+        let tSrc = lexer(lType,false,true,'');
+        let len = 400
+        let pos = -1;
+        for( let i = 0; i < tSrc.length; i++ ) {
+            const t = tSrc[i].value;
+            if( t == '(' ) {
+                pos = i+1;
+                continue;
+            }
+            if( 0 < pos && t == ')' ) {
+                len = parseInt(tSrc[pos].value);
+                break;
+            }
+        }    
+
+        if( len < descr.length )
+            descr = descr.substring(0,len);
+        return '\''+descr+'\'';
     }
     
     if( column == 'JOB' ) {
@@ -78,6 +94,10 @@ export function generateSample( lTable, lColumn, lType, values ) {
         var offset = Math.floor(seededRandom() * (max - min)) + min;
         return 'sysdate-'+offset;
     }
+    if( type == 'BLOB' || type == 'LONG' ) {
+        return 'null';
+    }
+
     return '\'N/A\'';
 }
 

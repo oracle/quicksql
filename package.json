@@ -1,6 +1,6 @@
 {
   "name": "@oracle/quicksql",
-  "version": "1.2.12",
+  "version": "1.2.13",
   "description": "Quick SQL to DDL and ERD translator",
   "main": "./dist/quick-sql.umd.cjs",
   "module": "./dist/quick-sql.js",

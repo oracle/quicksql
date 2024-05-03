@@ -116,5 +116,11 @@ export function concatNames(chunk1, chunk2, chunk3) {
     return ret;
 }
 
+export function getMajorVersion( versionStr ) {
+    if( versionStr.length < 2 )
+        return null;
+    return parseInt(versionStr.substring(0,2));
+}
+
 
 export default {singular, canonicalObjectName, concatNames};
